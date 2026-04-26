@@ -40,6 +40,8 @@ import { missingSuccessFeedbackRule } from './definitions/ux/missing-success-fee
 import { missingMotionReduceRule } from './definitions/ux/missing-motion-reduce.js';
 import { formNotDisabledDuringSubmitRule } from './definitions/ux/form-not-disabled-during-submit.js';
 import { landmarkStructureRule } from './definitions/a11y/landmark-structure.js';
+import { primitiveObsessionRule } from './definitions/domain/primitive-obsession.js';
+import { missingPaginationRule } from './definitions/perf/missing-pagination.js';
 
 export const ALL_RULES: RuleDefinition[] = [
   manualChangeDetectionRule,
@@ -82,5 +84,7 @@ export const ALL_RULES: RuleDefinition[] = [
   formNotDisabledDuringSubmitRule,
   externalMutationRule,
   anemicEntityRule,
+  primitiveObsessionRule,
   landmarkStructureRule,
+  missingPaginationRule,
 ];
