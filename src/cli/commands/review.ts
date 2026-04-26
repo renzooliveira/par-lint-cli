@@ -3,7 +3,7 @@ import path from 'node:path';
 import { writeFile, mkdir } from 'node:fs/promises';
 import ora from 'ora';
 import { loadConfig } from '../../config/loader.js';
-import { scanFiles } from '../../discovery/scanner.js';
+import { scanFiles, getChangedFiles } from '../../discovery/scanner.js';
 import { categorizeFiles } from '../../discovery/categorizer.js';
 import { RuleRunner } from '../../engine/runner.js';
 import { loadState, saveState, reconcileFindings } from '../../engine/state.js';
@@ -24,6 +24,7 @@ export const reviewCommand = new Command('review')
   .option('--target <path>', 'Target project directory to analyze')
   .option('--category <cats>', 'Filter by category (comma-separated): state,perf,scss,arch,a11y,component,ionic,ux,domain')
   .option('--rule <ids>', 'Filter by rule ID (comma-separated)')
+  .option('--incremental [base]', 'Only analyze files changed since base ref (default: HEAD~1)')
   .action(async (options: {
     output: string;
     file?: string;
@@ -33,6 +34,7 @@ export const reviewCommand = new Command('review')
     target?: string;
     category?: string;
     rule?: string;
+    incremental?: string | true;
   }) => {
     const cwd = options.target ? path.resolve(options.target) : process.cwd();
     const spinner = ora('Loading configuration...').start();
@@ -44,7 +46,16 @@ export const reviewCommand = new Command('review')
         : 'Using default configuration';
 
       spinner.text = 'Scanning files...';
-      const files = options.file ? [options.file] : await scanFiles({ cwd });
+      let files: string[];
+      if (options.file) {
+        files = [options.file];
+      } else if (options.incremental !== undefined) {
+        const baseRef = typeof options.incremental === 'string' ? options.incremental : 'HEAD~1';
+        files = getChangedFiles(cwd, baseRef);
+        spinner.text = `Incremental: ${files.length} changed files (base: ${baseRef})`;
+      } else {
+        files = await scanFiles({ cwd });
+      }
       const categorized = categorizeFiles(files);
       spinner.text = `Found ${categorized.length} files`;
 
