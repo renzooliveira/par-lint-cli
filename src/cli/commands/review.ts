@@ -23,6 +23,7 @@ export const reviewCommand = new Command('review')
   .option('--dry-run', 'Run analysis without writing state')
   .option('--target <path>', 'Target project directory to analyze')
   .option('--category <cats>', 'Filter by category (comma-separated): state,perf,scss,arch,a11y,component,ionic,ux,domain')
+  .option('--rule <ids>', 'Filter by rule ID (comma-separated)')
   .action(async (options: {
     output: string;
     file?: string;
@@ -31,6 +32,7 @@ export const reviewCommand = new Command('review')
     dryRun: boolean;
     target?: string;
     category?: string;
+    rule?: string;
   }) => {
     const cwd = options.target ? path.resolve(options.target) : process.cwd();
     const spinner = ora('Loading configuration...').start();
@@ -42,7 +44,7 @@ export const reviewCommand = new Command('review')
         : 'Using default configuration';
 
       spinner.text = 'Scanning files...';
-      const files = await scanFiles({ cwd });
+      const files = options.file ? [options.file] : await scanFiles({ cwd });
       const categorized = categorizeFiles(files);
       spinner.text = `Found ${categorized.length} files`;
 
@@ -61,9 +63,11 @@ export const reviewCommand = new Command('review')
 
       const suppressed = await applySuppressions(reconciledFindings, config, cwd);
       const categoryFilter = options.category ? new Set(options.category.split(',').map((c) => c.trim())) : null;
+      const ruleFilter = options.rule ? new Set(options.rule.split(',').map((r) => r.trim())) : null;
       report.findings = suppressed
         .filter((f) => (SEVERITY_RANK[f.severity] ?? 0) >= minRank)
-        .filter((f) => !categoryFilter || categoryFilter.has(f.category));
+        .filter((f) => !categoryFilter || categoryFilter.has(f.category))
+        .filter((f) => !ruleFilter || ruleFilter.has(f.rule_id));
 
       report.summary.total_findings = report.findings.length;
       report.summary.by_severity = {};
