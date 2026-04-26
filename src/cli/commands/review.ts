@@ -8,6 +8,7 @@ import { categorizeFiles } from '../../discovery/categorizer.js';
 import { RuleRunner } from '../../engine/runner.js';
 import { loadState, saveState, reconcileFindings } from '../../engine/state.js';
 import { applySuppressions } from '../../engine/suppression.js';
+import { FileCache, hashFile } from '../../engine/cache.js';
 import { formatJson } from '../formatters/json.js';
 import { formatConsole } from '../formatters/console.js';
 import { formatSarif } from '../formatters/sarif.js';
@@ -25,6 +26,7 @@ export const reviewCommand = new Command('review')
   .option('--category <cats>', 'Filter by category (comma-separated): state,perf,scss,arch,a11y,component,ionic,ux,domain')
   .option('--rule <ids>', 'Filter by rule ID (comma-separated)')
   .option('--incremental [base]', 'Only analyze files changed since base ref (default: HEAD~1)')
+  .option('--no-cache', 'Disable file hash caching')
   .action(async (options: {
     output: string;
     file?: string;
@@ -35,6 +37,7 @@ export const reviewCommand = new Command('review')
     category?: string;
     rule?: string;
     incremental?: string | true;
+    cache: boolean;
   }) => {
     const cwd = options.target ? path.resolve(options.target) : process.cwd();
     const spinner = ora('Loading configuration...').start();
@@ -63,7 +66,17 @@ export const reviewCommand = new Command('review')
       const runner = new RuleRunner();
       runner.registerMany(ALL_RULES);
 
-      const report = await runner.runAll(categorized, config, cwd);
+      let cache: FileCache | undefined;
+      if (options.cache && config.performance.cache_enabled) {
+        const cachePath = path.resolve(cwd, '.par-lint/cache.json');
+        cache = new FileCache(cachePath);
+        await cache.load();
+      }
+
+      const report = await runner.runAll(categorized, config, cwd, cache ? {
+        cache,
+        hashFn: (filePath) => hashFile(path.resolve(cwd, filePath)),
+      } : undefined);
 
       const statePath = path.resolve(cwd, config.output.state_path);
       const previousState = await loadState(statePath);
@@ -96,6 +109,7 @@ export const reviewCommand = new Command('review')
 
       if (!options.dryRun) {
         await saveState(statePath, report.findings);
+        if (cache) await cache.save();
       }
 
       spinner.stop();
