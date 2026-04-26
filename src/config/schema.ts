@@ -15,6 +15,7 @@ const layerRuleSchema = z.object({
 const ruleConfigSchema = z.looseObject({
   enabled: z.boolean().default(true),
   severity: z.enum(['info', 'warning', 'error']).optional(),
+  exclude: z.array(z.string()).optional(),
 });
 
 const suppressionPolicySchema = z.object({

@@ -41,9 +41,14 @@ export class RuleRunner {
     const findings: Finding[] = [];
 
     for (const rule of applicable) {
+      const ruleConfig = config.rules[rule.id];
+
+      if (ruleConfig?.exclude?.length) {
+        if (matchesAnyGlob(file.path, ruleConfig.exclude)) continue;
+      }
+
       const ruleFindings = await rule.run(file, config, cwd);
 
-      const ruleConfig = config.rules[rule.id];
       for (const finding of ruleFindings) {
         if (ruleConfig?.severity) {
           finding.severity = ruleConfig.severity;
@@ -132,4 +137,19 @@ function countBy<T>(items: T[], keyFn: (item: T) => string): Record<string, numb
     result[key] = (result[key] ?? 0) + 1;
   }
   return result;
+}
+
+function globToRegex(glob: string): RegExp {
+  const escaped = glob
+    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+    .replace(/\*\*/g, '§DOUBLESTAR§')
+    .replace(/\*/g, '[^/]*')
+    .replace(/§DOUBLESTAR§/g, '.*')
+    .replace(/\?/g, '[^/]');
+  return new RegExp(`^${escaped}$`);
+}
+
+function matchesAnyGlob(filePath: string, globs: string[]): boolean {
+  const normalized = filePath.replace(/\\/g, '/');
+  return globs.some((glob) => globToRegex(glob).test(normalized));
 }

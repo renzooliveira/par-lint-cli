@@ -13,6 +13,7 @@ export interface LayerRule {
 export interface RuleConfig {
   enabled: boolean;
   severity?: 'info' | 'warning' | 'error';
+  exclude?: string[];
   [key: string]: unknown;
 }
 
