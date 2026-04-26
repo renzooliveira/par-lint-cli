@@ -11,6 +11,8 @@ export const missingSuccessFeedbackRule: RuleDefinition = {
   version: '1.0.0',
   category: 'ux',
   severity: 'warning',
+  description: 'Detects mutation handlers (POST/PUT/DELETE) without success feedback',
+  principle: 'Confirmed mutations must communicate success to the user',
   applicable_to: ['is_typescript'],
 
   async run(file, _config, cwd) {

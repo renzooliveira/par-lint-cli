@@ -7,6 +7,8 @@ export const scssFileTooLongRule: RuleDefinition = {
   version: '1.0.0',
   category: 'scss',
   severity: 'error',
+  description: 'Detects SCSS files exceeding maximum line count',
+  principle: 'Large style files indicate missing component decomposition',
   applicable_to: ['is_scss', 'is_style'],
 
   async run(file, config, cwd) {

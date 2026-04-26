@@ -15,6 +15,8 @@ export const subscribeWithoutCleanupRule: RuleDefinition = {
   version: '1.0.0',
   category: 'state',
   severity: 'error',
+  description: 'Detects .subscribe() in components without cleanup (takeUntilDestroyed, unsubscribe)',
+  principle: 'Every subscription must have explicit cleanup to prevent memory leaks',
   applicable_to: ['is_component', 'is_page'],
 
   async run(file, _config, cwd) {

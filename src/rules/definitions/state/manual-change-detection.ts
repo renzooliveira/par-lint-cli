@@ -7,6 +7,8 @@ export const manualChangeDetectionRule: RuleDefinition = {
   version: '1.0.0',
   category: 'state',
   severity: 'warning',
+  description: 'Detects manual ChangeDetectorRef calls indicating broken state model',
+  principle: 'Manual change detection indicates broken state model — prefer signals/computed',
   applicable_to: ['is_component', 'is_typescript'],
 
   async run(file, _config, cwd) {

@@ -10,6 +10,8 @@ export const externalMutationRule: RuleDefinition = {
   version: '1.0.0',
   category: 'domain',
   severity: 'error',
+  description: 'Detects direct property assignment on objects from outside their class',
+  principle: 'Tell-Don\'t-Ask — state changes only via methods that express intent',
   applicable_to: ['is_typescript'],
 
   async run(file, config, cwd) {

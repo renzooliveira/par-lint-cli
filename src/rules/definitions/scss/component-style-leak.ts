@@ -9,6 +9,8 @@ export const componentStyleLeakRule: RuleDefinition = {
   version: '1.0.0',
   category: 'scss',
   severity: 'warning',
+  description: 'Detects ::ng-deep usage that leaks component styles globally',
+  principle: 'Component styles must not leak to other components',
   applicable_to: ['is_scss', 'is_style'],
 
   async run(file, _config, cwd) {

@@ -8,6 +8,8 @@ export const longFunctionRule: RuleDefinition = {
   version: '1.0.0',
   category: 'perf',
   severity: 'warning',
+  description: 'Detects functions exceeding maximum line count',
+  principle: 'Long functions accumulate responsibilities — extract smaller focused functions',
   applicable_to: ['is_typescript'],
 
   async run(file, config, cwd) {

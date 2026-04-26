@@ -10,6 +10,8 @@ export const missingOnPushRule: RuleDefinition = {
   version: '1.0.0',
   category: 'component',
   severity: 'warning',
+  description: 'Detects Angular components without OnPush change detection strategy',
+  principle: 'Components should use OnPush for predictable and performant change detection',
   applicable_to: ['is_component'],
 
   async run(file, _config, cwd) {

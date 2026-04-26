@@ -10,6 +10,8 @@ export const missingMotionReduceRule: RuleDefinition = {
   version: '1.0.0',
   category: 'ux',
   severity: 'warning',
+  description: 'Detects CSS animations/transitions without prefers-reduced-motion media query',
+  principle: 'Accessibility requires respecting user motion preferences',
   applicable_to: ['is_scss', 'is_style'],
 
   async run(file, _config, cwd) {

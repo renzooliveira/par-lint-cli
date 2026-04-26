@@ -23,6 +23,8 @@ export const externalSignalMutationRule: RuleDefinition = {
   version: '1.1.0',
   category: 'state',
   severity: 'error',
+  description: 'Detects signal.set()/update() calls outside the declaring class',
+  principle: 'Signal is encapsulated by the class that declares it',
   applicable_to: ['is_typescript'],
 
   async run(file, config, cwd) {

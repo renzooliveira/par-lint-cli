@@ -10,6 +10,8 @@ export const missingErrorStateRule: RuleDefinition = {
   version: '1.0.0',
   category: 'ux',
   severity: 'error',
+  description: 'Detects async pipe usage in templates without error state handling',
+  principle: 'Async operation failures must be shown to the user, not silently ignored',
   applicable_to: ['is_template'],
 
   async run(file, _config, cwd) {

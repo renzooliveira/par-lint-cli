@@ -19,6 +19,8 @@ export const formNotDisabledDuringSubmitRule: RuleDefinition = {
   version: '1.0.0',
   category: 'ux',
   severity: 'warning',
+  description: 'Detects form submit handlers without disabling the form/button during submission',
+  principle: 'Forms in submission must prevent double-submit',
   applicable_to: ['is_template'],
 
   async run(file, _config, cwd) {

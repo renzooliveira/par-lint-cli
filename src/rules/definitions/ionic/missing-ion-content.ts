@@ -7,6 +7,8 @@ export const missingIonContentRule: RuleDefinition = {
   version: '1.0.0',
   category: 'ionic',
   severity: 'warning',
+  description: 'Detects Ionic page templates missing <ion-content> wrapper',
+  principle: 'Ionic pages must wrap content in <ion-content> for proper scrolling and layout',
   applicable_to: ['is_template'],
 
   async run(file, _config, cwd) {

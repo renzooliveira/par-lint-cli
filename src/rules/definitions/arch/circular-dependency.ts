@@ -9,6 +9,8 @@ export const circularDependencyRule: RuleDefinition = {
   version: '1.0.0',
   category: 'arch',
   severity: 'error',
+  description: 'Detects circular import cycles between modules',
+  principle: 'Dependencies must form a directed acyclic graph (DAG)',
   applicable_to: ['is_typescript'],
 
   async run(file, _config, cwd) {

@@ -13,6 +13,8 @@ export const heavyComputationInRenderRule: RuleDefinition = {
   version: '1.0.0',
   category: 'perf',
   severity: 'warning',
+  description: 'Detects function calls in template interpolations without pure pipe or computed()',
+  principle: 'Template rendering must not execute heavy computation on every change detection cycle',
   applicable_to: ['is_template', 'is_html'],
 
   async run(file, _config, cwd) {

@@ -7,6 +7,8 @@ export const godFileRule: RuleDefinition = {
   version: '1.0.0',
   category: 'arch',
   severity: 'warning',
+  description: 'Detects files with excessive LOC, methods or exports',
+  principle: 'A single file must not accumulate multiple responsibilities',
   applicable_to: ['is_typescript'],
 
   async run(file, config, cwd) {

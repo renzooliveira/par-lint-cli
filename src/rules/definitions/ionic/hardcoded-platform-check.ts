@@ -9,6 +9,8 @@ export const hardcodedPlatformCheckRule: RuleDefinition = {
   version: '1.0.0',
   category: 'ionic',
   severity: 'warning',
+  description: 'Detects hardcoded Platform.is() checks instead of abstraction',
+  principle: 'Platform-specific logic should be abstracted for testability and portability',
   applicable_to: ['is_typescript'],
 
   async run(file, _config, cwd) {

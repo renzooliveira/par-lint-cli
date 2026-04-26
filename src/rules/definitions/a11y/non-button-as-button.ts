@@ -7,6 +7,8 @@ export const nonButtonAsButtonRule: RuleDefinition = {
   version: '1.0.0',
   category: 'a11y',
   severity: 'error',
+  description: 'Detects div/span with click handler missing role="button" and keyboard support',
+  principle: 'Clickable elements must be <button> or have proper ARIA role and keyboard handling',
   applicable_to: ['is_html', 'is_template'],
 
   async run(file, _config, cwd) {

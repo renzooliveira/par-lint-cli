@@ -8,6 +8,8 @@ export const highCyclomaticComplexityRule: RuleDefinition = {
   version: '1.0.0',
   category: 'perf',
   severity: 'warning',
+  description: 'Detects functions with cyclomatic complexity above threshold',
+  principle: 'High cyclomatic complexity makes code hard to test and maintain',
   applicable_to: ['is_typescript'],
 
   async run(file, config, cwd) {

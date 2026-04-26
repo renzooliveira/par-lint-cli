@@ -7,6 +7,8 @@ export const hardcodedSpacingRule: RuleDefinition = {
   version: '1.0.0',
   category: 'scss',
   severity: 'warning',
+  description: 'Detects literal spacing values instead of design tokens',
+  principle: 'Spacings must come from design tokens for visual consistency',
   applicable_to: ['is_scss', 'is_style'],
 
   async run(file, _config, cwd) {

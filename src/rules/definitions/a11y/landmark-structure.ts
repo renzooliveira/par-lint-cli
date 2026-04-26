@@ -9,6 +9,8 @@ export const landmarkStructureRule: RuleDefinition = {
   version: '1.0.0',
   category: 'a11y',
   severity: 'warning',
+  description: 'Detects pages missing landmark elements (main, nav, header)',
+  principle: 'Pages must have proper landmark structure for assistive technology navigation',
   applicable_to: ['is_page'],
 
   async run(file, _config, cwd) {

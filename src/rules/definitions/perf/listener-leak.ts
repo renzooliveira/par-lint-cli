@@ -10,6 +10,8 @@ export const listenerLeakRule: RuleDefinition = {
   version: '1.0.0',
   category: 'perf',
   severity: 'error',
+  description: 'Detects addEventListener/subscribe without matching cleanup',
+  principle: 'Every registered listener must be removed to prevent memory leaks',
   applicable_to: ['is_typescript'],
 
   async run(file, _config, cwd) {

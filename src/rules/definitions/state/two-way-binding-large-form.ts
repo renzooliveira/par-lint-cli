@@ -10,6 +10,8 @@ export const twoWayBindingLargeFormRule: RuleDefinition = {
   version: '1.0.0',
   category: 'state',
   severity: 'warning',
+  description: 'Detects templates with too many [(ngModel)] bindings instead of Reactive Forms',
+  principle: 'Large forms should use Reactive Forms for better control and validation',
   applicable_to: ['is_template', 'is_html'],
 
   async run(file, config, cwd) {

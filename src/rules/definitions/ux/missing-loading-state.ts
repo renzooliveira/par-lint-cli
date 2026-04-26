@@ -10,6 +10,8 @@ export const missingLoadingStateRule: RuleDefinition = {
   version: '1.0.0',
   category: 'ux',
   severity: 'warning',
+  description: 'Detects async operations in templates without loading indicator',
+  principle: 'Async operations must show visual progress feedback to the user',
   applicable_to: ['is_template'],
 
   async run(file, _config, cwd) {

@@ -11,6 +11,8 @@ export const missingPaginationRule: RuleDefinition = {
   version: '1.0.0',
   category: 'perf',
   severity: 'warning',
+  description: 'Detects collection endpoints without pagination parameters',
+  principle: 'Public endpoints returning collections must support pagination',
   applicable_to: ['is_service', 'is_typescript'],
 
   async run(file, _config, cwd) {

@@ -7,6 +7,8 @@ export const excessiveInputOutputRule: RuleDefinition = {
   version: '1.0.0',
   category: 'component',
   severity: 'info',
+  description: 'Detects components with too many @Input/@Output declarations',
+  principle: 'Large component surface area indicates multiple responsibilities',
   applicable_to: ['is_component', 'is_typescript'],
 
   async run(file, config, cwd) {

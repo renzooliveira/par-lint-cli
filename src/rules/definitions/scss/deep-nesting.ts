@@ -7,6 +7,8 @@ export const deepNestingRule: RuleDefinition = {
   version: '1.0.0',
   category: 'scss',
   severity: 'warning',
+  description: 'Detects SCSS selectors nested deeper than threshold',
+  principle: 'Deep nesting produces fragile selectors coupled to DOM structure',
   applicable_to: ['is_scss', 'is_style'],
 
   async run(file, config, cwd) {

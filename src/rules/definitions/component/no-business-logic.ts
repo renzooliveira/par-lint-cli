@@ -10,6 +10,8 @@ export const noBusinessLogicRule: RuleDefinition = {
   version: '1.0.0',
   category: 'component',
   severity: 'warning',
+  description: 'Detects business logic (complex conditionals) in presentational components',
+  principle: 'Presentational components orchestrate, they do not decide business rules',
   applicable_to: ['is_component'],
 
   async run(file, config, cwd) {

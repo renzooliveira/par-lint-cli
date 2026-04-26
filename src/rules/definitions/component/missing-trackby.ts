@@ -9,6 +9,8 @@ export const missingTrackByRule: RuleDefinition = {
   version: '1.0.0',
   category: 'component',
   severity: 'warning',
+  description: 'Detects *ngFor without trackBy function',
+  principle: 'Lists must use trackBy to avoid unnecessary DOM re-renders',
   applicable_to: ['is_template', 'is_html'],
 
   async run(file, _config, cwd) {

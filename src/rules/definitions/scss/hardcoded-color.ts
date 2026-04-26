@@ -7,6 +7,8 @@ export const hardcodedColorRule: RuleDefinition = {
   version: '1.0.0',
   category: 'scss',
   severity: 'warning',
+  description: 'Detects literal color values instead of design tokens',
+  principle: 'Colors must come from design tokens for consistency and theming',
   applicable_to: ['is_scss', 'is_style'],
 
   async run(file, _config, cwd) {

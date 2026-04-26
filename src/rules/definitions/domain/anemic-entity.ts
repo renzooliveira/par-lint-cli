@@ -11,6 +11,8 @@ export const anemicEntityRule: RuleDefinition = {
   version: '1.0.0',
   category: 'domain',
   severity: 'warning',
+  description: 'Detects entities with many properties but few methods (data bags)',
+  principle: 'Rich entities encapsulate behavior, not just data',
   applicable_to: ['is_entity', 'is_model'],
 
   async run(file, config, cwd) {

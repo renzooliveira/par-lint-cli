@@ -7,6 +7,8 @@ export const layerViolationRule: RuleDefinition = {
   version: '1.0.0',
   category: 'arch',
   severity: 'error',
+  description: 'Detects imports crossing configured layer boundaries',
+  principle: 'Lower layers must not know about upper layers',
   applicable_to: ['is_typescript'],
 
   async run(file, _config, cwd) {

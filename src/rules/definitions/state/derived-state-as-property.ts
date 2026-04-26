@@ -10,6 +10,8 @@ export const derivedStateAsPropertyRule: RuleDefinition = {
   version: '1.0.0',
   category: 'state',
   severity: 'warning',
+  description: 'Detects derived state assigned in ngOnInit instead of using computed()',
+  principle: 'Derived state should be computed, not manually synchronized in lifecycle hooks',
   applicable_to: ['is_component'],
 
   async run(file, config, cwd) {

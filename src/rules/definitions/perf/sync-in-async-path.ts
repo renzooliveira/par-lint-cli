@@ -13,6 +13,8 @@ export const syncInAsyncPathRule: RuleDefinition = {
   version: '1.0.0',
   category: 'perf',
   severity: 'error',
+  description: 'Detects synchronous blocking calls in async context',
+  principle: 'Async paths must not block — avoid .Result, .Wait(), synchronous subscribe',
   applicable_to: ['is_typescript'],
 
   async run(file, _config, cwd) {

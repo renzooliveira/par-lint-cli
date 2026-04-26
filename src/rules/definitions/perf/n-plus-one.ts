@@ -10,6 +10,8 @@ export const nPlusOneRule: RuleDefinition = {
   version: '1.0.0',
   category: 'perf',
   severity: 'error',
+  description: 'Detects HTTP/repository calls inside loops (N+1 pattern)',
+  principle: 'External resource access inside a loop is an anti-pattern — batch the request',
   applicable_to: ['is_typescript'],
 
   async run(file, _config, cwd) {

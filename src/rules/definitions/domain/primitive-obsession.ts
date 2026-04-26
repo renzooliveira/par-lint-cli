@@ -11,6 +11,8 @@ export const primitiveObsessionRule: RuleDefinition = {
   version: '1.0.0',
   category: 'domain',
   severity: 'info',
+  description: 'Detects methods with too many primitive parameters instead of value objects',
+  principle: 'Domain concepts deserve dedicated types, not naked primitives',
   applicable_to: ['is_typescript', 'is_service', 'is_component'],
 
   async run(file, _config, cwd) {

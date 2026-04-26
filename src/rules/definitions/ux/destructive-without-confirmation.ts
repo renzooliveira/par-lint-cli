@@ -10,6 +10,8 @@ export const destructiveWithoutConfirmationRule: RuleDefinition = {
   version: '1.0.0',
   category: 'ux',
   severity: 'error',
+  description: 'Detects delete/remove/destroy handlers without confirmation dialog',
+  principle: 'Destructive actions require explicit user confirmation before execution',
   applicable_to: ['is_typescript'],
 
   async run(file, _config, cwd) {

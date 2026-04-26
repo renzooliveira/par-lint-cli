@@ -7,6 +7,8 @@ export const missingAltRule: RuleDefinition = {
   version: '1.0.0',
   category: 'a11y',
   severity: 'error',
+  description: 'Detects <img> elements without alt attribute',
+  principle: 'Informative images must have alternative text for screen readers',
   applicable_to: ['is_html', 'is_template'],
 
   async run(file, _config, cwd) {

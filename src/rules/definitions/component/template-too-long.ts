@@ -8,6 +8,8 @@ export const templateTooLongRule: RuleDefinition = {
   version: '1.0.0',
   category: 'component',
   severity: 'warning',
+  description: 'Detects HTML templates exceeding maximum line count',
+  principle: 'Long templates indicate the component should be decomposed',
   applicable_to: ['is_template', 'is_html'],
 
   async run(file, config, cwd) {

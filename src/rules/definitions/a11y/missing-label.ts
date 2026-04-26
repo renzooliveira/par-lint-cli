@@ -7,6 +7,8 @@ export const missingLabelRule: RuleDefinition = {
   version: '1.0.0',
   category: 'a11y',
   severity: 'error',
+  description: 'Detects <input> elements without associated label or aria-label',
+  principle: 'Every form input must have an accessible label',
   applicable_to: ['is_html', 'is_template'],
 
   async run(file, _config, cwd) {

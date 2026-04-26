@@ -9,6 +9,8 @@ export const noExplicitAnyRule: RuleDefinition = {
   version: '1.0.0',
   category: 'component',
   severity: 'warning',
+  description: 'Detects explicit "any" type annotations',
+  principle: 'Explicit any bypasses type safety — use specific types or unknown',
   applicable_to: ['is_typescript'],
 
   async run(file, config, cwd) {

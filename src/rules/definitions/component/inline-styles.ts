@@ -9,6 +9,8 @@ export const inlineStylesRule: RuleDefinition = {
   version: '1.0.0',
   category: 'component',
   severity: 'warning',
+  description: 'Detects inline style attributes in HTML templates',
+  principle: 'Styles belong in SCSS files, not inline in templates',
   applicable_to: ['is_template', 'is_html'],
 
   async run(file, _config, cwd) {

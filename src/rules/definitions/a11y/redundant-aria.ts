@@ -24,6 +24,8 @@ export const redundantAriaRule: RuleDefinition = {
   version: '1.0.0',
   category: 'a11y',
   severity: 'warning',
+  description: 'Detects ARIA roles that duplicate native element semantics',
+  principle: 'ARIA should not duplicate semantics already provided by native HTML elements',
   applicable_to: ['is_template', 'is_html'],
 
   async run(file, _config, cwd) {
