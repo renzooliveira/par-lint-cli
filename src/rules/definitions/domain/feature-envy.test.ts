@@ -14,10 +14,11 @@ const config = parLintConfigSchema.parse({ project: { name: 'test' } });
 const file: CategorizedFile = { path: 'src/app/order.service.ts', tags: ['is_typescript'] };
 
 describe('domain/feature-envy', () => {
-  it('detects method accessing many props of another object', async () => {
+  it('detects method accessing many props of a local variable (not a parameter)', async () => {
     mockedRead.mockResolvedValue(`
 class OrderService {
-  process(customer: Customer) {
+  process() {
+    const customer = getCustomer();
     const name = customer.name;
     const email = customer.email;
     const phone = customer.phone;
@@ -51,6 +52,48 @@ class OrderService {
     this.email;
     this.phone;
     this.address;
+  }
+}
+`);
+    const findings = await featureEnvyRule.run(file, config, '/tmp');
+    expect(findings).toHaveLength(0);
+  });
+
+  it('ignores function parameters (destructuring target)', async () => {
+    mockedRead.mockResolvedValue(`
+function mapResponse(res: ApiResponse) {
+  return {
+    id: res.id,
+    name: res.name,
+    email: res.email,
+    phone: res.phone,
+    status: res.status,
+  };
+}
+`);
+    const findings = await featureEnvyRule.run(file, config, '/tmp');
+    expect(findings).toHaveLength(0);
+  });
+
+  it('ignores mapper files', async () => {
+    const mapperFile: CategorizedFile = { path: 'src/data-access/tasks.mapper.ts', tags: ['is_typescript'] };
+    mockedRead.mockResolvedValue(`
+export function toTask(res: TaskResponse) {
+  return { id: res.id, name: res.name, status: res.status, date: res.date };
+}
+`);
+    const findings = await featureEnvyRule.run(mapperFile, config, '/tmp');
+    expect(findings).toHaveLength(0);
+  });
+
+  it('scopes access counting per function', async () => {
+    mockedRead.mockResolvedValue(`
+class Service {
+  methodA(a: A) {
+    return a.x + a.y;
+  }
+  methodB(b: B) {
+    return b.x + b.y;
   }
 }
 `);
