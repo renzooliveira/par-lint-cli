@@ -38,6 +38,8 @@ import { derivedStateAsPropertyRule } from './definitions/state/derived-state-as
 import { componentStyleLeakRule } from './definitions/scss/component-style-leak.js';
 import { missingSuccessFeedbackRule } from './definitions/ux/missing-success-feedback.js';
 import { missingMotionReduceRule } from './definitions/ux/missing-motion-reduce.js';
+import { formNotDisabledDuringSubmitRule } from './definitions/ux/form-not-disabled-during-submit.js';
+import { landmarkStructureRule } from './definitions/a11y/landmark-structure.js';
 
 export const ALL_RULES: RuleDefinition[] = [
   manualChangeDetectionRule,
@@ -77,6 +79,8 @@ export const ALL_RULES: RuleDefinition[] = [
   missingSuccessFeedbackRule,
   destructiveWithoutConfirmationRule,
   missingMotionReduceRule,
+  formNotDisabledDuringSubmitRule,
   externalMutationRule,
   anemicEntityRule,
+  landmarkStructureRule,
 ];
