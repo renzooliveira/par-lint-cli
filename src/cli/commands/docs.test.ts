@@ -3,8 +3,8 @@ import { generateRuleCatalog } from './docs.js';
 
 describe('generateRuleCatalog', () => {
   const fakeRules = [
-    { id: 'b-rule', category: 'perf', severity: 'warning', version: '1.0', applicable_to: ['ts'] },
-    { id: 'a-rule', category: 'perf', severity: 'error', version: '1.0', applicable_to: ['html'] },
+    { id: 'b-rule', category: 'perf', severity: 'warning', version: '1.0', applicable_to: ['ts'], description: 'Perf issue B' },
+    { id: 'a-rule', category: 'perf', severity: 'error', version: '1.0', applicable_to: ['html'], description: 'Perf issue A' },
     { id: 'c-rule', category: 'a11y', severity: 'info', version: '1.0', applicable_to: [] },
   ] as any[];
 
@@ -32,10 +32,10 @@ describe('generateRuleCatalog', () => {
     expect(aIdx).toBeLessThan(bIdx);
   });
 
-  it('contains table headers', () => {
+  it('contains table headers with description', () => {
     const md = generateRuleCatalog(fakeRules);
     expect(md).toContain('| Rule ID');
-    expect(md).toContain('| Severity');
+    expect(md).toContain('| Description');
   });
 
   it('contains rule data in table rows', () => {
@@ -43,5 +43,11 @@ describe('generateRuleCatalog', () => {
     expect(md).toContain('| a-rule');
     expect(md).toContain('| error');
     expect(md).toContain('| html');
+  });
+
+  it('includes description when available', () => {
+    const md = generateRuleCatalog(fakeRules);
+    expect(md).toContain('Perf issue A');
+    expect(md).toContain('Perf issue B');
   });
 });

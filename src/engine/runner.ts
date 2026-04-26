@@ -10,6 +10,8 @@ export interface RuleDefinition {
   version: string;
   category: string;
   severity: 'info' | 'warning' | 'error';
+  description?: string;
+  principle?: string;
   applicable_to: string[];
   run(file: CategorizedFile, config: ParLintConfig, cwd: string): Promise<Finding[]>;
 }

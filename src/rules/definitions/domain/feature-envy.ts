@@ -10,6 +10,8 @@ export const featureEnvyRule: RuleDefinition = {
   version: '1.0.0',
   category: 'domain',
   severity: 'warning',
+  description: 'Method accesses too many properties of another object',
+  principle: 'A method that uses more data from another class belongs in that class',
   applicable_to: ['is_typescript'],
 
   async run(file, config, cwd) {

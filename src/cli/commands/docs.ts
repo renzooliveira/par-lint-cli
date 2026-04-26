@@ -19,11 +19,12 @@ export function generateRuleCatalog(rules: RuleDefinition[]): string {
   for (const [category, catRules] of Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b))) {
     lines.push(`## ${category}`);
     lines.push('');
-    lines.push('| Rule ID | Severity | Applicable To |');
-    lines.push('|---------|----------|---------------|');
+    lines.push('| Rule ID | Severity | Description | Applicable To |');
+    lines.push('|---------|----------|-------------|---------------|');
     for (const rule of catRules.sort((a, b) => a.id.localeCompare(b.id))) {
       const tags = rule.applicable_to.length > 0 ? rule.applicable_to.join(', ') : 'all';
-      lines.push(`| ${rule.id} | ${rule.severity} | ${tags} |`);
+      const desc = rule.description ?? '';
+      lines.push(`| ${rule.id} | ${rule.severity} | ${desc} | ${tags} |`);
     }
     lines.push('');
   }

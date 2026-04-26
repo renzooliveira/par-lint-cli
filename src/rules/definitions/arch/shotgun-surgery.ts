@@ -7,6 +7,8 @@ export const shotgunSurgeryRule: RuleDefinition = {
   version: '1.0.0',
   category: 'arch',
   severity: 'info',
+  description: 'File co-changes frequently with many others in git history',
+  principle: 'Frequent cascading changes indicate wrong cohesion boundaries',
   applicable_to: ['is_typescript'],
 
   async run(file, config, cwd) {

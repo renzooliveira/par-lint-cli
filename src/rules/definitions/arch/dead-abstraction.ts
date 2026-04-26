@@ -10,6 +10,8 @@ export const deadAbstractionRule: RuleDefinition = {
   version: '1.0.0',
   category: 'arch',
   severity: 'info',
+  description: 'Exported type/interface with no consumers outside its file',
+  principle: 'Abstractions exist to serve consumers',
   applicable_to: ['is_typescript'],
 
   async run(file, _config, cwd) {

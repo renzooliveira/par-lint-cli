@@ -10,6 +10,8 @@ export const inappropriateIntimacyRule: RuleDefinition = {
   version: '1.0.0',
   category: 'domain',
   severity: 'warning',
+  description: 'Two classes reference each other in excessive depth',
+  principle: 'Classes should not know each other in excessive depth',
   applicable_to: ['is_typescript'],
 
   async run(file, config, cwd) {
