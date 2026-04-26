@@ -38,6 +38,8 @@ export function formatConsole(report: Report): string {
     return lines.join('\n');
   }
 
+  lines.push(...formatTopOffenders(report.findings));
+
   const grouped = groupBy(report.findings, (f) => f.category);
 
   for (const [category, findings] of Object.entries(grouped)) {
@@ -58,6 +60,34 @@ export function formatConsole(report: Report): string {
   lines.push('');
 
   return lines.join('\n');
+}
+
+function formatTopOffenders(findings: Finding[]): string[] {
+  const byFile = groupBy(findings, (f) => f.file);
+  const scored = Object.entries(byFile).map(([file, fileFnds]) => {
+    const errors = fileFnds.filter((f) => f.severity === 'error').length;
+    const warnings = fileFnds.filter((f) => f.severity === 'warning').length;
+    const score = errors * 10 + warnings;
+    return { file, total: fileFnds.length, errors, warnings, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  const top = scored.slice(0, 10);
+
+  if (top.length === 0) return [];
+
+  const lines: string[] = [];
+  lines.push(chalk.bold.underline('  Top Offenders'));
+  for (let i = 0; i < top.length; i++) {
+    const { file, total, errors, warnings, score } = top[i]!;
+    const parts: string[] = [];
+    if (errors) parts.push(chalk.red(`${errors} errors`));
+    if (warnings) parts.push(chalk.yellow(`${warnings} warnings`));
+    lines.push(`  ${chalk.dim(`${i + 1}.`)} ${file} — ${total} findings (${parts.join(', ')}) ${chalk.dim(`[score: ${score}]`)}`);
+  }
+  lines.push('');
+
+  return lines;
 }
 
 function groupBy<T>(items: T[], keyFn: (item: T) => string): Record<string, T[]> {

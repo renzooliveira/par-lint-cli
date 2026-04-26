@@ -13,11 +13,16 @@ export const godFileRule: RuleDefinition = {
     const opts = config.rules['arch/god-file']?.options as {
       maxLines?: number;
       maxFunctions?: number;
+      maxFunctionsService?: number;
+      maxFunctionsComponent?: number;
       maxExports?: number;
     } | undefined;
 
     const maxLines = opts?.maxLines ?? 400;
-    const maxFunctions = opts?.maxFunctions ?? 20;
+    const isService = file.tags.includes('is_service');
+    const isComponent = file.tags.includes('is_component');
+    const maxFunctions = (isService ? opts?.maxFunctionsService : isComponent ? opts?.maxFunctionsComponent : undefined)
+      ?? opts?.maxFunctions ?? (isService ? 25 : isComponent ? 15 : 20);
     const maxExports = opts?.maxExports ?? 15;
 
     const metrics = await analyzeFile(file.path, cwd);

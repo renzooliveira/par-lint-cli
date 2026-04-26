@@ -15,8 +15,13 @@ export const templateTooLongRule: RuleDefinition = {
 
     const opts = config.rules['component/template-too-long']?.options as {
       maxLines?: number;
+      maxLinesPage?: number;
+      maxLinesComponent?: number;
     } | undefined;
-    const maxLines = opts?.maxLines ?? 100;
+
+    const isPage = file.tags.includes('is_page') || file.path.includes('.page.');
+    const defaultMax = isPage ? 150 : 80;
+    const maxLines = (isPage ? opts?.maxLinesPage : opts?.maxLinesComponent) ?? opts?.maxLines ?? defaultMax;
 
     const source = await readFile(path.resolve(cwd, file.path), 'utf-8');
     const lineCount = source.split('\n').length;
