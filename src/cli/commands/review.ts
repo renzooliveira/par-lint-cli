@@ -22,6 +22,7 @@ export const reviewCommand = new Command('review')
   .option('--json', 'Output JSON to stdout')
   .option('--dry-run', 'Run analysis without writing state')
   .option('--target <path>', 'Target project directory to analyze')
+  .option('--category <cats>', 'Filter by category (comma-separated): state,perf,scss,arch,a11y,component,ionic,ux,domain')
   .action(async (options: {
     output: string;
     file?: string;
@@ -29,6 +30,7 @@ export const reviewCommand = new Command('review')
     json: boolean;
     dryRun: boolean;
     target?: string;
+    category?: string;
   }) => {
     const cwd = options.target ? path.resolve(options.target) : process.cwd();
     const spinner = ora('Loading configuration...').start();
@@ -54,10 +56,22 @@ export const reviewCommand = new Command('review')
       const previousState = await loadState(statePath);
       const { findings: reconciledFindings, resolved } = reconcileFindings(report.findings, previousState);
 
-      report.findings = await applySuppressions(reconciledFindings, config, cwd);
+      const SEVERITY_RANK: Record<string, number> = { info: 0, warning: 1, error: 2 };
+      const minRank = SEVERITY_RANK[options.severity] ?? 0;
 
+      const suppressed = await applySuppressions(reconciledFindings, config, cwd);
+      const categoryFilter = options.category ? new Set(options.category.split(',').map((c) => c.trim())) : null;
+      report.findings = suppressed
+        .filter((f) => (SEVERITY_RANK[f.severity] ?? 0) >= minRank)
+        .filter((f) => !categoryFilter || categoryFilter.has(f.category));
+
+      report.summary.total_findings = report.findings.length;
+      report.summary.by_severity = {};
+      report.summary.by_category = {};
       report.summary.by_status = {};
       for (const f of report.findings) {
+        report.summary.by_severity[f.severity] = (report.summary.by_severity[f.severity] ?? 0) + 1;
+        report.summary.by_category[f.category] = (report.summary.by_category[f.category] ?? 0) + 1;
         report.summary.by_status[f.status] = (report.summary.by_status[f.status] ?? 0) + 1;
       }
 
