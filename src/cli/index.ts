@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { reviewCommand } from './commands/review.js';
 import { initCommand } from './commands/init.js';
 import { rulesCommand } from './commands/rules.js';
+import { docsCommand } from './commands/docs.js';
 
 const program = new Command()
   .name('par-lint')
@@ -11,5 +12,6 @@ const program = new Command()
 program.addCommand(reviewCommand);
 program.addCommand(initCommand);
 program.addCommand(rulesCommand);
+program.addCommand(docsCommand);
 
 program.parse();
