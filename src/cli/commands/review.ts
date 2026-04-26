@@ -9,6 +9,7 @@ import { RuleRunner } from '../../engine/runner.js';
 import { loadState, saveState, reconcileFindings } from '../../engine/state.js';
 import { applySuppressions } from '../../engine/suppression.js';
 import { FileCache, hashFile } from '../../engine/cache.js';
+import { loadBaseline, saveBaseline, filterByBaseline } from '../../engine/baseline.js';
 import { formatJson } from '../formatters/json.js';
 import { formatConsole } from '../formatters/console.js';
 import { formatSarif } from '../formatters/sarif.js';
@@ -27,6 +28,8 @@ export const reviewCommand = new Command('review')
   .option('--rule <ids>', 'Filter by rule ID (comma-separated)')
   .option('--incremental [base]', 'Only analyze files changed since base ref (default: HEAD~1)')
   .option('--no-cache', 'Disable file hash caching')
+  .option('--baseline', 'Filter out findings present in baseline')
+  .option('--save-baseline', 'Save current findings as baseline')
   .action(async (options: {
     output: string;
     file?: string;
@@ -38,6 +41,8 @@ export const reviewCommand = new Command('review')
     rule?: string;
     incremental?: string | true;
     cache: boolean;
+    baseline?: boolean;
+    saveBaseline?: boolean;
   }) => {
     const cwd = options.target ? path.resolve(options.target) : process.cwd();
     const spinner = ora('Loading configuration...').start();
@@ -88,10 +93,18 @@ export const reviewCommand = new Command('review')
       const suppressed = await applySuppressions(reconciledFindings, config, cwd);
       const categoryFilter = options.category ? new Set(options.category.split(',').map((c) => c.trim())) : null;
       const ruleFilter = options.rule ? new Set(options.rule.split(',').map((r) => r.trim())) : null;
-      report.findings = suppressed
+      let filtered = suppressed
         .filter((f) => (SEVERITY_RANK[f.severity] ?? 0) >= minRank)
         .filter((f) => !categoryFilter || categoryFilter.has(f.category))
         .filter((f) => !ruleFilter || ruleFilter.has(f.rule_id));
+
+      const baselinePath = path.resolve(cwd, '.par-lint/baseline.json');
+      if (options.baseline) {
+        const baselineIds = await loadBaseline(baselinePath);
+        filtered = filterByBaseline(filtered, baselineIds);
+      }
+
+      report.findings = filtered;
 
       report.summary.total_findings = report.findings.length;
       report.summary.by_severity = {};
@@ -110,6 +123,11 @@ export const reviewCommand = new Command('review')
       if (!options.dryRun) {
         await saveState(statePath, report.findings);
         if (cache) await cache.save();
+      }
+
+      if (options.saveBaseline) {
+        await saveBaseline(baselinePath, report.findings);
+        console.log(`  Baseline saved with ${report.findings.length} findings`);
       }
 
       spinner.stop();
