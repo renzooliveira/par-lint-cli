@@ -7,6 +7,7 @@ import { categorizeFiles } from '../../discovery/categorizer.js';
 import { RuleRunner } from '../../engine/runner.js';
 import { formatConsole } from '../formatters/console.js';
 import { ALL_RULES } from '../../rules/registry.js';
+import { loadCustomRules } from '../../engine/plugin-loader.js';
 
 const WATCH_EXTENSIONS = new Set(['.ts', '.html', '.scss', '.css']);
 const IGNORE_DIRS = new Set(['node_modules', 'dist', 'build', '.par-lint', 'coverage']);
@@ -51,6 +52,11 @@ export const watchCommand = new Command('watch')
 
     const runner = new RuleRunner();
     runner.registerMany(ALL_RULES);
+
+    if (config.custom_rules.length > 0) {
+      const customRules = await loadCustomRules(config.custom_rules, cwd);
+      runner.registerMany(customRules);
+    }
 
     const SEVERITY_RANK: Record<string, number> = { info: 0, warning: 1, error: 2 };
     const minRank = SEVERITY_RANK[options.severity] ?? 0;

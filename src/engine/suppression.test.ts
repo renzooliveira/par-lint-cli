@@ -49,6 +49,7 @@ describe('applySuppressions', () => {
     suppression: { require_reason: true, min_reason_length: 20, reviewable: true },
     output: { formats: ['json'], json_path: '', sarif_path: '', markdown_path: '', state_path: '' },
     performance: { cache_enabled: true, parallel_workers: 4, incremental: 'auto' },
+    custom_rules: [],
   };
 
   it('suppresses finding when directive matches and reason is long enough', async () => {

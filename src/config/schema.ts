@@ -72,6 +72,8 @@ export const parLintConfigSchema = z.object({
     parallel_workers: 4,
     incremental: 'auto' as const,
   })),
+
+  custom_rules: z.array(z.string()).default([]),
 });
 
 export type ParLintConfigInput = z.input<typeof parLintConfigSchema>;

@@ -57,4 +57,6 @@ export interface ParLintConfig {
   output: OutputConfig;
 
   performance: PerformanceConfig;
+
+  custom_rules: string[];
 }

@@ -15,6 +15,7 @@ import { formatConsole } from '../formatters/console.js';
 import { formatSarif } from '../formatters/sarif.js';
 import { formatMarkdown } from '../formatters/markdown.js';
 import { ALL_RULES } from '../../rules/registry.js';
+import { loadCustomRules } from '../../engine/plugin-loader.js';
 
 export const reviewCommand = new Command('review')
   .description('Analyze codebase for pattern violations')
@@ -72,6 +73,11 @@ export const reviewCommand = new Command('review')
       spinner.text = 'Running rules...';
       const runner = new RuleRunner();
       runner.registerMany(ALL_RULES);
+
+      if (config.custom_rules.length > 0) {
+        const customRules = await loadCustomRules(config.custom_rules, cwd);
+        runner.registerMany(customRules);
+      }
 
       let cache: FileCache | undefined;
       if (options.cache && config.performance.cache_enabled) {
@@ -142,6 +148,8 @@ export const reviewCommand = new Command('review')
 
       if (options.json) {
         process.stdout.write(formatJson(report));
+        const hasErrors = (report.summary.by_severity['error'] ?? 0) > 0;
+        process.exitCode = hasErrors ? 1 : 0;
         return;
       }
 
