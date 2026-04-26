@@ -1,0 +1,11 @@
+.header {
+  background: blue;
+}
+
+::ng-deep .modal-content {
+  padding: 16px;
+}
+
+.app-title {
+  font-size: 24px;
+}
