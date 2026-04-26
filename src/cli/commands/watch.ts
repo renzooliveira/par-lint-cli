@@ -10,6 +10,10 @@ import { ALL_RULES } from '../../rules/registry.js';
 
 const WATCH_EXTENSIONS = new Set(['.ts', '.html', '.scss', '.css']);
 const IGNORE_DIRS = new Set(['node_modules', 'dist', 'build', '.par-lint', 'coverage']);
+const CONFIG_FILES = new Set([
+  'par-lint.config.yaml', 'par-lint.config.yml', 'par-lint.config.json',
+  '.par-lint.yaml', '.par-lint.yml',
+]);
 
 export function createDebouncer(
   fn: (files: Set<string>) => void,
@@ -43,7 +47,7 @@ export const watchCommand = new Command('watch')
     const cwd = options.target ? path.resolve(options.target) : process.cwd();
     const debounceMs = parseInt(options.debounce, 10) || 300;
 
-    const { config } = await loadConfig(cwd);
+    let { config } = await loadConfig(cwd);
 
     const runner = new RuleRunner();
     runner.registerMany(ALL_RULES);
@@ -54,6 +58,16 @@ export const watchCommand = new Command('watch')
     console.log(chalk.bold(`\n  par-lint watch`));
     console.log(chalk.dim(`  Watching ${cwd}`));
     console.log(chalk.dim(`  Press Ctrl+C to stop\n`));
+
+    const reloadConfig = async () => {
+      try {
+        const result = await loadConfig(cwd);
+        config = result.config;
+        console.log(chalk.cyan(`  [${new Date().toLocaleTimeString()}] Config reloaded`));
+      } catch (err) {
+        console.error(chalk.red(`  Config reload failed: ${err instanceof Error ? err.message : err}`));
+      }
+    };
 
     const analyze = async (files: Set<string>) => {
       const filePaths = [...files];
@@ -91,6 +105,12 @@ export const watchCommand = new Command('watch')
     watch(cwd, { recursive: true }, (_event, filename) => {
       if (!filename) return;
       const normalized = filename.replace(/\\/g, '/');
+      const basename = path.basename(normalized);
+
+      if (CONFIG_FILES.has(basename)) {
+        reloadConfig();
+        return;
+      }
 
       const parts = normalized.split('/');
       if (parts.some((p) => IGNORE_DIRS.has(p))) return;
