@@ -4,6 +4,7 @@ import { initCommand } from './commands/init.js';
 import { rulesCommand } from './commands/rules.js';
 import { docsCommand } from './commands/docs.js';
 import { watchCommand } from './commands/watch.js';
+import { summaryCommand } from './commands/summary.js';
 
 const program = new Command()
   .name('par-lint')
@@ -15,5 +16,6 @@ program.addCommand(initCommand);
 program.addCommand(rulesCommand);
 program.addCommand(docsCommand);
 program.addCommand(watchCommand);
+program.addCommand(summaryCommand);
 
 program.parse();
