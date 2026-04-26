@@ -42,6 +42,10 @@ import { formNotDisabledDuringSubmitRule } from './definitions/ux/form-not-disab
 import { landmarkStructureRule } from './definitions/a11y/landmark-structure.js';
 import { primitiveObsessionRule } from './definitions/domain/primitive-obsession.js';
 import { missingPaginationRule } from './definitions/perf/missing-pagination.js';
+import { featureEnvyRule } from './definitions/domain/feature-envy.js';
+import { inappropriateIntimacyRule } from './definitions/domain/inappropriate-intimacy.js';
+import { deadAbstractionRule } from './definitions/arch/dead-abstraction.js';
+import { shotgunSurgeryRule } from './definitions/arch/shotgun-surgery.js';
 
 export const ALL_RULES: RuleDefinition[] = [
   manualChangeDetectionRule,
@@ -87,4 +91,8 @@ export const ALL_RULES: RuleDefinition[] = [
   primitiveObsessionRule,
   landmarkStructureRule,
   missingPaginationRule,
+  featureEnvyRule,
+  inappropriateIntimacyRule,
+  deadAbstractionRule,
+  shotgunSurgeryRule,
 ];

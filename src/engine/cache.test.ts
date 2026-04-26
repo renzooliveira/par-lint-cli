@@ -66,7 +66,7 @@ describe('FileCache', () => {
 
     const result = cache.lookup('src/app.ts', 'abc123');
     expect(result).toHaveLength(1);
-    expect(result?.[0].file).toBe('src/app.ts');
+    expect(result?.[0]?.file).toBe('src/app.ts');
   });
 
   it('returns null when hash differs', async () => {
