@@ -2,6 +2,7 @@ import type { Finding } from '../types/finding.js';
 import type { ParLintConfig } from '../types/config.js';
 import type { CategorizedFile } from '../discovery/categorizer.js';
 import type { Report, ReportDiff, ReportPerformance, ReportSummary } from '../types/report.js';
+import type { FileCache } from './cache.js';
 import { randomUUID } from 'node:crypto';
 
 export interface RuleDefinition {
@@ -64,18 +65,44 @@ export class RuleRunner {
     files: CategorizedFile[],
     config: ParLintConfig,
     cwd: string,
+    options?: { cache?: FileCache; hashFn?: (path: string) => Promise<string> },
   ): Promise<Report> {
     const startTime = Date.now();
+    const workers = Math.max(1, config.performance.parallel_workers);
     const allFindings: Finding[] = [];
+    let cacheHits = 0;
 
-    for (const file of files) {
-      const findings = await this.runFile(file, config, cwd);
-      allFindings.push(...findings);
+    const processFile = async (file: CategorizedFile): Promise<Finding[]> => {
+      if (options?.cache && options.hashFn) {
+        try {
+          const hash = await options.hashFn(file.path);
+          const cached = options.cache.lookup(file.path, hash);
+          if (cached) {
+            cacheHits++;
+            return cached;
+          }
+          const findings = await this.runFile(file, config, cwd);
+          options.cache.store(file.path, hash, findings);
+          return findings;
+        } catch {
+          return this.runFile(file, config, cwd);
+        }
+      }
+      return this.runFile(file, config, cwd);
+    };
+
+    for (let i = 0; i < files.length; i += workers) {
+      const chunk = files.slice(i, i + workers);
+      const results = await Promise.all(chunk.map(processFile));
+      for (const findings of results) {
+        allFindings.push(...findings);
+      }
     }
 
     const duration = Date.now() - startTime;
+    const cacheRate = files.length > 0 ? cacheHits / files.length : 0;
 
-    return buildReport(allFindings, config, cwd, duration, files.length);
+    return buildReport(allFindings, config, cwd, duration, files.length, cacheRate);
   }
 
   get registeredRules(): RuleDefinition[] {
@@ -89,6 +116,7 @@ function buildReport(
   cwd: string,
   durationMs: number,
   filesAnalyzed: number,
+  cacheHitRate = 0,
 ): Report {
   const summary: ReportSummary = {
     total_findings: findings.length,
@@ -108,7 +136,7 @@ function buildReport(
   const performance: ReportPerformance = {
     total_duration_ms: durationMs,
     by_tool: {},
-    cache_hit_rate: 0,
+    cache_hit_rate: cacheHitRate,
     files_analyzed: filesAnalyzed,
   };
 

@@ -25,6 +25,50 @@ function makeRule(id: string, tags: string[] = ['is_typescript']): RuleDefinitio
   };
 }
 
+describe('RuleRunner.runAll parallel', () => {
+  it('processes files concurrently with configured workers', async () => {
+    const runner = new RuleRunner();
+    const callOrder: string[] = [];
+
+    const slowRule: RuleDefinition = {
+      id: 'slow/rule',
+      version: '1.0.0',
+      category: 'test',
+      severity: 'warning',
+      applicable_to: [],
+      async run(file) {
+        callOrder.push(file.path);
+        await new Promise((r) => setTimeout(r, 10));
+        return [createFinding({
+          rule_id: 'slow/rule',
+          file: file.path,
+          line: 1,
+          severity: 'warning',
+          message: 'test',
+          source_principle: 'test',
+          category: 'test',
+        })];
+      },
+    };
+
+    runner.register(slowRule);
+
+    const files: CategorizedFile[] = Array.from({ length: 8 }, (_, i) => ({
+      path: `file${i}.ts`,
+      tags: ['is_typescript'] as CategorizedFile['tags'],
+    }));
+
+    const config = parLintConfigSchema.parse({
+      project: { name: 'test' },
+      performance: { parallel_workers: 4 },
+    });
+
+    const report = await runner.runAll(files, config, '/tmp');
+    expect(report.findings).toHaveLength(8);
+    expect(report.performance.files_analyzed).toBe(8);
+  });
+});
+
 describe('RuleRunner', () => {
   it('skips rule when file matches exclude glob', async () => {
     const runner = new RuleRunner();
