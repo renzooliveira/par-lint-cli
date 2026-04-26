@@ -9,7 +9,7 @@ export const missingErrorStateRule: RuleDefinition = {
   id: 'ux/missing-error-state',
   version: '1.0.0',
   category: 'ux',
-  severity: 'info',
+  severity: 'error',
   applicable_to: ['is_template'],
 
   async run(file, _config, cwd) {
@@ -24,7 +24,7 @@ export const missingErrorStateRule: RuleDefinition = {
       rule_id: 'ux/missing-error-state',
       file: file.path,
       line: 1,
-      severity: 'info',
+      severity: 'error',
       message: 'Template uses async pipe but has no error state handling. Add error feedback for failed requests.',
       source_principle: 'Async data should handle error state for user feedback',
       category: 'ux',

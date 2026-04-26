@@ -6,7 +6,7 @@ export const deepNestingRule: RuleDefinition = {
   id: 'scss/deep-nesting',
   version: '1.0.0',
   category: 'scss',
-  severity: 'error',
+  severity: 'warning',
   applicable_to: ['is_scss', 'is_style'],
 
   async run(file, config, cwd) {
@@ -21,7 +21,7 @@ export const deepNestingRule: RuleDefinition = {
         rule_id: 'scss/deep-nesting',
         file: file.path,
         line: issue.line,
-        severity: 'error',
+        severity: 'warning',
         message: `SCSS nesting depth ${issue.depth} exceeds max ${maxDepth}: ${issue.selector}`,
         source_principle: 'Deep nesting increases specificity wars and maintenance cost',
         category: 'scss',

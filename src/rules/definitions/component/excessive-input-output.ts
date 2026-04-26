@@ -6,7 +6,7 @@ export const excessiveInputOutputRule: RuleDefinition = {
   id: 'component/excessive-input-output',
   version: '1.0.0',
   category: 'component',
-  severity: 'warning',
+  severity: 'info',
   applicable_to: ['is_component', 'is_typescript'],
 
   async run(file, config, cwd) {
@@ -35,7 +35,7 @@ export const excessiveInputOutputRule: RuleDefinition = {
         rule_id: 'component/excessive-input-output',
         file: file.path,
         line: 1,
-        severity: 'warning',
+        severity: 'info',
         message: `Excessive inputs: ${inputCount} exceeds max ${maxInputs}. Consider a config object or splitting the component.`,
         source_principle: 'Too many inputs indicate the component has too many responsibilities',
         category: 'component',
@@ -55,7 +55,7 @@ export const excessiveInputOutputRule: RuleDefinition = {
         rule_id: 'component/excessive-input-output',
         file: file.path,
         line: 1,
-        severity: 'warning',
+        severity: 'info',
         message: `Excessive outputs: ${outputCount} exceeds max ${maxOutputs}. Consider event aggregation or splitting the component.`,
         source_principle: 'Too many outputs indicate the component is doing too much',
         category: 'component',

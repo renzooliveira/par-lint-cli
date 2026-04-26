@@ -6,7 +6,7 @@ export const hardcodedColorRule: RuleDefinition = {
   id: 'scss/hardcoded-color',
   version: '1.0.0',
   category: 'scss',
-  severity: 'error',
+  severity: 'warning',
   applicable_to: ['is_scss', 'is_style'],
 
   async run(file, _config, cwd) {
@@ -21,7 +21,7 @@ export const hardcodedColorRule: RuleDefinition = {
         file: file.path,
         line: issue.line,
         column: issue.column,
-        severity: 'error',
+        severity: 'warning',
         message: `Hardcoded color ${issue.value} in property '${issue.property}'. Use design token or variable.`,
         source_principle: 'Hardcoded colors break design system consistency',
         category: 'scss',

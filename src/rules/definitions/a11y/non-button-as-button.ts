@@ -6,7 +6,7 @@ export const nonButtonAsButtonRule: RuleDefinition = {
   id: 'a11y/non-button-as-button',
   version: '1.0.0',
   category: 'a11y',
-  severity: 'warning',
+  severity: 'error',
   applicable_to: ['is_html', 'is_template'],
 
   async run(file, _config, cwd) {
@@ -21,7 +21,7 @@ export const nonButtonAsButtonRule: RuleDefinition = {
         file: file.path,
         line: issue.line,
         column: issue.column,
-        severity: 'warning',
+        severity: 'error',
         message: `${issue.issue}. Use <button> or add role="button".`,
         source_principle: 'Interactive elements must be semantically correct (WCAG 4.1.2)',
         category: 'a11y',

@@ -6,7 +6,7 @@ export const hardcodedSpacingRule: RuleDefinition = {
   id: 'scss/hardcoded-spacing',
   version: '1.0.0',
   category: 'scss',
-  severity: 'error',
+  severity: 'warning',
   applicable_to: ['is_scss', 'is_style'],
 
   async run(file, _config, cwd) {
@@ -21,7 +21,7 @@ export const hardcodedSpacingRule: RuleDefinition = {
         file: file.path,
         line: issue.line,
         column: issue.column,
-        severity: 'error',
+        severity: 'warning',
         message: `Hardcoded spacing ${issue.value} in '${issue.property}'. Use spacing variable or token.`,
         source_principle: 'Hardcoded spacing values break design system grid consistency',
         category: 'scss',

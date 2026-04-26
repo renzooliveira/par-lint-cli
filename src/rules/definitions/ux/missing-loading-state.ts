@@ -9,7 +9,7 @@ export const missingLoadingStateRule: RuleDefinition = {
   id: 'ux/missing-loading-state',
   version: '1.0.0',
   category: 'ux',
-  severity: 'info',
+  severity: 'warning',
   applicable_to: ['is_template'],
 
   async run(file, _config, cwd) {
@@ -24,7 +24,7 @@ export const missingLoadingStateRule: RuleDefinition = {
       rule_id: 'ux/missing-loading-state',
       file: file.path,
       line: 1,
-      severity: 'info',
+      severity: 'warning',
       message: 'Template uses async pipe but has no loading state indicator. Add a loading spinner or skeleton.',
       source_principle: 'Async data should show loading state to prevent blank screen',
       category: 'ux',

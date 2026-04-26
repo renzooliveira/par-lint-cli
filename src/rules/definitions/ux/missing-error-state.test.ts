@@ -14,7 +14,7 @@ describe('ux/missing-error-state', () => {
 
     expect(findings).toHaveLength(1);
     expect(findings[0]!.rule_id).toBe('ux/missing-error-state');
-    expect(findings[0]!.severity).toBe('info');
+    expect(findings[0]!.severity).toBe('error');
   });
 
   it('does not flag template without async pipe', async () => {
