@@ -1,0 +1,12 @@
+.container {
+  color: #ff0000;
+  margin: 15px;
+
+  .inner {
+    .deep {
+      .too-deep {
+        padding: 8px;
+      }
+    }
+  }
+}
