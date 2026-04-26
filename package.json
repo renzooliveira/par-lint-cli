@@ -4,7 +4,7 @@
   "description": "Deterministic code pattern validation CLI for Angular/Ionic/TS/SCSS",
   "type": "module",
   "bin": {
-    "par-lint": "./dist/cli/index.js"
+    "par-lint": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
