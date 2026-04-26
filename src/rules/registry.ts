@@ -28,35 +28,55 @@ import { missingIonContentRule } from './definitions/ionic/missing-ion-content.j
 import { hardcodedPlatformCheckRule } from './definitions/ionic/hardcoded-platform-check.js';
 import { missingLoadingStateRule } from './definitions/ux/missing-loading-state.js';
 import { missingErrorStateRule } from './definitions/ux/missing-error-state.js';
+import { externalMutationRule } from './definitions/domain/external-mutation.js';
+import { anemicEntityRule } from './definitions/domain/anemic-entity.js';
+import { nPlusOneRule } from './definitions/perf/n-plus-one.js';
+import { destructiveWithoutConfirmationRule } from './definitions/ux/destructive-without-confirmation.js';
+import { redundantAriaRule } from './definitions/a11y/redundant-aria.js';
+import { inlineStylesRule } from './definitions/component/inline-styles.js';
+import { derivedStateAsPropertyRule } from './definitions/state/derived-state-as-property.js';
+import { componentStyleLeakRule } from './definitions/scss/component-style-leak.js';
+import { missingSuccessFeedbackRule } from './definitions/ux/missing-success-feedback.js';
+import { missingMotionReduceRule } from './definitions/ux/missing-motion-reduce.js';
 
 export const ALL_RULES: RuleDefinition[] = [
   manualChangeDetectionRule,
   subscribeWithoutCleanupRule,
   externalSignalMutationRule,
   twoWayBindingLargeFormRule,
+  derivedStateAsPropertyRule,
   syncInAsyncPathRule,
   longFunctionRule,
   highCyclomaticComplexityRule,
   listenerLeakRule,
   heavyComputationInRenderRule,
+  nPlusOneRule,
   deepNestingRule,
   hardcodedColorRule,
   hardcodedSpacingRule,
   scssFileTooLongRule,
+  componentStyleLeakRule,
   circularDependencyRule,
   layerViolationRule,
   godFileRule,
   missingAltRule,
   missingLabelRule,
   nonButtonAsButtonRule,
+  redundantAriaRule,
   templateTooLongRule,
   excessiveInputOutputRule,
   noExplicitAnyRule,
   noBusinessLogicRule,
   missingOnPushRule,
   missingTrackByRule,
+  inlineStylesRule,
   missingIonContentRule,
   hardcodedPlatformCheckRule,
   missingLoadingStateRule,
   missingErrorStateRule,
+  missingSuccessFeedbackRule,
+  destructiveWithoutConfirmationRule,
+  missingMotionReduceRule,
+  externalMutationRule,
+  anemicEntityRule,
 ];
