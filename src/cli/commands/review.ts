@@ -21,14 +21,16 @@ export const reviewCommand = new Command('review')
   .option('--severity <level>', 'Minimum severity to report: info,warning,error', 'info')
   .option('--json', 'Output JSON to stdout')
   .option('--dry-run', 'Run analysis without writing state')
+  .option('--target <path>', 'Target project directory to analyze')
   .action(async (options: {
     output: string;
     file?: string;
     severity: string;
     json: boolean;
     dryRun: boolean;
+    target?: string;
   }) => {
-    const cwd = process.cwd();
+    const cwd = options.target ? path.resolve(options.target) : process.cwd();
     const spinner = ora('Loading configuration...').start();
 
     try {
