@@ -50,6 +50,8 @@ export function formatConsole(report: Report): string {
     lines.push('');
   }
 
+  lines.push(...formatSummaryTable(report));
+
   const { summary } = report;
   const parts: string[] = [];
   if (summary.by_severity['error']) parts.push(chalk.red(`${summary.by_severity['error']} errors`));
@@ -60,6 +62,36 @@ export function formatConsole(report: Report): string {
   lines.push('');
 
   return lines.join('\n');
+}
+
+const CATEGORY_ICONS: Record<string, string> = {
+  state: '⚡',
+  perf: '🏎',
+  scss: '🎨',
+  arch: '🏛',
+  a11y: '♿',
+  component: '🧩',
+  ionic: '📱',
+  ux: '👤',
+  domain: '🔷',
+};
+
+function formatSummaryTable(report: Report): string[] {
+  const lines: string[] = [];
+  const { by_category } = report.summary;
+  const categories = Object.entries(by_category).sort((a, b) => b[1] - a[1]);
+
+  if (categories.length === 0) return lines;
+
+  lines.push(chalk.bold.underline('  By Category'));
+  for (const [cat, count] of categories) {
+    const icon = CATEGORY_ICONS[cat] ?? '•';
+    const bar = '█'.repeat(Math.min(Math.ceil(count / 10), 40));
+    lines.push(`  ${icon} ${cat.padEnd(12)} ${String(count).padStart(5)}  ${chalk.dim(bar)}`);
+  }
+  lines.push('');
+
+  return lines;
 }
 
 function formatTopOffenders(findings: Finding[]): string[] {
