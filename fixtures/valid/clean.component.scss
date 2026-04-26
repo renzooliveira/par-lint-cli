@@ -1,0 +1,8 @@
+:host {
+  .container {
+    color: var(--text-primary);
+    background-color: $bg-primary;
+    margin: $spacing-md;
+    padding: $spacing-sm;
+  }
+}

@@ -1,0 +1,58 @@
+<div class="container">
+  <header>
+    <h1>Title</h1>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section class="hero">
+      <h2>Hero Section</h2>
+      <p>Description text goes here.</p>
+    </section>
+    <section class="content">
+      <div class="card" *ngFor="let item of items">
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.description }}</p>
+        <button (click)="onAction(item)">Action</button>
+      </div>
+    </section>
+    <section class="sidebar">
+      <div class="widget">
+        <h4>Widget 1</h4>
+        <p>Widget content</p>
+      </div>
+      <div class="widget">
+        <h4>Widget 2</h4>
+        <p>Widget content</p>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <p>Footer content</p>
+  </footer>
+  <!-- padding lines to exceed 50 line threshold for test -->
+  <div class="extra-1"><span>1</span></div>
+  <div class="extra-2"><span>2</span></div>
+  <div class="extra-3"><span>3</span></div>
+  <div class="extra-4"><span>4</span></div>
+  <div class="extra-5"><span>5</span></div>
+  <div class="extra-6"><span>6</span></div>
+  <div class="extra-7"><span>7</span></div>
+  <div class="extra-8"><span>8</span></div>
+  <div class="extra-9"><span>9</span></div>
+  <div class="extra-10"><span>10</span></div>
+  <div class="extra-11"><span>11</span></div>
+  <div class="extra-12"><span>12</span></div>
+  <div class="extra-13"><span>13</span></div>
+  <div class="extra-14"><span>14</span></div>
+  <div class="extra-15"><span>15</span></div>
+  <div class="extra-16"><span>16</span></div>
+  <div class="extra-17"><span>17</span></div>
+  <div class="extra-18"><span>18</span></div>
+  <div class="extra-19"><span>19</span></div>
+  <div class="extra-20"><span>20</span></div>
+</div>

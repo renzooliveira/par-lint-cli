@@ -1,0 +1,11 @@
+:host {
+  .container {
+    .wrapper {
+      .inner {
+        .deep-nested {
+          color: red;
+        }
+      }
+    }
+  }
+}

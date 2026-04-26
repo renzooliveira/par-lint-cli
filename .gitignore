@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.par-lint/
+*.tgz
+.DS_Store
