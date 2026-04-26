@@ -1,10 +1,14 @@
 import type { RuleDefinition } from '../../../engine/runner.js';
-import { findPattern } from '../../../adapters/ast-grep.js';
+import { findPattern, readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
 const DEFAULT_IGNORE_CALLERS = [
   'store', 'query', 'params', 'formData', 'searchParams', 'headers', 'urlParams',
+  'map', 'set', 'counts', 'cache', 'registry', 'dict', 'lookup',
 ];
+
+const SIGNAL_DECL_RE = /(?:const|let|readonly|private|protected|public)\s+(\w+)\s*=\s*(?:signal|computed|contentChild|contentChildren|viewChild|viewChildren|model)\s*[<(]/g;
+const SIGNAL_NAME_RE = /signal|Signal/i;
 
 const DEFAULT_IGNORE_FILE_PATTERNS = [
   /\.decider\./i,
@@ -34,6 +38,9 @@ export const externalSignalMutationRule: RuleDefinition = {
 
     if (ignoreFilePatterns.some((re) => re.test(file.path))) return [];
 
+    const source = await readSource(file.path, cwd);
+    const signalNames = extractSignalNames(source);
+
     const patterns = [
       '$SIG.set($$$ARGS)',
       '$SIG.update($$$ARGS)',
@@ -50,6 +57,7 @@ export const externalSignalMutationRule: RuleDefinition = {
 
         const caller = text.split('.')[0]!.trim();
         if (ignoreCallers.has(caller)) continue;
+        if (!isLikelySignal(caller, signalNames)) continue;
 
         findings.push(createFinding({
           rule_id: 'state/external-signal-mutation',
@@ -77,3 +85,19 @@ export const externalSignalMutationRule: RuleDefinition = {
     return findings;
   },
 };
+
+function extractSignalNames(source: string): Set<string> {
+  const names = new Set<string>();
+  SIGNAL_DECL_RE.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = SIGNAL_DECL_RE.exec(source)) !== null) {
+    names.add(m[1]!);
+  }
+  return names;
+}
+
+function isLikelySignal(caller: string, signalNames: Set<string>): boolean {
+  if (signalNames.has(caller)) return true;
+  if (SIGNAL_NAME_RE.test(caller)) return true;
+  return false;
+}
