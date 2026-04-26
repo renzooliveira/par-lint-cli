@@ -30,6 +30,7 @@ export const reviewCommand = new Command('review')
   .option('--no-cache', 'Disable file hash caching')
   .option('--baseline', 'Filter out findings present in baseline')
   .option('--save-baseline', 'Save current findings as baseline')
+  .option('--profile', 'Show rule execution time profiling')
   .action(async (options: {
     output: string;
     file?: string;
@@ -43,6 +44,7 @@ export const reviewCommand = new Command('review')
     cache: boolean;
     baseline?: boolean;
     saveBaseline?: boolean;
+    profile?: boolean;
   }) => {
     const cwd = options.target ? path.resolve(options.target) : process.cwd();
     const spinner = ora('Loading configuration...').start();
@@ -78,10 +80,16 @@ export const reviewCommand = new Command('review')
         await cache.load();
       }
 
-      const report = await runner.runAll(categorized, config, cwd, cache ? {
-        cache,
-        hashFn: (filePath) => hashFile(path.resolve(cwd, filePath)),
-      } : undefined);
+      const runOptions: Parameters<typeof runner.runAll>[3] = {};
+      if (cache) {
+        runOptions.cache = cache;
+        runOptions.hashFn = (filePath) => hashFile(path.resolve(cwd, filePath));
+      }
+      if (options.profile) {
+        runOptions.profile = true;
+      }
+
+      const report = await runner.runAll(categorized, config, cwd, runOptions);
 
       const statePath = path.resolve(cwd, config.output.state_path);
       const previousState = await loadState(statePath);
@@ -162,6 +170,15 @@ export const reviewCommand = new Command('review')
         await mkdir(path.dirname(mdPath), { recursive: true });
         await writeFile(mdPath, formatMarkdown(report), 'utf-8');
         console.log(`  Markdown written to ${path.relative(cwd, mdPath)}`);
+      }
+
+      if (options.profile && Object.keys(report.performance.by_tool).length > 0) {
+        console.log('\n  Rule profiling (ms):');
+        const sorted = Object.entries(report.performance.by_tool).sort((a, b) => b[1] - a[1]);
+        for (const [rule, ms] of sorted) {
+          console.log(`    ${String(ms).padStart(6)}ms  ${rule}`);
+        }
+        console.log(`\n  Total: ${report.performance.total_duration_ms}ms | Files: ${report.performance.files_analyzed} | Cache: ${(report.performance.cache_hit_rate * 100).toFixed(0)}%\n`);
       }
 
       const hasErrors = (report.summary.by_severity['error'] ?? 0) > 0;

@@ -37,7 +37,12 @@ export class RuleRunner {
     });
   }
 
-  async runFile(file: CategorizedFile, config: ParLintConfig, cwd: string): Promise<Finding[]> {
+  async runFile(
+    file: CategorizedFile,
+    config: ParLintConfig,
+    cwd: string,
+    ruleTimings?: Map<string, number>,
+  ): Promise<Finding[]> {
     const applicable = this.getApplicableRules(file, config);
     const findings: Finding[] = [];
 
@@ -48,7 +53,12 @@ export class RuleRunner {
         if (matchesAnyGlob(file.path, ruleConfig.exclude)) continue;
       }
 
+      const ruleStart = ruleTimings ? Date.now() : 0;
       const ruleFindings = await rule.run(file, config, cwd);
+      if (ruleTimings) {
+        const elapsed = Date.now() - ruleStart;
+        ruleTimings.set(rule.id, (ruleTimings.get(rule.id) ?? 0) + elapsed);
+      }
 
       for (const finding of ruleFindings) {
         if (ruleConfig?.severity) {
@@ -65,12 +75,13 @@ export class RuleRunner {
     files: CategorizedFile[],
     config: ParLintConfig,
     cwd: string,
-    options?: { cache?: FileCache; hashFn?: (path: string) => Promise<string> },
+    options?: { cache?: FileCache; hashFn?: (path: string) => Promise<string>; profile?: boolean },
   ): Promise<Report> {
     const startTime = Date.now();
     const workers = Math.max(1, config.performance.parallel_workers);
     const allFindings: Finding[] = [];
     let cacheHits = 0;
+    const ruleTimings = options?.profile ? new Map<string, number>() : undefined;
 
     const processFile = async (file: CategorizedFile): Promise<Finding[]> => {
       if (options?.cache && options.hashFn) {
@@ -81,14 +92,14 @@ export class RuleRunner {
             cacheHits++;
             return cached;
           }
-          const findings = await this.runFile(file, config, cwd);
+          const findings = await this.runFile(file, config, cwd, ruleTimings);
           options.cache.store(file.path, hash, findings);
           return findings;
         } catch {
-          return this.runFile(file, config, cwd);
+          return this.runFile(file, config, cwd, ruleTimings);
         }
       }
-      return this.runFile(file, config, cwd);
+      return this.runFile(file, config, cwd, ruleTimings);
     };
 
     for (let i = 0; i < files.length; i += workers) {
@@ -101,8 +112,9 @@ export class RuleRunner {
 
     const duration = Date.now() - startTime;
     const cacheRate = files.length > 0 ? cacheHits / files.length : 0;
+    const byRule = ruleTimings ? Object.fromEntries(ruleTimings) : {};
 
-    return buildReport(allFindings, config, cwd, duration, files.length, cacheRate);
+    return buildReport(allFindings, config, cwd, duration, files.length, cacheRate, byRule);
   }
 
   get registeredRules(): RuleDefinition[] {
@@ -117,6 +129,7 @@ function buildReport(
   durationMs: number,
   filesAnalyzed: number,
   cacheHitRate = 0,
+  byRule: Record<string, number> = {},
 ): Report {
   const summary: ReportSummary = {
     total_findings: findings.length,
@@ -135,7 +148,7 @@ function buildReport(
 
   const performance: ReportPerformance = {
     total_duration_ms: durationMs,
-    by_tool: {},
+    by_tool: byRule,
     cache_hit_rate: cacheHitRate,
     files_analyzed: filesAnalyzed,
   };
