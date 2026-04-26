@@ -7,6 +7,7 @@ import { watchCommand } from './commands/watch.js';
 import { summaryCommand } from './commands/summary.js';
 import { hookCommand } from './commands/hook.js';
 import { diffCommand } from './commands/diff.js';
+import { ciCommand } from './commands/ci.js';
 
 const program = new Command()
   .name('par-lint')
@@ -21,5 +22,6 @@ program.addCommand(watchCommand);
 program.addCommand(summaryCommand);
 program.addCommand(hookCommand);
 program.addCommand(diffCommand);
+program.addCommand(ciCommand);
 
 program.parse();
