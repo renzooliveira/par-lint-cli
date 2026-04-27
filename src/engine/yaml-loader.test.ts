@@ -1,0 +1,197 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { compileYamlRule, loadYamlRules, type YamlRuleDocument } from './yaml-loader.js';
+import type { CategorizedFile } from '../discovery/categorizer.js';
+import type { ParLintConfig } from '../types/config.js';
+import path from 'node:path';
+
+vi.mock('../adapters/ast-grep.js', () => ({
+  readSource: vi.fn(),
+}));
+
+import { readSource } from '../adapters/ast-grep.js';
+const mockReadSource = vi.mocked(readSource);
+
+const defaultConfig = {} as ParLintConfig;
+
+function makeFile(path: string): CategorizedFile {
+  return { path, tags: ['is_typescript'] } as CategorizedFile;
+}
+
+function mockSource(source: string) {
+  mockReadSource.mockResolvedValueOnce(source);
+}
+
+describe('compileYamlRule', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('validation', () => {
+    it('rejects document without rule key', () => {
+      expect(() => compileYamlRule({} as YamlRuleDocument)).toThrow('must have a "rule" key');
+    });
+
+    it('rejects rule without required fields', () => {
+      const doc = { rule: { id: 'test/x' } } as YamlRuleDocument;
+      expect(() => compileYamlRule(doc)).toThrow();
+    });
+
+    it('rejects unknown mode', () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'test/x',
+          version: '1.0.0',
+          category: 'test',
+          severity: 'warning',
+          applicable_to: ['is_typescript'],
+          mode: 'unknown' as 'regex',
+          message_template: 'msg',
+          fix_complexity: 'S',
+        },
+      };
+      expect(() => compileYamlRule(doc)).toThrow('mode');
+    });
+  });
+
+  describe('mode: regex', () => {
+    const yamlDoc: YamlRuleDocument = {
+      rule: {
+        id: 'hygiene/console-log-in-production',
+        version: '1.0.0',
+        category: 'hygiene',
+        severity: 'warning',
+        description: 'Detects console.log in production code',
+        principle: 'Console logging pollutes output',
+        applicable_to: ['is_typescript'],
+        exclude_patterns: ['*.spec.ts', '*.test.ts'],
+        mode: 'regex',
+        regex: {
+          pattern: '\\bconsole\\.(log|debug|info)\\s*\\(',
+          capture_group: 1,
+        },
+        message_template: 'console.{match[1]}() in production code.',
+        fix_complexity: 'S',
+      },
+    };
+
+    it('compiles to valid RuleDefinition', () => {
+      const rule = compileYamlRule(yamlDoc);
+      expect(rule.id).toBe('hygiene/console-log-in-production');
+      expect(rule.version).toBe('1.0.0');
+      expect(rule.category).toBe('hygiene');
+      expect(rule.severity).toBe('warning');
+      expect(rule.applicable_to).toEqual(['is_typescript']);
+      expect(typeof rule.run).toBe('function');
+    });
+
+    it('finds matches in source lines', async () => {
+      const rule = compileYamlRule(yamlDoc);
+      mockSource("const x = 1;\nconsole.log('hello');\nconsole.error('ok');");
+
+      const findings = await rule.run(makeFile('src/app.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.line).toBe(2);
+      expect(findings[0]!.message).toBe('console.log() in production code.');
+    });
+
+    it('respects exclude_patterns', async () => {
+      const rule = compileYamlRule(yamlDoc);
+
+      const findings = await rule.run(makeFile('src/app.spec.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(0);
+      expect(mockReadSource).not.toHaveBeenCalled();
+    });
+
+    it('finds multiple matches in same file', async () => {
+      const rule = compileYamlRule(yamlDoc);
+      mockSource("console.log('a');\nconsole.debug('b');\nconsole.info('c');");
+
+      const findings = await rule.run(makeFile('src/app.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(3);
+      expect(findings[0]!.message).toBe('console.log() in production code.');
+      expect(findings[1]!.message).toBe('console.debug() in production code.');
+      expect(findings[2]!.message).toBe('console.info() in production code.');
+    });
+
+    it('handles regex without capture group', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'test/debugger',
+          version: '1.0.0',
+          category: 'test',
+          severity: 'error',
+          applicable_to: ['is_typescript'],
+          mode: 'regex',
+          regex: { pattern: '\\bdebugger\\b' },
+          message_template: 'debugger statement found',
+          fix_complexity: 'S',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockSource('const x = 1;\ndebugger;\nconst y = 2;');
+
+      const findings = await rule.run(makeFile('src/app.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.line).toBe(2);
+      expect(findings[0]!.message).toBe('debugger statement found');
+    });
+
+    it('supports match groups in message template', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'test/todo',
+          version: '1.0.0',
+          category: 'test',
+          severity: 'info',
+          applicable_to: ['is_typescript'],
+          mode: 'regex',
+          regex: { pattern: '//\\s*TODO:?\\s*(.+)' },
+          message_template: 'TODO found: {match[1]}',
+          fix_complexity: 'S',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockSource('// TODO: fix this later');
+
+      const findings = await rule.run(makeFile('src/app.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.message).toBe('TODO found: fix this later');
+    });
+  });
+
+  describe('loadYamlRules', () => {
+    it('loads and compiles a real YAML rule file', async () => {
+      const cwd = path.resolve(import.meta.dirname, '../..');
+      const rules = await loadYamlRules(
+        ['rules/yaml/hygiene/console-log-in-production.yaml'],
+        cwd,
+      );
+
+      expect(rules).toHaveLength(1);
+      expect(rules[0]!.id).toBe('hygiene/console-log-in-production-yaml');
+      expect(rules[0]!.severity).toBe('warning');
+      expect(typeof rules[0]!.run).toBe('function');
+    });
+
+    it('skips non-yaml paths', async () => {
+      const rules = await loadYamlRules(['some-rule.mjs'], '/tmp');
+      expect(rules).toHaveLength(0);
+    });
+
+    it('loads YAML rule that produces findings', async () => {
+      const cwd = path.resolve(import.meta.dirname, '../..');
+      const rules = await loadYamlRules(
+        ['rules/yaml/hygiene/console-log-in-production.yaml'],
+        cwd,
+      );
+      const rule = rules[0]!;
+
+      mockSource("console.log('test');\nconsole.error('ok');");
+      const findings = await rule.run(makeFile('src/app.ts'), defaultConfig, cwd);
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.message).toContain('console.log()');
+    });
+  });
+});
