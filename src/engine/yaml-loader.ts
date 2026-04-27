@@ -3,7 +3,7 @@ import type { Finding } from '../types/finding.js';
 import type { CategorizedFile } from '../discovery/categorizer.js';
 import type { ParLintConfig } from '../types/config.js';
 import { createFinding } from './finding.js';
-import { readSource } from '../adapters/ast-grep.js';
+import { readSource, findPattern } from '../adapters/ast-grep.js';
 import { analyzeSource } from '../adapters/ts-metrics.js';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -22,6 +22,11 @@ export interface YamlMetricConfig {
   operator: '>' | '>=' | '<' | '<=' | '==' | '!=';
 }
 
+export interface YamlAstGrepConfig {
+  pattern: string;
+  language?: 'typescript' | 'html' | 'css';
+}
+
 export interface YamlRule {
   id: string;
   version: string;
@@ -31,9 +36,10 @@ export interface YamlRule {
   principle?: string;
   applicable_to: string[];
   exclude_patterns?: string[];
-  mode: 'regex' | 'metric';
+  mode: 'regex' | 'metric' | 'ast-grep';
   regex?: YamlRegexConfig;
   metric?: YamlMetricConfig;
+  ast_grep?: YamlAstGrepConfig;
   message_template: string;
   fix_complexity: string;
 }
@@ -199,6 +205,61 @@ function compileMetricRule(rule: YamlRule): RuleDefinition {
   };
 }
 
+function compileAstGrepRule(rule: YamlRule): RuleDefinition {
+  if (!rule.ast_grep) {
+    throw new Error(`YAML rule "${rule.id}": mode "ast-grep" requires an "ast_grep" block`);
+  }
+
+  const { pattern } = rule.ast_grep;
+
+  return {
+    id: rule.id,
+    version: rule.version,
+    category: rule.category,
+    severity: rule.severity,
+    description: rule.description,
+    principle: rule.principle,
+    applicable_to: rule.applicable_to,
+
+    async run(
+      file: CategorizedFile,
+      _config: ParLintConfig,
+      cwd: string,
+    ): Promise<Finding[]> {
+      if (rule.exclude_patterns?.length && matchesExclude(file.path, rule.exclude_patterns)) {
+        return [];
+      }
+
+      const matches = await findPattern(file.path, pattern, cwd);
+      return matches.map((m) => {
+        const message = rule.message_template
+          .replace(/\{match\[0\]\}/g, m.text);
+
+        return createFinding({
+          rule_id: rule.id,
+          file: file.path,
+          line: m.line,
+          column: m.column,
+          end_line: m.endLine,
+          end_column: m.endColumn,
+          severity: rule.severity,
+          message,
+          source_principle: rule.principle ?? '',
+          category: rule.category,
+          fix_complexity: (rule.fix_complexity as 'S' | 'M' | 'L') ?? 'S',
+          evidence_trail: [{
+            tool: 'yaml-ast-grep',
+            query: { pattern, file: file.path },
+            result: { line: m.line, text: m.text },
+            timestamp: new Date().toISOString(),
+            cache_hit: false,
+          }],
+        });
+      });
+    },
+  };
+}
+
 export async function loadYamlRules(paths: string[], cwd: string): Promise<RuleDefinition[]> {
   const rules: RuleDefinition[] = [];
 
@@ -244,7 +305,9 @@ export function compileYamlRule(doc: YamlRuleDocument): RuleDefinition {
       return compileRegexRule(rule);
     case 'metric':
       return compileMetricRule(rule);
+    case 'ast-grep':
+      return compileAstGrepRule(rule);
     default:
-      throw new Error(`YAML rule "${rule.id}": unsupported mode "${rule.mode}". Supported: regex, metric`);
+      throw new Error(`YAML rule "${rule.id}": unsupported mode "${rule.mode}". Supported: regex, metric, ast-grep`);
   }
 }

@@ -6,10 +6,13 @@ import path from 'node:path';
 
 vi.mock('../adapters/ast-grep.js', () => ({
   readSource: vi.fn(),
+  findPattern: vi.fn(),
 }));
 
-import { readSource } from '../adapters/ast-grep.js';
+import { readSource, findPattern } from '../adapters/ast-grep.js';
+import type { AstGrepMatch } from '../adapters/ast-grep.js';
 const mockReadSource = vi.mocked(readSource);
+const mockFindPatternFn = vi.mocked(findPattern);
 
 const defaultConfig = {} as ParLintConfig;
 
@@ -19,6 +22,10 @@ function makeFile(path: string): CategorizedFile {
 
 function mockSource(source: string) {
   mockReadSource.mockResolvedValueOnce(source);
+}
+
+function mockFindPattern(matches: AstGrepMatch[]) {
+  mockFindPatternFn.mockResolvedValueOnce(matches);
 }
 
 describe('compileYamlRule', () => {
@@ -298,6 +305,131 @@ describe('compileYamlRule', () => {
       const findings = await rule.run(makeFile('src/barrel.ts'), defaultConfig, '/tmp');
       expect(findings).toHaveLength(1);
       expect(findings[0]!.message).toBe('3 exports exceed max 1.');
+    });
+  });
+
+  describe('mode: ast-grep', () => {
+    it('finds AST pattern matches', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'test/eval-usage',
+          version: '1.0.0',
+          category: 'security',
+          severity: 'error',
+          applicable_to: ['is_typescript'],
+          mode: 'ast-grep',
+          ast_grep: { pattern: 'eval($$$)' },
+          message_template: 'eval() is a security risk.',
+          fix_complexity: 'M',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockFindPattern([
+        { text: "eval('code')", line: 5, column: 1, endLine: 5, endColumn: 13 },
+      ]);
+
+      const findings = await rule.run(makeFile('src/app.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.line).toBe(5);
+      expect(findings[0]!.message).toBe('eval() is a security risk.');
+    });
+
+    it('returns empty when no matches', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'test/eval-usage',
+          version: '1.0.0',
+          category: 'security',
+          severity: 'error',
+          applicable_to: ['is_typescript'],
+          mode: 'ast-grep',
+          ast_grep: { pattern: 'eval($$$)' },
+          message_template: 'eval() found.',
+          fix_complexity: 'S',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockFindPattern([]);
+
+      const findings = await rule.run(makeFile('src/safe.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(0);
+    });
+
+    it('respects exclude_patterns', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'test/eval-usage',
+          version: '1.0.0',
+          category: 'security',
+          severity: 'error',
+          applicable_to: ['is_typescript'],
+          exclude_patterns: ['*.test.ts'],
+          mode: 'ast-grep',
+          ast_grep: { pattern: 'eval($$$)' },
+          message_template: 'eval() found.',
+          fix_complexity: 'S',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+
+      const findings = await rule.run(makeFile('src/app.test.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(0);
+      expect(mockFindPatternFn).not.toHaveBeenCalled();
+    });
+
+    it('uses matched text in message with {match[0]}', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'test/subscribe',
+          version: '1.0.0',
+          category: 'rxjs',
+          severity: 'warning',
+          applicable_to: ['is_typescript'],
+          mode: 'ast-grep',
+          ast_grep: { pattern: '$OBJ.subscribe($$$)' },
+          message_template: 'Found: {match[0]}',
+          fix_complexity: 'M',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockFindPattern([
+        { text: 'this.http.get().subscribe(data => {})', line: 10, column: 5, endLine: 10, endColumn: 42 },
+      ]);
+
+      const findings = await rule.run(makeFile('src/svc.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.message).toBe('Found: this.http.get().subscribe(data => {})');
+    });
+
+    it('finds multiple matches', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'test/eval',
+          version: '1.0.0',
+          category: 'security',
+          severity: 'error',
+          applicable_to: ['is_typescript'],
+          mode: 'ast-grep',
+          ast_grep: { pattern: 'eval($$$)' },
+          message_template: 'eval() usage.',
+          fix_complexity: 'M',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockFindPattern([
+        { text: "eval('a')", line: 3, column: 1, endLine: 3, endColumn: 10 },
+        { text: "eval('b')", line: 7, column: 1, endLine: 7, endColumn: 10 },
+      ]);
+
+      const findings = await rule.run(makeFile('src/x.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(2);
+      expect(findings[0]!.line).toBe(3);
+      expect(findings[1]!.line).toBe(7);
     });
   });
 
