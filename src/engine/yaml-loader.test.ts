@@ -161,6 +161,146 @@ describe('compileYamlRule', () => {
     });
   });
 
+  describe('mode: metric', () => {
+    it('detects file exceeding line_count threshold', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'arch/file-too-long',
+          version: '1.0.0',
+          category: 'arch',
+          severity: 'warning',
+          applicable_to: ['is_typescript'],
+          mode: 'metric',
+          metric: {
+            measure: 'line_count',
+            scope: 'file',
+            threshold: 5,
+            operator: '>',
+          },
+          message_template: 'File has {value} lines, max {threshold}.',
+          fix_complexity: 'M',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockSource('line1\nline2\nline3\nline4\nline5\nline6');
+
+      const findings = await rule.run(makeFile('src/big.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.message).toBe('File has 6 lines, max 5.');
+    });
+
+    it('passes when under threshold', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'arch/file-too-long',
+          version: '1.0.0',
+          category: 'arch',
+          severity: 'warning',
+          applicable_to: ['is_typescript'],
+          mode: 'metric',
+          metric: {
+            measure: 'line_count',
+            scope: 'file',
+            threshold: 100,
+            operator: '>',
+          },
+          message_template: 'File has {value} lines, max {threshold}.',
+          fix_complexity: 'M',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockSource('line1\nline2');
+
+      const findings = await rule.run(makeFile('src/small.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(0);
+    });
+
+    it('supports function_count measure', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'arch/too-many-functions',
+          version: '1.0.0',
+          category: 'arch',
+          severity: 'error',
+          applicable_to: ['is_typescript'],
+          mode: 'metric',
+          metric: {
+            measure: 'function_count',
+            scope: 'file',
+            threshold: 2,
+            operator: '>',
+          },
+          message_template: 'File has {value} functions, max {threshold}.',
+          fix_complexity: 'L',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockSource('function a() {\n  return 1;\n}\nfunction b() {\n  return 2;\n}\nfunction c() {\n  return 3;\n}');
+
+      const findings = await rule.run(makeFile('src/app.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.message).toBe('File has 3 functions, max 2.');
+    });
+
+    it('supports >= operator', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'test/gte',
+          version: '1.0.0',
+          category: 'test',
+          severity: 'warning',
+          applicable_to: ['is_typescript'],
+          mode: 'metric',
+          metric: {
+            measure: 'line_count',
+            scope: 'file',
+            threshold: 3,
+            operator: '>=',
+          },
+          message_template: 'File has {value} lines, max {threshold}.',
+          fix_complexity: 'S',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockSource('a\nb\nc');
+
+      const findings = await rule.run(makeFile('src/x.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+    });
+
+    it('supports export_count measure', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'arch/too-many-exports',
+          version: '1.0.0',
+          category: 'arch',
+          severity: 'warning',
+          applicable_to: ['is_typescript'],
+          mode: 'metric',
+          metric: {
+            measure: 'export_count',
+            scope: 'file',
+            threshold: 1,
+            operator: '>',
+          },
+          message_template: '{value} exports exceed max {threshold}.',
+          fix_complexity: 'M',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockSource('export const a = 1;\nexport const b = 2;\nexport const c = 3;');
+
+      const findings = await rule.run(makeFile('src/barrel.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.message).toBe('3 exports exceed max 1.');
+    });
+  });
+
   describe('loadYamlRules', () => {
     it('loads and compiles a real YAML rule file', async () => {
       const cwd = path.resolve(import.meta.dirname, '../..');

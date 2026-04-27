@@ -4,6 +4,7 @@ import type { CategorizedFile } from '../discovery/categorizer.js';
 import type { ParLintConfig } from '../types/config.js';
 import { createFinding } from './finding.js';
 import { readSource } from '../adapters/ast-grep.js';
+import { analyzeSource } from '../adapters/ts-metrics.js';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { parse as parseYaml } from 'yaml';
@@ -12,6 +13,13 @@ export interface YamlRegexConfig {
   pattern: string;
   capture_group?: number;
   multiline?: boolean;
+}
+
+export interface YamlMetricConfig {
+  measure: 'line_count' | 'function_count' | 'cyclomatic_complexity' | 'parameter_count' | 'export_count';
+  scope: 'file' | 'function' | 'class' | 'method';
+  threshold: number;
+  operator: '>' | '>=' | '<' | '<=' | '==' | '!=';
 }
 
 export interface YamlRule {
@@ -23,8 +31,9 @@ export interface YamlRule {
   principle?: string;
   applicable_to: string[];
   exclude_patterns?: string[];
-  mode: 'regex';
+  mode: 'regex' | 'metric';
   regex?: YamlRegexConfig;
+  metric?: YamlMetricConfig;
   message_template: string;
   fix_complexity: string;
 }
@@ -108,6 +117,88 @@ function compileRegexRule(rule: YamlRule): RuleDefinition {
   };
 }
 
+const OPERATORS: Record<string, (a: number, b: number) => boolean> = {
+  '>': (a, b) => a > b,
+  '>=': (a, b) => a >= b,
+  '<': (a, b) => a < b,
+  '<=': (a, b) => a <= b,
+  '==': (a, b) => a === b,
+  '!=': (a, b) => a !== b,
+};
+
+const MEASURE_MAP: Record<string, (metrics: ReturnType<typeof analyzeSource>) => number> = {
+  line_count: (m) => m.lineCount,
+  function_count: (m) => m.functionCount,
+  cyclomatic_complexity: (m) => m.maxCyclomaticComplexity,
+  parameter_count: (m) => m.parameterCountMax,
+  export_count: (m) => m.exportCount,
+};
+
+function compileMetricRule(rule: YamlRule): RuleDefinition {
+  if (!rule.metric) {
+    throw new Error(`YAML rule "${rule.id}": mode "metric" requires a "metric" block`);
+  }
+
+  const { measure, threshold, operator } = rule.metric;
+  const compare = OPERATORS[operator];
+  if (!compare) {
+    throw new Error(`YAML rule "${rule.id}": unsupported operator "${operator}"`);
+  }
+
+  const extract = MEASURE_MAP[measure];
+  if (!extract) {
+    throw new Error(`YAML rule "${rule.id}": unsupported measure "${measure}"`);
+  }
+
+  return {
+    id: rule.id,
+    version: rule.version,
+    category: rule.category,
+    severity: rule.severity,
+    description: rule.description,
+    principle: rule.principle,
+    applicable_to: rule.applicable_to,
+
+    async run(
+      file: CategorizedFile,
+      _config: ParLintConfig,
+      cwd: string,
+    ): Promise<Finding[]> {
+      if (rule.exclude_patterns?.length && matchesExclude(file.path, rule.exclude_patterns)) {
+        return [];
+      }
+
+      const source = await readSource(file.path, cwd);
+      const metrics = analyzeSource(source);
+      const value = extract(metrics);
+
+      if (!compare(value, threshold)) return [];
+
+      const message = rule.message_template
+        .replace(/\{value\}/g, String(value))
+        .replace(/\{threshold\}/g, String(threshold));
+
+      return [createFinding({
+        rule_id: rule.id,
+        file: file.path,
+        line: 1,
+        severity: rule.severity,
+        message,
+        source_principle: rule.principle ?? '',
+        category: rule.category,
+        fix_complexity: (rule.fix_complexity as 'S' | 'M' | 'L') ?? 'S',
+        evidence_trail: [{
+          tool: 'yaml-metric',
+          query: { measure, threshold, operator, file: file.path },
+          result: { value },
+          timestamp: new Date().toISOString(),
+          cache_hit: false,
+        }],
+      })];
+    },
+  };
+}
+
 export async function loadYamlRules(paths: string[], cwd: string): Promise<RuleDefinition[]> {
   const rules: RuleDefinition[] = [];
 
@@ -151,7 +242,9 @@ export function compileYamlRule(doc: YamlRuleDocument): RuleDefinition {
   switch (rule.mode) {
     case 'regex':
       return compileRegexRule(rule);
+    case 'metric':
+      return compileMetricRule(rule);
     default:
-      throw new Error(`YAML rule "${rule.id}": unsupported mode "${rule.mode}". Supported: regex`);
+      throw new Error(`YAML rule "${rule.id}": unsupported mode "${rule.mode}". Supported: regex, metric`);
   }
 }
