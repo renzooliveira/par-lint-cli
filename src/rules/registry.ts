@@ -166,6 +166,34 @@ import { eventListenerWithoutDisposeRule } from './definitions/perf/event-listen
 import { classFileNameMismatchRule } from './definitions/naming/class-file-name-mismatch.js';
 import { genericNameInContextRule } from './definitions/naming/generic-name-in-context.js';
 import { similarBlockRule } from './definitions/duplication/similar-block.js';
+import { directDomManipulationRule } from './definitions/security/direct-dom-manipulation.js';
+import { hardcodedSecretRule } from './definitions/security/hardcoded-secret.js';
+import { mutableStateInComputedRule } from './definitions/state/mutable-state-in-computed.js';
+import { hardcodedTextRule } from './definitions/template/hardcoded-text.js';
+import { dataClumpsRule } from './definitions/domain/data-clumps.js';
+import { middleManRule } from './definitions/domain/middle-man.js';
+import { temporaryFieldRule } from './definitions/domain/temporary-field.js';
+import { noCrossSliceImportRule } from './definitions/arch/no-cross-slice-import.js';
+import { mixedConcernsInDirectoryRule } from './definitions/arch/mixed-concerns-in-directory.js';
+import { wrongLifecycleRule } from './definitions/ionic/wrong-lifecycle.js';
+import { missingIonBackButtonRule } from './definitions/ionic/missing-ion-back-button.js';
+import { missingLoadingControllerRule } from './definitions/ionic/missing-loading-controller.js';
+import { missingRefresherRule } from './definitions/ionic/missing-refresher.js';
+import { preferIonGridRule } from './definitions/ionic/prefer-ion-grid.js';
+import { enforcePathAliasRule } from './definitions/imports/enforce-path-alias.js';
+import { noCircularTypeImportRule } from './definitions/imports/no-circular-type-import.js';
+import { contextMismatchRule } from './definitions/naming/context-mismatch.js';
+import { fileClassMismatchRule } from './definitions/naming/file-class-mismatch.js';
+import { missingBreakpointsRule } from './definitions/responsive/missing-breakpoints.js';
+import { touchTargetTooSmallRule } from './definitions/responsive/touch-target-too-small.js';
+import { noObjectMutationRule } from './definitions/fp/no-object-mutation.js';
+import { preferReadonlyPropertyRule } from './definitions/fp/prefer-readonly-property.js';
+import { preferReadonlyParameterRule } from './definitions/fp/prefer-readonly-parameter.js';
+import { preferFrameworkSolutionRule } from './definitions/duplication/prefer-framework-solution.js';
+import { structuralCloneRule } from './definitions/duplication/structural-clone.js';
+import { duplicateTypeShapeRule } from './definitions/duplication/duplicate-type-shape.js';
+import { similarScssBlockRule } from './definitions/duplication/similar-scss-block.js';
+import { preferExistingUtilityRule } from './definitions/duplication/prefer-existing-utility.js';
 
 export const ALL_RULES: RuleDefinition[] = [
   manualChangeDetectionRule,
@@ -335,4 +363,32 @@ export const ALL_RULES: RuleDefinition[] = [
   classFileNameMismatchRule,
   genericNameInContextRule,
   similarBlockRule,
+  directDomManipulationRule,
+  hardcodedSecretRule,
+  mutableStateInComputedRule,
+  hardcodedTextRule,
+  dataClumpsRule,
+  middleManRule,
+  temporaryFieldRule,
+  noCrossSliceImportRule,
+  mixedConcernsInDirectoryRule,
+  wrongLifecycleRule,
+  missingIonBackButtonRule,
+  missingLoadingControllerRule,
+  missingRefresherRule,
+  preferIonGridRule,
+  enforcePathAliasRule,
+  noCircularTypeImportRule,
+  contextMismatchRule,
+  fileClassMismatchRule,
+  missingBreakpointsRule,
+  touchTargetTooSmallRule,
+  noObjectMutationRule,
+  preferReadonlyPropertyRule,
+  preferReadonlyParameterRule,
+  preferFrameworkSolutionRule,
+  structuralCloneRule,
+  duplicateTypeShapeRule,
+  similarScssBlockRule,
+  preferExistingUtilityRule,
 ];
