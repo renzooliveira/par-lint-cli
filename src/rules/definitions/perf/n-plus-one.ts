@@ -3,11 +3,11 @@ import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
 const LOOP_START_RE = /\b(for|while)\b/;
-const HTTP_CALL_RE = /\.(get|post|put|patch|delete|request)\s*\(|\.fetch\s*\(|\.query\s*\(|\.findOne\s*\(|\.findById\s*\(/;
+const HTTP_CALL_RE = /this\.http\.\w+\s*\(|this\.\w+(?:Service|Repository|Api|Client)\.\w+\s*\(|\bfetch\s*\(|\.query\s*\(|\.findOne\s*\(|\.findById\s*\(/;
 
 export const nPlusOneRule: RuleDefinition = {
   id: 'perf/n-plus-one',
-  version: '1.0.0',
+  version: '1.1.0',
   category: 'perf',
   severity: 'error',
   description: 'Detects HTTP/repository calls inside loops (N+1 pattern)',

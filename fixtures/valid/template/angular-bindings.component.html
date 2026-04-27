@@ -1,0 +1,6 @@
+<div class="container" [class.active]="isActive" [class.disabled]="isDisabled">
+  <button (click)="onClick()" [disabled]="isLoading" type="submit">Save</button>
+</div>
+<input [attr.aria-label]="label" placeholder="default">
+<div *ngIf="count > 0" [style.color]="textColor" style="padding: 8px">Content</div>
+<span *ngIf="items?.length > 0" class="badge" [class.active]="isActive">{{ items.length }}</span>

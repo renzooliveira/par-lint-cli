@@ -86,4 +86,31 @@ class Counter {
     const findings = await mutableStateInComputedRule.run(file, config, '/tmp');
     expect(findings).toHaveLength(0);
   });
+
+  it('ignores spread-then-sort/reverse inside computed (copy is pure)', async () => {
+    mockedRead.mockResolvedValue(`
+class ListComponent {
+  items = signal<Item[]>([]);
+  sorted = computed(() => [...this.items()].sort((a, b) => a.name.localeCompare(b.name)));
+  reversed = computed(() => [...this.items()].reverse());
+}
+`);
+    const findings = await mutableStateInComputedRule.run(file, config, '/tmp');
+    expect(findings).toHaveLength(0);
+  });
+
+  it('ignores local Map.set() inside computed (object construction)', async () => {
+    mockedRead.mockResolvedValue(`
+class TaskList {
+  tasks = signal<Task[]>([]);
+  taskMap = computed(() => {
+    const map = new Map<string, Task>();
+    for (const t of this.tasks()) map.set(t.id, t);
+    return map;
+  });
+}
+`);
+    const findings = await mutableStateInComputedRule.run(file, config, '/tmp');
+    expect(findings).toHaveLength(0);
+  });
 });

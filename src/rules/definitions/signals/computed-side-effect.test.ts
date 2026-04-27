@@ -22,4 +22,18 @@ describe('signals/computed-side-effect', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('does not flag effect() with .set() or computed() with new Map()', async () => {
+    const file = categorizeFile('valid/signals/effect-with-set.component.ts');
+    const findings = await computedSideEffectRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
+
+  it('does not flag local Map.set() inside computed (object construction, not signal mutation)', async () => {
+    const file = categorizeFile('valid/signals/computed-with-map-set.page.ts');
+    const findings = await computedSideEffectRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

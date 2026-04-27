@@ -2,12 +2,12 @@ import type { RuleDefinition } from '../../../engine/runner.js';
 import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
-const COMPUTED_RE = /computed\s*\(\s*\(\s*\)\s*=>/;
-const SIDE_EFFECT_RE = /\.(set|update)\s*\(|console\.\w+\s*\(|\.subscribe\s*\(/;
+const COMPUTED_START_RE = /\bcomputed\s*\(/;
+const SIDE_EFFECT_RE = /this\.\w+\.(?:set|update)\s*\(|console\.\w+\s*\(|\.subscribe\s*\(/;
 
 export const computedSideEffectRule: RuleDefinition = {
   id: 'signals/computed-side-effect',
-  version: '1.0.0',
+  version: '1.1.0',
   category: 'signals',
   severity: 'error',
   description: 'Detects side effects (.set(), .update(), console.*, subscribe) inside computed()',
@@ -24,22 +24,28 @@ export const computedSideEffectRule: RuleDefinition = {
     const findings = [];
 
     let inComputed = false;
-    let braceDepth = 0;
-    let computedBraceDepth = 0;
+    let parenDepth = 0;
+    let computedParenDepth = 0;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
 
-      if (!inComputed && COMPUTED_RE.test(line)) {
+      if (!inComputed && COMPUTED_START_RE.test(line)) {
+        const matchIdx = line.search(COMPUTED_START_RE);
+        let preParens = 0;
+        for (let j = 0; j < matchIdx; j++) {
+          if (line[j] === '(') preParens++;
+          else if (line[j] === ')') preParens--;
+        }
         inComputed = true;
-        computedBraceDepth = braceDepth;
+        computedParenDepth = parenDepth + preParens;
       }
 
       for (const ch of line) {
-        if (ch === '{') braceDepth++;
-        else if (ch === '}') {
-          braceDepth--;
-          if (inComputed && braceDepth <= computedBraceDepth) {
+        if (ch === '(') parenDepth++;
+        else if (ch === ')') {
+          parenDepth--;
+          if (inComputed && parenDepth <= computedParenDepth) {
             inComputed = false;
           }
         }

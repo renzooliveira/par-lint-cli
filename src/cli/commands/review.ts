@@ -97,7 +97,7 @@ export const reviewCommand = new Command('review')
       let cache: FileCache | undefined;
       if (options.cache && config.performance.cache_enabled) {
         const cachePath = path.resolve(cwd, '.par-lint/cache.json');
-        cache = new FileCache(cachePath);
+        cache = new FileCache(cachePath, runner.getRulesVersion());
         await cache.load();
       }
 

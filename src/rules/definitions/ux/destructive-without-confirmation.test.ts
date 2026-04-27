@@ -24,4 +24,28 @@ describe('ux/destructive-without-confirmation', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('does not flag service layer (confirmation belongs in UI)', async () => {
+    const config = parLintConfigSchema.parse({ project: { name: 'test' } });
+    const file = categorizeFile('valid/ux/destructive-in-service.service.ts');
+    const findings = await destructiveWithoutConfirmationRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
+
+  it('does not flag removePending* in page (non-persisted ephemeral data)', async () => {
+    const config = parLintConfigSchema.parse({ project: { name: 'test' } });
+    const file = categorizeFile('valid/ux/remove-pending-in-page.page.ts');
+    const findings = await destructiveWithoutConfirmationRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
+
+  it('does not flag remove methods that only manipulate local signals', async () => {
+    const config = parLintConfigSchema.parse({ project: { name: 'test' } });
+    const file = categorizeFile('valid/ux/remove-local-only.component.ts');
+    const findings = await destructiveWithoutConfirmationRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

@@ -4,10 +4,12 @@ import { createFinding } from '../../../engine/finding.js';
 
 const DESTRUCTIVE_METHOD_RE = /^\s*(?:async\s+)?(?:public\s+|private\s+|protected\s+)?(delete\w*|remove\w*|destroy\w*)\s*\(/gm;
 const CONFIRM_RE = /confirm|AlertController|MatDialog|IonAlert|showAlert|openConfirm/;
+const EPHEMERAL_RE = /Pending|Draft|Temp|Cache|Local|FromList|FromQueue/i;
+const PERSISTENCE_RE = /this\.\w+(?:Service|Api|Repository|Http|Client)\.\w+\s*\(|this\.http\.\w+\s*\(|\bfetch\s*\(|\.delete\s*\(|\.remove\s*\(.*(?:Service|Api|Repository)/;
 
 export const destructiveWithoutConfirmationRule: RuleDefinition = {
   id: 'ux/destructive-without-confirmation',
-  version: '1.0.0',
+  version: '1.1.0',
   category: 'ux',
   severity: 'error',
   description: 'Detects delete/remove/destroy handlers without confirmation dialog',
@@ -15,6 +17,8 @@ export const destructiveWithoutConfirmationRule: RuleDefinition = {
   applicable_to: ['is_typescript'],
 
   async run(file, _config, cwd) {
+    if (!file.tags.includes('is_component') && !file.tags.includes('is_page')) return [];
+
     const source = await readSource(file.path, cwd);
     const lines = source.split('\n');
     const findings = [];
@@ -23,6 +27,7 @@ export const destructiveWithoutConfirmationRule: RuleDefinition = {
     let match: RegExpExecArray | null;
     while ((match = DESTRUCTIVE_METHOD_RE.exec(source)) !== null) {
       const methodName = match[1]!;
+      if (EPHEMERAL_RE.test(methodName)) continue;
       const methodStart = source.substring(0, match.index).split('\n').length;
 
       let braceDepth = 0;
@@ -36,6 +41,8 @@ export const destructiveWithoutConfirmationRule: RuleDefinition = {
         methodBody += line + '\n';
         if (started && braceDepth <= 0) break;
       }
+
+      if (!PERSISTENCE_RE.test(methodBody)) continue;
 
       if (!CONFIRM_RE.test(methodBody)) {
         findings.push(createFinding({

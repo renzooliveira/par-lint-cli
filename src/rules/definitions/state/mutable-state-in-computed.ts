@@ -2,11 +2,11 @@ import type { RuleDefinition } from '../../../engine/runner.js';
 import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
-const MUTATION_RE = /\.(set|update|push|splice|pop|shift|unshift|sort|reverse|fill)\s*\(/;
+const MUTATION_RE = /this\.\w+\.(set|update)\s*\(|(?<!\])\.(push|splice|pop|shift|unshift|sort|reverse|fill)\s*\(/;
 
 export const mutableStateInComputedRule: RuleDefinition = {
   id: 'state/mutable-state-in-computed',
-  version: '1.0.0',
+  version: '1.2.0',
   category: 'state',
   severity: 'error',
   description: 'Detects state mutation inside computed()',

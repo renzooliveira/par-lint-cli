@@ -3,12 +3,51 @@ import { createFinding } from '../../../engine/finding.js';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-const TAG_RE = /<([a-zA-Z][a-zA-Z0-9-]*)\b([^>]*)>/g;
-const ATTR_RE = /\b([a-zA-Z_][\w.-]*)\s*=/g;
+const TAG_RE = /<([a-zA-Z][a-zA-Z0-9-]*)\b((?:[^>"']|"[^"]*"|'[^']*')*)>/g;
+
+function extractAttrNames(attrs: string): string[] {
+  const names: string[] = [];
+  let i = 0;
+  while (i < attrs.length) {
+    while (i < attrs.length && /\s/.test(attrs[i]!)) i++;
+    if (i >= attrs.length) break;
+
+    let name = '';
+    if ('[(*#'.includes(attrs[i]!)) {
+      const start = i;
+      i++;
+      while (i < attrs.length && attrs[i] !== '=' && !/\s/.test(attrs[i]!)) i++;
+      name = attrs.slice(start, i);
+    } else if (/[a-zA-Z_]/.test(attrs[i]!)) {
+      const start = i;
+      while (i < attrs.length && /[\w.\-]/.test(attrs[i]!)) i++;
+      name = attrs.slice(start, i);
+    } else {
+      i++;
+      continue;
+    }
+
+    while (i < attrs.length && /\s/.test(attrs[i]!)) i++;
+    if (i < attrs.length && attrs[i] === '=') {
+      i++;
+      while (i < attrs.length && /\s/.test(attrs[i]!)) i++;
+      if (i < attrs.length && (attrs[i] === '"' || attrs[i] === "'")) {
+        const quote = attrs[i]!;
+        i++;
+        while (i < attrs.length && attrs[i] !== quote) i++;
+        if (i < attrs.length) i++;
+      }
+      names.push(name);
+    } else {
+      names.push(name);
+    }
+  }
+  return names;
+}
 
 export const duplicateAttributeRule: RuleDefinition = {
   id: 'template/duplicate-attribute',
-  version: '1.0.0',
+  version: '1.1.0',
   category: 'template',
   severity: 'error',
   description: 'Detects elements with duplicate attributes — second silently overwrites first',
@@ -24,13 +63,9 @@ export const duplicateAttributeRule: RuleDefinition = {
     for (const tagMatch of source.matchAll(TAG_RE)) {
       const attrs = tagMatch[2]!;
       const seen = new Map<string, number>();
-      ATTR_RE.lastIndex = 0;
-
-      let attrMatch;
-      while ((attrMatch = ATTR_RE.exec(attrs)) !== null) {
-        const name = attrMatch[1]!.toLowerCase();
-        const count = (seen.get(name) ?? 0) + 1;
-        seen.set(name, count);
+      for (const name of extractAttrNames(attrs)) {
+        const key = name.toLowerCase();
+        seen.set(key, (seen.get(key) ?? 0) + 1);
       }
 
       for (const [name, count] of seen) {

@@ -5,16 +5,17 @@ import { createFinding } from '../../../engine/finding.js';
 const CLASS_DECL_RE = /^\s*(?:export\s+)?(?:abstract\s+)?class\s+(\w+)/;
 
 function fileNameToClassName(fileName: string): string {
-  const base = fileName.replace(/\.(component|service|pipe|directive|guard|interceptor|resolver|module|page|model|entity|dto|interface|enum|store|facade|mapper|controller)\.(ts|js)$/, '');
-  const suffix = fileName.match(/\.(component|service|pipe|directive|guard|interceptor|resolver|module|page|model|entity|dto|interface|enum|store|facade|mapper|controller)\./)?.[1] ?? '';
+  const suffixMatch = fileName.match(/\.([a-z][a-z-]*)\.(ts|js)$/);
+  const suffix = suffixMatch?.[1] ?? '';
+  const base = suffix ? fileName.replace(`.${suffix}.${suffixMatch![2]}`, '') : fileName.replace(/\.(ts|js)$/, '');
   const pascal = base.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
-  const pascalSuffix = suffix ? suffix.charAt(0).toUpperCase() + suffix.slice(1) : '';
+  const pascalSuffix = suffix ? suffix.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('') : '';
   return pascal + pascalSuffix;
 }
 
 export const fileClassMismatchRule: RuleDefinition = {
   id: 'naming/file-class-mismatch',
-  version: '1.0.0',
+  version: '1.1.0',
   category: 'naming',
   severity: 'error',
   description: 'Detects mismatch between file name and exported class name',
