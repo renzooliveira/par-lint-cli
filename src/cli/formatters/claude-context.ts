@@ -16,13 +16,22 @@ interface ClaudeContextIssue {
   confidence: number;
 }
 
+interface ClaudeContextScan {
+  files: number;
+  issues: number;
+  rules_v: string;
+  by_category: Record<string, number>;
+  by_severity: Record<string, number>;
+  truncated?: true;
+}
+
 interface ClaudeContextOutput {
-  scan: {
-    files: number;
-    issues: number;
-    rules_v: string;
-  };
+  scan: ClaudeContextScan;
   issues: ClaudeContextIssue[];
+}
+
+export interface ClaudeContextOptions {
+  maxIssues?: number;
 }
 
 function findingToIssue(finding: Finding, index: number): ClaudeContextIssue {
@@ -42,14 +51,36 @@ function findingToIssue(finding: Finding, index: number): ClaudeContextIssue {
   };
 }
 
-export function formatClaudeContext(report: Report): string {
+function countBy(findings: Finding[], key: 'category' | 'severity'): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const f of findings) {
+    const val = key === 'category' ? f.category : f.severity;
+    counts[val] = (counts[val] ?? 0) + 1;
+  }
+  return counts;
+}
+
+export function formatClaudeContext(report: Report, options?: ClaudeContextOptions): string {
+  const allFindings = report.findings;
+  const maxIssues = options?.maxIssues;
+  const truncated = maxIssues != null && allFindings.length > maxIssues;
+  const sliced = truncated ? allFindings.slice(0, maxIssues) : allFindings;
+
+  const scan: ClaudeContextScan = {
+    files: report.performance.files_analyzed,
+    issues: allFindings.length,
+    rules_v: report.par_lint_version,
+    by_category: countBy(allFindings, 'category'),
+    by_severity: countBy(allFindings, 'severity'),
+  };
+
+  if (truncated) {
+    scan.truncated = true;
+  }
+
   const output: ClaudeContextOutput = {
-    scan: {
-      files: report.performance.files_analyzed,
-      issues: report.findings.length,
-      rules_v: report.par_lint_version,
-    },
-    issues: report.findings.map(findingToIssue),
+    scan,
+    issues: sliced.map(findingToIssue),
   };
 
   return JSON.stringify(output);

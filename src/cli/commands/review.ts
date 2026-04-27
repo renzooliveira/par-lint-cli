@@ -33,11 +33,13 @@ export const reviewCommand = new Command('review')
   .option('--baseline', 'Filter out findings present in baseline')
   .option('--save-baseline', 'Save current findings as baseline')
   .option('--profile', 'Show rule execution time profiling')
+  .option('--max-issues <n>', 'Max issues in claude-context output (default: 50)', '50')
   .action(async (options: {
     output: string;
     file?: string;
     severity: string;
     json: boolean;
+    maxIssues: string;
     dryRun: boolean;
     target?: string;
     category?: string;
@@ -182,7 +184,8 @@ export const reviewCommand = new Command('review')
       }
 
       if (formats.includes('claude-context')) {
-        process.stdout.write(formatClaudeContext(report));
+        const maxIssues = parseInt(options.maxIssues, 10);
+        process.stdout.write(formatClaudeContext(report, { maxIssues }));
       }
 
       if (options.profile && Object.keys(report.performance.by_tool).length > 0) {

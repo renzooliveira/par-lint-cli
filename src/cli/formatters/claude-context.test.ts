@@ -36,6 +36,8 @@ describe('formatClaudeContext', () => {
       files: 5,
       issues: 1,
       rules_v: '0.1.0',
+      by_category: { rxjs: 1 },
+      by_severity: { error: 1 },
     });
   });
 
@@ -123,5 +125,41 @@ describe('formatClaudeContext', () => {
 
     const raw = formatClaudeContext(makeReport([finding]));
     expect(() => JSON.parse(raw)).not.toThrow();
+  });
+
+  it('includes category summary in scan', () => {
+    const findings = [
+      createFinding({ rule_id: 'rxjs/a', file: 'a.ts', line: 1, severity: 'error', message: 'a', source_principle: 'p', category: 'rxjs' }),
+      createFinding({ rule_id: 'rxjs/b', file: 'b.ts', line: 2, severity: 'warning', message: 'b', source_principle: 'p', category: 'rxjs' }),
+      createFinding({ rule_id: 'arch/c', file: 'c.ts', line: 3, severity: 'error', message: 'c', source_principle: 'p', category: 'arch' }),
+    ];
+
+    const report = makeReport(findings);
+    const output = JSON.parse(formatClaudeContext(report));
+
+    expect(output.scan.by_category).toEqual({ rxjs: 2, arch: 1 });
+    expect(output.scan.by_severity).toEqual({ error: 2, warning: 1 });
+  });
+
+  it('respects maxIssues option', () => {
+    const findings = Array.from({ length: 10 }, (_, i) =>
+      createFinding({ rule_id: `test/r${i}`, file: `f${i}.ts`, line: i + 1, severity: 'warning', message: `msg${i}`, source_principle: 'p', category: 'test' }),
+    );
+
+    const report = makeReport(findings);
+    const output = JSON.parse(formatClaudeContext(report, { maxIssues: 3 }));
+
+    expect(output.issues).toHaveLength(3);
+    expect(output.scan.issues).toBe(10);
+    expect(output.scan.truncated).toBe(true);
+  });
+
+  it('does not set truncated when all issues fit', () => {
+    const finding = createFinding({ rule_id: 'test/r', file: 'a.ts', line: 1, severity: 'error', message: 'm', source_principle: 'p', category: 'test' });
+    const report = makeReport([finding]);
+    const output = JSON.parse(formatClaudeContext(report, { maxIssues: 50 }));
+
+    expect(output.issues).toHaveLength(1);
+    expect(output.scan.truncated).toBeUndefined();
   });
 });
