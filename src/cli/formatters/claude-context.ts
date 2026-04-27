@@ -67,7 +67,7 @@ export function formatClaudeContext(report: Report, options?: ClaudeContextOptio
     (a, b) => (SEVERITY_RANK[a.severity] ?? 9) - (SEVERITY_RANK[b.severity] ?? 9),
   );
   const maxIssues = options?.maxIssues;
-  const truncated = maxIssues != null && allFindings.length > maxIssues;
+  const truncated = maxIssues != null && maxIssues > 0 && allFindings.length > maxIssues;
   const sliced = truncated ? allFindings.slice(0, maxIssues) : allFindings;
 
   const scan: ClaudeContextScan = {

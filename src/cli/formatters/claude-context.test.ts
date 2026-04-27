@@ -163,6 +163,18 @@ describe('formatClaudeContext', () => {
     expect(output.scan.truncated).toBeUndefined();
   });
 
+  it('treats maxIssues 0 as no limit', () => {
+    const findings = Array.from({ length: 5 }, (_, i) =>
+      createFinding({ rule_id: `test/r${i}`, file: `f${i}.ts`, line: i + 1, severity: 'error', message: `msg${i}`, source_principle: 'p', category: 'test' }),
+    );
+
+    const report = makeReport(findings);
+    const output = JSON.parse(formatClaudeContext(report, { maxIssues: 0 }));
+
+    expect(output.issues).toHaveLength(5);
+    expect(output.scan.truncated).toBeUndefined();
+  });
+
   it('sorts issues by severity: error first, then warning, then info', () => {
     const findings = [
       createFinding({ rule_id: 'test/w', file: 'w.ts', line: 1, severity: 'warning', message: 'warn', source_principle: 'p', category: 'test' }),
