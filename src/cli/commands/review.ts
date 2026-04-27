@@ -33,7 +33,7 @@ export const reviewCommand = new Command('review')
   .option('--baseline', 'Filter out findings present in baseline')
   .option('--save-baseline', 'Save current findings as baseline')
   .option('--profile', 'Show rule execution time profiling')
-  .option('--max-issues <n>', 'Max issues in claude-context output (default: 50)', '50')
+  .option('--max-issues <n>', 'Max issues in claude-context output (default: 10)', '10')
   .action(async (options: {
     output: string;
     file?: string;
