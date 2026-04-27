@@ -22,4 +22,11 @@ describe('naming/reserved-word-collision', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('skips *.config.ts files (framework convention)', async () => {
+    const file = categorizeFile('valid/naming/capacitor.config.ts');
+    const findings = await reservedWordCollisionRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

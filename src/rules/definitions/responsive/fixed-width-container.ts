@@ -3,10 +3,12 @@ import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
 const FIXED_WIDTH_RE = /^\s*width\s*:\s*(\d+)px\s*;/;
+const ICON_SELECTOR_RE = /\b(?:logo|icon|avatar)\b/i;
+const SELECTOR_RE = /^([^{]+)\{/;
 
 export const fixedWidthContainerRule: RuleDefinition = {
   id: 'responsive/fixed-width-container',
-  version: '1.0.0',
+  version: '1.1.0',
   category: 'responsive',
   severity: 'warning',
   description: 'Detects fixed width in px on containers instead of max-width or percentage',
@@ -19,13 +21,21 @@ export const fixedWidthContainerRule: RuleDefinition = {
     const source = await readSource(file.path, cwd);
     const lines = source.split('\n');
     const findings = [];
+    let inIconContext = false;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
       if (line.trimStart().startsWith('//') || line.trimStart().startsWith('*')) continue;
 
+      const selectorMatch = SELECTOR_RE.exec(line);
+      if (selectorMatch) {
+        inIconContext = ICON_SELECTOR_RE.test(selectorMatch[1]!);
+      }
+      if (line.includes('}')) inIconContext = false;
+
       const match = FIXED_WIDTH_RE.exec(line);
       if (!match) continue;
+      if (inIconContext) continue;
 
       findings.push(createFinding({
         rule_id: 'responsive/fixed-width-container',

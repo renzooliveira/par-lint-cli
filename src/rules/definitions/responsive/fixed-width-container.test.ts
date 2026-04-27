@@ -22,4 +22,11 @@ describe('responsive/fixed-width-container', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('skips logo/icon elements with intentional fixed size', async () => {
+    const file = categorizeFile('valid/responsive/icon-fixed-width.component.scss');
+    const findings = await fixedWidthContainerRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

@@ -22,4 +22,11 @@ describe('duplication/duplicate-css-class', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('skips complementary classes (base + media query variant)', async () => {
+    const file = categorizeFile('valid/duplication/responsive-base.component.scss');
+    const findings = await duplicateCssClassRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

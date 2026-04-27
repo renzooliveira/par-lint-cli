@@ -22,4 +22,11 @@ describe('scss/no-important', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('skips !important preceded by Shadow DOM override comment', async () => {
+    const file = categorizeFile('valid/scss/shadow-dom-important.component.scss');
+    const findings = await noImportantRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

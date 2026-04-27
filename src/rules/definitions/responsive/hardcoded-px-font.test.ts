@@ -22,4 +22,11 @@ describe('responsive/hardcoded-px-font', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('skips ion-icon contexts (glyphs use px intentionally)', async () => {
+    const file = categorizeFile('valid/responsive/icon-px-font.component.scss');
+    const findings = await hardcodedPxFontRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

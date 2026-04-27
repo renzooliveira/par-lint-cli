@@ -12,7 +12,7 @@ const DECLARATION_RE = /\b(?:const|let|var)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g;
 
 export const reservedWordCollisionRule: RuleDefinition = {
   id: 'naming/reserved-word-collision',
-  version: '1.0.0',
+  version: '1.1.0',
   category: 'naming',
   severity: 'warning',
   description: 'Detects variables using generic domain-reserved words',
@@ -22,6 +22,7 @@ export const reservedWordCollisionRule: RuleDefinition = {
   async run(file, config, cwd) {
     if (!file.path.endsWith('.ts')) return [];
     if (file.path.endsWith('.spec.ts') || file.path.endsWith('.test.ts')) return [];
+    if (file.path.endsWith('.config.ts')) return [];
 
     const opts = config.rules['naming/reserved-word-collision']?.options as {
       reservedWords?: string[];
