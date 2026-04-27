@@ -163,6 +163,9 @@ import { frameworkInDomainRule } from './definitions/arch/framework-in-domain.js
 import { deepInheritanceChainRule } from './definitions/arch/deep-inheritance-chain.js';
 import { standaloneExplicitRule } from './definitions/component/standalone-explicit.js';
 import { eventListenerWithoutDisposeRule } from './definitions/perf/event-listener-without-dispose.js';
+import { classFileNameMismatchRule } from './definitions/naming/class-file-name-mismatch.js';
+import { genericNameInContextRule } from './definitions/naming/generic-name-in-context.js';
+import { similarBlockRule } from './definitions/duplication/similar-block.js';
 
 export const ALL_RULES: RuleDefinition[] = [
   manualChangeDetectionRule,
@@ -329,4 +332,7 @@ export const ALL_RULES: RuleDefinition[] = [
   deepInheritanceChainRule,
   standaloneExplicitRule,
   eventListenerWithoutDisposeRule,
+  classFileNameMismatchRule,
+  genericNameInContextRule,
+  similarBlockRule,
 ];
