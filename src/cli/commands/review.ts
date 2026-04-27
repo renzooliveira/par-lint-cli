@@ -14,6 +14,7 @@ import { formatJson } from '../formatters/json.js';
 import { formatConsole } from '../formatters/console.js';
 import { formatSarif } from '../formatters/sarif.js';
 import { formatMarkdown } from '../formatters/markdown.js';
+import { formatClaudeContext } from '../formatters/claude-context.js';
 import { ALL_RULES } from '../../rules/registry.js';
 import { loadCustomRules } from '../../engine/plugin-loader.js';
 
@@ -178,6 +179,10 @@ export const reviewCommand = new Command('review')
         await mkdir(path.dirname(mdPath), { recursive: true });
         await writeFile(mdPath, formatMarkdown(report), 'utf-8');
         console.log(`  Markdown written to ${path.relative(cwd, mdPath)}`);
+      }
+
+      if (formats.includes('claude-context')) {
+        process.stdout.write(formatClaudeContext(report));
       }
 
       if (options.profile && Object.keys(report.performance.by_tool).length > 0) {
