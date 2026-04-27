@@ -1,0 +1,21 @@
+<div>
+  @if (showA) {
+    <div>
+      @if (showB) {
+        <ul>
+          @for (item of items; track item.id) {
+            <li>{{ item.name }}</li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</div>
+
+<div *ngIf="condA">
+  <div *ngIf="condB">
+    <div *ngFor="let x of list">
+      {{ x }}
+    </div>
+  </div>
+</div>

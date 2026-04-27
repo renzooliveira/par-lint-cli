@@ -1,0 +1,9 @@
+.truncated-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.normal-text {
+  color: blue;
+}

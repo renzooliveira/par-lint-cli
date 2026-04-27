@@ -1,0 +1,7 @@
+@import 'variables';
+@import 'mixins';
+@import 'theme/colors';
+
+.container {
+  color: $primary;
+}

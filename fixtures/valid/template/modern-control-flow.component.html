@@ -1,0 +1,11 @@
+@if (isVisible) {
+  <p>Visible</p>
+}
+@for (item of items; track item.id) {
+  <p>{{ item.name }}</p>
+}
+@switch (status) {
+  @case ('active') {
+    <span>Active</span>
+  }
+}

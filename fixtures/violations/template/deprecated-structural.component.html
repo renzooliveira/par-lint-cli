@@ -1,0 +1,9 @@
+<div *ngIf="isVisible">
+  <p>Visible</p>
+</div>
+<ul>
+  <li *ngFor="let item of items">{{ item.name }}</li>
+</ul>
+<div *ngSwitch="status">
+  <span *ngSwitchCase="'active'">Active</span>
+</div>

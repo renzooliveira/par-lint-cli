@@ -1,0 +1,9 @@
+%btn-base {
+  padding: 8px 16px;
+  border: none;
+}
+
+.btn-primary {
+  @extend %btn-base;
+  background: blue;
+}

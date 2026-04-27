@@ -1,0 +1,9 @@
+:root {
+  --par-color-primary: #333;
+  --par-font-size-lg: 18px;
+  --ion-color-primary: #444;
+}
+
+.component {
+  color: var(--par-color-primary);
+}

@@ -1,0 +1,13 @@
+$spacing-md: 16px;
+$radius-sm: 8px;
+$card-width: 320px;
+
+.card {
+  padding: $spacing-md;
+  margin: 0;
+  border-radius: $radius-sm;
+  width: $card-width;
+  opacity: 1;
+  flex-grow: 0;
+  z-index: 100%;
+}

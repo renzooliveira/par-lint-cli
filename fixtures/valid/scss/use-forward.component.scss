@@ -1,0 +1,6 @@
+@use 'variables' as vars;
+@forward 'mixins';
+
+.container {
+  color: vars.$primary;
+}

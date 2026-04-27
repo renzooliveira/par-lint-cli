@@ -1,0 +1,19 @@
+.user-card {
+  color: black;
+
+  &__title {
+    font-size: 16px;
+  }
+
+  &__title--bold {
+    font-weight: bold;
+  }
+
+  &--highlighted {
+    background: yellow;
+  }
+}
+
+.order-list {
+  display: flex;
+}

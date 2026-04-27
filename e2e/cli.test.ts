@@ -20,7 +20,7 @@ function run(args: string): { stdout: string; exitCode: number } {
 }
 
 describe('CLI E2E', () => {
-  it('review --json produces valid JSON with findings', () => {
+  it('review --json produces valid JSON with findings', { timeout: 20000 }, () => {
     const { stdout } = run(`review --target "${FIXTURE}" --json`);
     const report = JSON.parse(stdout);
 

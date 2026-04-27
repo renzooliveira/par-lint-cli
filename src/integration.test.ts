@@ -13,10 +13,10 @@ const FIXTURES = path.resolve(import.meta.dirname, '../fixtures');
 const config = parLintConfigSchema.parse({ project: { name: 'integration-test' } });
 
 describe('integration: full pipeline', () => {
-  it('registers all 43 rules', () => {
+  it('registers all rules', () => {
     const runner = new RuleRunner();
     runner.registerMany(ALL_RULES);
-    expect(runner.registeredRules).toHaveLength(47);
+    expect(runner.registeredRules).toHaveLength(164);
   });
 
   it('runs all rules against violation fixtures and produces findings', async () => {
