@@ -22,7 +22,11 @@ interface ClaudeContextScan {
   rules_v: string;
   by_category: Record<string, number>;
   by_severity: Record<string, number>;
-  truncated?: true;
+  truncated?: {
+    total_issues: number;
+    total_by_category: Record<string, number>;
+    total_by_severity: Record<string, number>;
+  };
 }
 
 interface ClaudeContextOutput {
@@ -72,14 +76,18 @@ export function formatClaudeContext(report: Report, options?: ClaudeContextOptio
 
   const scan: ClaudeContextScan = {
     files: report.performance.files_analyzed,
-    issues: allFindings.length,
+    issues: sliced.length,
     rules_v: report.par_lint_version,
-    by_category: countBy(allFindings, 'category'),
-    by_severity: countBy(allFindings, 'severity'),
+    by_category: countBy(sliced, 'category'),
+    by_severity: countBy(sliced, 'severity'),
   };
 
   if (truncated) {
-    scan.truncated = true;
+    scan.truncated = {
+      total_issues: allFindings.length,
+      total_by_category: countBy(allFindings, 'category'),
+      total_by_severity: countBy(allFindings, 'severity'),
+    };
   }
 
   const output: ClaudeContextOutput = {

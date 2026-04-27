@@ -141,7 +141,7 @@ describe('formatClaudeContext', () => {
     expect(output.scan.by_severity).toEqual({ error: 2, warning: 1 });
   });
 
-  it('respects maxIssues option', () => {
+  it('respects maxIssues option with coherent counts', () => {
     const findings = Array.from({ length: 10 }, (_, i) =>
       createFinding({ rule_id: `test/r${i}`, file: `f${i}.ts`, line: i + 1, severity: 'warning', message: `msg${i}`, source_principle: 'p', category: 'test' }),
     );
@@ -150,8 +150,14 @@ describe('formatClaudeContext', () => {
     const output = JSON.parse(formatClaudeContext(report, { maxIssues: 3 }));
 
     expect(output.issues).toHaveLength(3);
-    expect(output.scan.issues).toBe(10);
-    expect(output.scan.truncated).toBe(true);
+    expect(output.scan.issues).toBe(3);
+    expect(output.scan.by_category).toEqual({ test: 3 });
+    expect(output.scan.by_severity).toEqual({ warning: 3 });
+    expect(output.scan.truncated).toEqual({
+      total_issues: 10,
+      total_by_category: { test: 10 },
+      total_by_severity: { warning: 10 },
+    });
   });
 
   it('does not set truncated when all issues fit', () => {
@@ -160,6 +166,7 @@ describe('formatClaudeContext', () => {
     const output = JSON.parse(formatClaudeContext(report, { maxIssues: 50 }));
 
     expect(output.issues).toHaveLength(1);
+    expect(output.scan.issues).toBe(1);
     expect(output.scan.truncated).toBeUndefined();
   });
 
@@ -173,6 +180,29 @@ describe('formatClaudeContext', () => {
 
     expect(output.issues).toHaveLength(5);
     expect(output.scan.truncated).toBeUndefined();
+  });
+
+  it('truncated scan counts match delivered issues, not total', () => {
+    const findings = [
+      createFinding({ rule_id: 'ux/a', file: 'a.ts', line: 1, severity: 'error', message: 'a', source_principle: 'p', category: 'ux' }),
+      createFinding({ rule_id: 'ux/b', file: 'b.ts', line: 2, severity: 'error', message: 'b', source_principle: 'p', category: 'ux' }),
+      createFinding({ rule_id: 'imports/c', file: 'c.ts', line: 3, severity: 'error', message: 'c', source_principle: 'p', category: 'imports' }),
+      createFinding({ rule_id: 'imports/d', file: 'd.ts', line: 4, severity: 'warning', message: 'd', source_principle: 'p', category: 'imports' }),
+      createFinding({ rule_id: 'perf/e', file: 'e.ts', line: 5, severity: 'warning', message: 'e', source_principle: 'p', category: 'perf' }),
+    ];
+
+    const report = makeReport(findings);
+    const output = JSON.parse(formatClaudeContext(report, { maxIssues: 3 }));
+
+    expect(output.issues).toHaveLength(3);
+    expect(output.scan.issues).toBe(3);
+    expect(output.scan.by_category).toEqual({ ux: 2, imports: 1 });
+    expect(output.scan.by_severity).toEqual({ error: 3 });
+    expect(output.scan.truncated).toEqual({
+      total_issues: 5,
+      total_by_category: { ux: 2, imports: 2, perf: 1 },
+      total_by_severity: { error: 3, warning: 2 },
+    });
   });
 
   it('sorts issues by severity: error first, then warning, then info', () => {
