@@ -162,4 +162,20 @@ describe('formatClaudeContext', () => {
     expect(output.issues).toHaveLength(1);
     expect(output.scan.truncated).toBeUndefined();
   });
+
+  it('sorts issues by severity: error first, then warning, then info', () => {
+    const findings = [
+      createFinding({ rule_id: 'test/w', file: 'w.ts', line: 1, severity: 'warning', message: 'warn', source_principle: 'p', category: 'test' }),
+      createFinding({ rule_id: 'test/i', file: 'i.ts', line: 2, severity: 'info', message: 'info', source_principle: 'p', category: 'test' }),
+      createFinding({ rule_id: 'test/e', file: 'e.ts', line: 3, severity: 'error', message: 'err', source_principle: 'p', category: 'test' }),
+      createFinding({ rule_id: 'test/e2', file: 'e2.ts', line: 4, severity: 'error', message: 'err2', source_principle: 'p', category: 'test' }),
+    ];
+
+    const report = makeReport(findings);
+    const output = JSON.parse(formatClaudeContext(report));
+
+    expect(output.issues.map((i: { severity: string }) => i.severity)).toEqual([
+      'error', 'error', 'warning', 'info',
+    ]);
+  });
 });

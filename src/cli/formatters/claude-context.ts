@@ -60,8 +60,12 @@ function countBy(findings: Finding[], key: 'category' | 'severity'): Record<stri
   return counts;
 }
 
+const SEVERITY_RANK: Record<string, number> = { error: 0, warning: 1, info: 2, 'review-suggested': 3 };
+
 export function formatClaudeContext(report: Report, options?: ClaudeContextOptions): string {
-  const allFindings = report.findings;
+  const allFindings = [...report.findings].sort(
+    (a, b) => (SEVERITY_RANK[a.severity] ?? 9) - (SEVERITY_RANK[b.severity] ?? 9),
+  );
   const maxIssues = options?.maxIssues;
   const truncated = maxIssues != null && allFindings.length > maxIssues;
   const sliced = truncated ? allFindings.slice(0, maxIssues) : allFindings;
