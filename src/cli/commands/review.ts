@@ -18,6 +18,7 @@ import { formatClaudeContext } from '../formatters/claude-context.js';
 import { ALL_RULES } from '../../rules/registry.js';
 import { loadCustomRules } from '../../engine/plugin-loader.js';
 import { loadYamlRules } from '../../engine/yaml-loader.js';
+import { globby } from 'globby';
 
 export const reviewCommand = new Command('review')
   .description('Analyze codebase for pattern violations')
@@ -79,8 +80,9 @@ export const reviewCommand = new Command('review')
       runner.registerMany(ALL_RULES);
 
       if (config.custom_rules.length > 0) {
-        const yamlPaths = config.custom_rules.filter((p) => p.endsWith('.yaml') || p.endsWith('.yml'));
-        const jsPaths = config.custom_rules.filter((p) => !p.endsWith('.yaml') && !p.endsWith('.yml'));
+        const resolved = await globby(config.custom_rules, { cwd, absolute: false });
+        const yamlPaths = resolved.filter((p) => p.endsWith('.yaml') || p.endsWith('.yml'));
+        const jsPaths = resolved.filter((p) => !p.endsWith('.yaml') && !p.endsWith('.yml'));
 
         if (yamlPaths.length > 0) {
           const yamlRules = await loadYamlRules(yamlPaths, cwd);

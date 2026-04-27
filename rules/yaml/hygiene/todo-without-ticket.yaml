@@ -1,0 +1,15 @@
+rule:
+  id: hygiene/todo-without-ticket-yaml
+  version: 1.0.0
+  category: hygiene
+  severity: info
+  description: Detects TODO comments without a ticket reference
+  principle: TODOs without tickets become permanent technical debt
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: '//\s*TODO(?!\s*[\[(]?\w+-\d+)'
+
+  message_template: "TODO without ticket reference. Add a ticket ID (e.g. TODO(PROJ-123))."
+  fix_complexity: S

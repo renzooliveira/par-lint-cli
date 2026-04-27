@@ -1,0 +1,16 @@
+rule:
+  id: hygiene/debugger-statement-yaml
+  version: 1.0.0
+  category: hygiene
+  severity: error
+  description: Detects debugger statements left in code
+  principle: Debugger statements must not ship to production
+  applicable_to: [is_typescript]
+  exclude_patterns: ["*.spec.ts", "*.test.ts"]
+
+  mode: regex
+  regex:
+    pattern: '\bdebugger\b'
+
+  message_template: "debugger statement found. Remove before committing."
+  fix_complexity: S
