@@ -22,4 +22,11 @@ describe('security/high-entropy-string', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('does not flag regex patterns or rule IDs', async () => {
+    const file = categorizeFile('valid/security/regex-patterns.service.ts');
+    const findings = await highEntropyStringRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

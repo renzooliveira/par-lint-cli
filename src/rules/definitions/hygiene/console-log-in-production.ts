@@ -16,6 +16,7 @@ export const consoleLogInProductionRule: RuleDefinition = {
   async run(file, _config, cwd) {
     if (!file.path.endsWith('.ts')) return [];
     if (file.path.endsWith('.spec.ts') || file.path.endsWith('.test.ts')) return [];
+    if (/\b(cli|commands?|bin)\b/.test(file.path)) return [];
 
     const source = await readSource(file.path, cwd);
     const lines = source.split('\n');

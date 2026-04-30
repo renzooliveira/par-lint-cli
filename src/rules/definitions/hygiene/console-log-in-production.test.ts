@@ -22,4 +22,11 @@ describe('hygiene/console-log-in-production', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('skips CLI command files', async () => {
+    const file = categorizeFile('valid/hygiene/cli-command.ts');
+    const findings = await consoleLogInProductionRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

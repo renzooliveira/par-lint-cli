@@ -9,12 +9,19 @@ const RECOGNIZED_SUFFIXES = new Set([
   'interceptor', 'resolver', 'store', 'modal', 'widget',
   'util', 'constant', 'enum', 'interface', 'type',
   'module', 'routes', 'config',
+  'schema', 'loader', 'runner', 'scanner', 'cache', 'plugin',
+  'registry', 'handler', 'helper', 'mapper', 'validator',
+  'strategy', 'builder', 'command', 'formatter', 'parser',
+  'transformer', 'converter', 'provider', 'gateway', 'repository',
+  'listener', 'observer', 'emitter', 'middleware', 'filter',
+  'serializer', 'deserializer', 'encoder', 'decoder',
 ]);
 
 const EXEMPT_BASENAMES = new Set([
   'index.ts', 'main.ts', 'polyfills.ts',
   'environment.ts', 'environment.prod.ts', 'environment.development.ts',
   'setup-jest.ts', 'jest.config.ts', 'vitest.config.ts',
+  'types.ts', 'constants.ts', 'defaults.ts', 'utils.ts', 'helpers.ts',
 ]);
 
 function extractTypeSuffix(basename: string): string | null {

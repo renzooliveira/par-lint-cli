@@ -24,4 +24,11 @@ describe('fp/mutating-array-method', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('does not flag push on local builder arrays', async () => {
+    const file = categorizeFile('valid/fp/local-builder-push.service.ts');
+    const findings = await mutatingArrayMethodRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

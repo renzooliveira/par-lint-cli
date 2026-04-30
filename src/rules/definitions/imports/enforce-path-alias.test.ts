@@ -7,6 +7,15 @@ vi.mock('../../../adapters/ast-grep.js', () => ({
   readSource: vi.fn(),
 }));
 
+vi.mock('node:fs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:fs')>();
+  return {
+    ...actual,
+    existsSync: vi.fn((p: string) => p.includes('tsconfig.json')),
+    readFileSync: vi.fn(() => '{ "compilerOptions": { "paths": { "@app/*": ["src/app/*"] } } }'),
+  };
+});
+
 import { readSource } from '../../../adapters/ast-grep.js';
 const mockedRead = vi.mocked(readSource);
 
