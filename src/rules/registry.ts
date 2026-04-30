@@ -194,6 +194,19 @@ import { structuralCloneRule } from './definitions/duplication/structural-clone.
 import { duplicateTypeShapeRule } from './definitions/duplication/duplicate-type-shape.js';
 import { similarScssBlockRule } from './definitions/duplication/similar-scss-block.js';
 import { preferExistingUtilityRule } from './definitions/duplication/prefer-existing-utility.js';
+import { preferPureFunctionRule } from './definitions/fp/prefer-pure-function.js';
+import { similarComponentRule } from './definitions/duplication/similar-component.js';
+import { multipleConceptsPerFileRule } from './definitions/arch/multiple-concepts-per-file.js';
+import { stateNotInUrlRule } from './definitions/ux/state-not-in-url.js';
+import { textOverflowUnhandledRule } from './definitions/component/text-overflow-unhandled.js';
+import { missingTabularNumsRule } from './definitions/scss/missing-tabular-nums.js';
+import { missingTranslateNoRule } from './definitions/i18n/missing-translate-no.js';
+import { runtimeStateCheckRule } from './definitions/domain/runtime-state-check.js';
+import { largeListNotVirtualizedRule } from './definitions/perf/large-list-not-virtualized.js';
+import { speculativeGeneralityRule } from './definitions/domain/speculative-generality.js';
+import { customWithoutJustificationRule } from './definitions/component/custom-without-justification.js';
+import { crossAggregateDirectCallRule } from './definitions/arch/cross-aggregate-direct-call.js';
+import { arrayAsCollectionAnemicRule } from './definitions/domain/array-as-collection-anemic.js';
 
 export const ALL_RULES: RuleDefinition[] = [
   manualChangeDetectionRule,
@@ -391,4 +404,17 @@ export const ALL_RULES: RuleDefinition[] = [
   duplicateTypeShapeRule,
   similarScssBlockRule,
   preferExistingUtilityRule,
+  preferPureFunctionRule,
+  similarComponentRule,
+  multipleConceptsPerFileRule,
+  stateNotInUrlRule,
+  textOverflowUnhandledRule,
+  missingTabularNumsRule,
+  missingTranslateNoRule,
+  runtimeStateCheckRule,
+  largeListNotVirtualizedRule,
+  speculativeGeneralityRule,
+  customWithoutJustificationRule,
+  crossAggregateDirectCallRule,
+  arrayAsCollectionAnemicRule,
 ];
