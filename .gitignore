@@ -3,3 +3,5 @@ dist/
 .par-lint/
 *.tgz
 .DS_Store
+.claude/handoffs/
+tmp-scan.json
