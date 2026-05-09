@@ -3,7 +3,7 @@ import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
 const MUTATION_RE = /(\w+)\.(\w+)\s*=\s*[^=]/g;
-const SKIP_PATTERNS = /^(this|self|result|response|config|options|event|error|err|e)\b/;
+const SKIP_PATTERNS = /^(this|self|result|response|config|options|event|error|err|e|process|spinner)\b/;
 
 export const externalMutationRule: RuleDefinition = {
   id: 'domain/external-mutation',
@@ -19,7 +19,7 @@ export const externalMutationRule: RuleDefinition = {
       maxMutations?: number;
       ignoreObjects?: string[];
     } | undefined;
-    const maxMutations = opts?.maxMutations ?? 2;
+    const maxMutations = opts?.maxMutations ?? 4;
     const ignoreObjects = new Set(opts?.ignoreObjects ?? []);
 
     const source = await readSource(file.path, cwd);

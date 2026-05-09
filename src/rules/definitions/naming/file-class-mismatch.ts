@@ -43,6 +43,7 @@ export const fileClassMismatchRule: RuleDefinition = {
       if (actualClass === expectedClass) continue;
 
       if (actualClass.toLowerCase() === expectedClass.toLowerCase()) continue;
+      if (actualClass.endsWith(expectedClass)) continue;
 
       findings.push(createFinding({
         rule_id: 'naming/file-class-mismatch',

@@ -17,5 +17,7 @@ export class OrderService {
     user.name = 'new name';
     user.email = 'new@email.com';
     user.role = 'admin';
+    user.active = true;
+    user.updatedAt = new Date();
   }
 }
