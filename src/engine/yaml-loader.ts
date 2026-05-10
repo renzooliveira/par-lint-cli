@@ -5,8 +5,9 @@ import type { ParLintConfig } from '../types/config.js';
 import { createFinding } from './finding.js';
 import { readSource, findPattern } from '../adapters/ast-grep.js';
 import { analyzeSource } from '../adapters/ts-metrics.js';
-import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { readFile, readdir } from 'node:fs/promises';
+import { resolve, dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parse as parseYaml } from 'yaml';
 
 export interface YamlRegexConfig {
@@ -286,6 +287,43 @@ export async function loadYamlRules(paths: string[], cwd: string): Promise<RuleD
     rules.push(compileYamlRule(doc));
   }
 
+  return rules;
+}
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const PKG_ROOT = resolve(__dirname, '..');
+
+async function discoverYamlFiles(dir: string): Promise<string[]> {
+  const results: string[] = [];
+  let entries;
+  try {
+    entries = await readdir(dir, { withFileTypes: true });
+  } catch {
+    return results;
+  }
+  for (const entry of entries) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...await discoverYamlFiles(full));
+    } else if (entry.name.endsWith('.yaml') || entry.name.endsWith('.yml')) {
+      results.push(full);
+    }
+  }
+  return results;
+}
+
+export async function loadBuiltinYamlRules(): Promise<RuleDefinition[]> {
+  const yamlDir = join(PKG_ROOT, 'rules', 'yaml');
+  const files = await discoverYamlFiles(yamlDir);
+  if (files.length === 0) return [];
+
+  const rules: RuleDefinition[] = [];
+  for (const absolute of files) {
+    const content = await readFile(absolute, 'utf-8');
+    const doc = parseYaml(content) as YamlRuleDocument;
+    rules.push(compileYamlRule(doc));
+  }
   return rules;
 }
 

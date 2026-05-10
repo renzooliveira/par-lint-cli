@@ -17,7 +17,7 @@ import { formatMarkdown } from '../formatters/markdown.js';
 import { formatClaudeContext } from '../formatters/claude-context.js';
 import { ALL_RULES } from '../../rules/registry.js';
 import { loadCustomRules } from '../../engine/plugin-loader.js';
-import { loadYamlRules } from '../../engine/yaml-loader.js';
+import { loadYamlRules, loadBuiltinYamlRules } from '../../engine/yaml-loader.js';
 import { globby } from 'globby';
 
 export const reviewCommand = new Command('review')
@@ -78,6 +78,9 @@ export const reviewCommand = new Command('review')
       spinner.text = 'Running rules...';
       const runner = new RuleRunner();
       runner.registerMany(ALL_RULES);
+
+      const builtinYaml = await loadBuiltinYamlRules();
+      runner.registerMany(builtinYaml);
 
       if (config.custom_rules.length > 0) {
         const resolved = await globby(config.custom_rules, { cwd, absolute: false });

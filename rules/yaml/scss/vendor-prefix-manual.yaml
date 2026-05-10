@@ -1,0 +1,15 @@
+rule:
+  id: scss/vendor-prefix-manual
+  version: 1.0.0
+  category: scss
+  severity: info
+  description: Detects manual vendor prefixes that autoprefixer should handle
+  principle: Autoprefixer manages vendor prefixes automatically and keeps them current
+  applicable_to: [is_scss, is_style]
+
+  mode: regex
+  regex:
+    pattern: '^\s*-(webkit|moz|ms|o)-'
+
+  message_template: "Manual vendor prefix detected. Let autoprefixer handle vendor prefixes."
+  fix_complexity: L

@@ -85,7 +85,6 @@ import { enforceBarrelImportRule } from './definitions/imports/enforce-barrel-im
 import { sortedImportsRule } from './definitions/imports/sorted-imports.js';
 import { nestedSubscribeRule } from './definitions/rxjs/nested-subscribe.js';
 import { subscribeInConstructorRule } from './definitions/rxjs/subscribe-in-constructor.js';
-import { topromiseDeprecatedRule } from './definitions/rxjs/topromise-deprecated.js';
 import { missingErrorHandlerRule } from './definitions/rxjs/missing-error-handler.js';
 import { observableInTemplateCallRule } from './definitions/rxjs/observable-in-template-call.js';
 import { signalReadAfterAwaitRule } from './definitions/signals/signal-read-after-await.js';
@@ -100,10 +99,7 @@ import { emptyCatchRule } from './definitions/error/empty-catch.js';
 import { catchOnlyConsoleRule } from './definitions/error/catch-only-console.js';
 import { swallowedPromiseRule } from './definitions/error/swallowed-promise.js';
 import { genericErrorMessageRule } from './definitions/error/generic-error-message.js';
-import { consoleLogInProductionRule } from './definitions/hygiene/console-log-in-production.js';
 import { commentedOutCodeRule } from './definitions/hygiene/commented-out-code.js';
-import { todoWithoutTicketRule } from './definitions/hygiene/todo-without-ticket.js';
-import { debuggerStatementRule } from './definitions/hygiene/debugger-statement.js';
 import { unusedImportRule } from './definitions/hygiene/unused-import.js';
 import { deadCodeAfterReturnRule } from './definitions/hygiene/dead-code-after-return.js';
 import { deprecatedInputDecoratorRule } from './definitions/component/deprecated-input-decorator.js';
@@ -123,7 +119,6 @@ import { tosignalMissingInitialvalueRule } from './definitions/signals/tosignal-
 import { subscribeInServiceRule } from './definitions/rxjs/subscribe-in-service.js';
 import { subjectNeverCompletedRule } from './definitions/rxjs/subject-never-completed.js';
 import { noImportantRule } from './definitions/scss/no-important.js';
-import { deprecatedImportRule } from './definitions/scss/deprecated-import.js';
 import { alwaysTrueAssertionRule } from './definitions/test/always-true-assertion.js';
 import { tsIgnoreWithoutReasonRule } from './definitions/typescript/ts-ignore-without-reason.js';
 import { functionTooManyParamsRule } from './definitions/typescript/function-too-many-params.js';
@@ -135,9 +130,7 @@ import { noNgmoduleRule } from './definitions/component/no-ngmodule.js';
 import { booleanMissingPrefixRule } from './definitions/naming/boolean-missing-prefix.js';
 import { evalUsageRule } from './definitions/security/eval-usage.js';
 import { letReassignmentRule } from './definitions/fp/let-reassignment.js';
-import { enumInsteadOfConstRule } from './definitions/fp/enum-instead-of-const.js';
 import { varInLoopRule } from './definitions/fp/var-in-loop.js';
-import { vendorPrefixManualRule } from './definitions/scss/vendor-prefix-manual.js';
 import { commentedOutAssertionRule } from './definitions/test/commented-out-assertion.js';
 import { giantTestRule } from './definitions/test/giant-test.js';
 import { sensitiveDataInLogRule } from './definitions/security/sensitive-data-in-log.js';
@@ -150,12 +143,10 @@ import { missingIconAccessibilityRule } from './definitions/ionic/missing-icon-a
 import { poorTestNamingRule } from './definitions/test/poor-test-naming.js';
 import { threadSleepInTestRule } from './definitions/test/thread-sleep-in-test.js';
 import { imperativeLoopRule } from './definitions/fp/imperative-loop.js';
-import { redundantLambdaRule } from './definitions/fp/redundant-lambda.js';
 import { nondeterministicInPureRule } from './definitions/fp/nondeterministic-in-pure.js';
 import { localstorageUsageRule } from './definitions/ionic/localstorage-usage.js';
 import { cordovaPluginUsageRule } from './definitions/ionic/cordova-plugin-usage.js';
 import { animateNonCompositableRule } from './definitions/perf/animate-non-compositable.js';
-import { noExtendClassRule } from './definitions/scss/no-extend-class.js';
 import { assertInCatchOnlyRule } from './definitions/test/assert-in-catch-only.js';
 import { highEntropyStringRule } from './definitions/security/high-entropy-string.js';
 import { technicalNamingRule } from './definitions/domain/technical-naming.js';
@@ -295,7 +286,6 @@ export const ALL_RULES: RuleDefinition[] = [
   sortedImportsRule,
   nestedSubscribeRule,
   subscribeInConstructorRule,
-  topromiseDeprecatedRule,
   missingErrorHandlerRule,
   observableInTemplateCallRule,
   signalReadAfterAwaitRule,
@@ -310,10 +300,7 @@ export const ALL_RULES: RuleDefinition[] = [
   catchOnlyConsoleRule,
   swallowedPromiseRule,
   genericErrorMessageRule,
-  consoleLogInProductionRule,
   commentedOutCodeRule,
-  todoWithoutTicketRule,
-  debuggerStatementRule,
   unusedImportRule,
   deadCodeAfterReturnRule,
   deprecatedInputDecoratorRule,
@@ -333,7 +320,6 @@ export const ALL_RULES: RuleDefinition[] = [
   subscribeInServiceRule,
   subjectNeverCompletedRule,
   noImportantRule,
-  deprecatedImportRule,
   alwaysTrueAssertionRule,
   tsIgnoreWithoutReasonRule,
   functionTooManyParamsRule,
@@ -345,9 +331,7 @@ export const ALL_RULES: RuleDefinition[] = [
   booleanMissingPrefixRule,
   evalUsageRule,
   letReassignmentRule,
-  enumInsteadOfConstRule,
   varInLoopRule,
-  vendorPrefixManualRule,
   commentedOutAssertionRule,
   giantTestRule,
   sensitiveDataInLogRule,
@@ -360,12 +344,10 @@ export const ALL_RULES: RuleDefinition[] = [
   poorTestNamingRule,
   threadSleepInTestRule,
   imperativeLoopRule,
-  redundantLambdaRule,
   nondeterministicInPureRule,
   localstorageUsageRule,
   cordovaPluginUsageRule,
   animateNonCompositableRule,
-  noExtendClassRule,
   assertInCatchOnlyRule,
   highEntropyStringRule,
   technicalNamingRule,

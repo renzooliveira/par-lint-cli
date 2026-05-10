@@ -1,0 +1,16 @@
+rule:
+  id: fp/redundant-lambda
+  version: 1.0.0
+  category: fp
+  severity: info
+  description: Detects (x) => fn(x) that can be simplified to fn
+  principle: Redundant wrappers add noise; pass the function reference directly
+  applicable_to: [is_typescript]
+  exclude_patterns: ["*.spec.ts", "*.test.ts"]
+
+  mode: regex
+  regex:
+    pattern: '\((\w+)\)\s*=>\s*(\w+)\(\1\)'
+
+  message_template: "Redundant lambda ({match[1]}) => {match[2]}({match[1]}). Pass {match[2]} directly."
+  fix_complexity: L

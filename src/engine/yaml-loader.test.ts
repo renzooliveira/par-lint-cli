@@ -442,7 +442,7 @@ describe('compileYamlRule', () => {
       );
 
       expect(rules).toHaveLength(1);
-      expect(rules[0]!.id).toBe('hygiene/console-log-in-production-yaml');
+      expect(rules[0]!.id).toBe('hygiene/console-log-in-production');
       expect(rules[0]!.severity).toBe('warning');
       expect(typeof rules[0]!.run).toBe('function');
     });

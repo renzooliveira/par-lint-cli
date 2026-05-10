@@ -1,12 +1,12 @@
 rule:
-  id: hygiene/console-log-in-production-yaml
+  id: hygiene/console-log-in-production
   version: 1.0.0
   category: hygiene
   severity: warning
   description: Detects console.log/debug/info in production code
   principle: Console logging in production pollutes output; use proper logging service
   applicable_to: [is_typescript]
-  exclude_patterns: ["*.spec.ts", "*.test.ts"]
+  exclude_patterns: ["*.spec.ts", "*.test.ts", "*/cli/*", "*/commands/*", "*/bin/*"]
 
   mode: regex
   regex:

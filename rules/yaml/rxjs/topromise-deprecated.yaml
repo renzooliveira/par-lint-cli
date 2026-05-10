@@ -1,0 +1,15 @@
+rule:
+  id: rxjs/topromise-deprecated
+  version: 1.0.0
+  category: rxjs
+  severity: warning
+  description: Detects deprecated .toPromise() usage
+  principle: .toPromise() is deprecated in RxJS 7; use firstValueFrom/lastValueFrom
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: '\.toPromise\s*\(\s*\)'
+
+  message_template: ".toPromise() is deprecated. Use firstValueFrom() or lastValueFrom()."
+  fix_complexity: S

@@ -8,6 +8,7 @@ import { RuleRunner } from '../../engine/runner.js';
 import { formatConsole } from '../formatters/console.js';
 import { ALL_RULES } from '../../rules/registry.js';
 import { loadCustomRules } from '../../engine/plugin-loader.js';
+import { loadBuiltinYamlRules } from '../../engine/yaml-loader.js';
 
 const WATCH_EXTENSIONS = new Set(['.ts', '.html', '.scss', '.css']);
 const IGNORE_DIRS = new Set(['node_modules', 'dist', 'build', '.par-lint', 'coverage']);
@@ -52,6 +53,9 @@ export const watchCommand = new Command('watch')
 
     const runner = new RuleRunner();
     runner.registerMany(ALL_RULES);
+
+    const builtinYaml = await loadBuiltinYamlRules();
+    runner.registerMany(builtinYaml);
 
     if (config.custom_rules.length > 0) {
       const customRules = await loadCustomRules(config.custom_rules, cwd);
