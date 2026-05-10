@@ -1,0 +1,15 @@
+rule:
+  id: component/standalone-explicit
+  version: 1.0.0
+  category: component
+  severity: info
+  description: Detects standalone true when it is the default in Angular 19+
+  principle: Remove boilerplate that matches framework defaults
+  applicable_to: [is_component]
+
+  mode: regex
+  regex:
+    pattern: 'standalone\s*:\s*true'
+
+  message_template: "standalone: true is the default since Angular 19. Remove the redundant property."
+  fix_complexity: L

@@ -102,10 +102,7 @@ import { genericErrorMessageRule } from './definitions/error/generic-error-messa
 import { commentedOutCodeRule } from './definitions/hygiene/commented-out-code.js';
 import { unusedImportRule } from './definitions/hygiene/unused-import.js';
 import { deadCodeAfterReturnRule } from './definitions/hygiene/dead-code-after-return.js';
-import { deprecatedInputDecoratorRule } from './definitions/component/deprecated-input-decorator.js';
-import { deprecatedOutputDecoratorRule } from './definitions/component/deprecated-output-decorator.js';
 import { constructorInjectionRule } from './definitions/component/constructor-injection.js';
-import { deprecatedHostDecoratorRule } from './definitions/component/deprecated-host-decorator.js';
 import { deprecatedStructuralDirectiveRule } from './definitions/template/deprecated-structural-directive.js';
 import { forMissingTrackRule } from './definitions/template/for-missing-track.js';
 import { ngclassInsteadOfClassBindingRule } from './definitions/template/ngclass-instead-of-class-binding.js';
@@ -126,7 +123,6 @@ import { exhaustiveSwitchRule } from './definitions/typescript/exhaustive-switch
 import { elseAfterReturnRule } from './definitions/hygiene/else-after-return.js';
 import { methodCallInTemplateRule } from './definitions/template/method-call-in-template.js';
 import { forWithoutEmptyRule } from './definitions/template/for-without-empty.js';
-import { noNgmoduleRule } from './definitions/component/no-ngmodule.js';
 import { booleanMissingPrefixRule } from './definitions/naming/boolean-missing-prefix.js';
 import { evalUsageRule } from './definitions/security/eval-usage.js';
 import { letReassignmentRule } from './definitions/fp/let-reassignment.js';
@@ -136,7 +132,6 @@ import { giantTestRule } from './definitions/test/giant-test.js';
 import { sensitiveDataInLogRule } from './definitions/security/sensitive-data-in-log.js';
 import { classTooManyMethodsRule } from './definitions/arch/class-too-many-methods.js';
 import { classTooManyFieldsRule } from './definitions/arch/class-too-many-fields.js';
-import { deprecatedViewchildDecoratorRule } from './definitions/component/deprecated-viewchild-decorator.js';
 import { missingPathmatchFullRule } from './definitions/routing/missing-pathmatch-full.js';
 import { wildcardNotLastRule } from './definitions/routing/wildcard-not-last.js';
 import { missingIconAccessibilityRule } from './definitions/ionic/missing-icon-accessibility.js';
@@ -152,7 +147,6 @@ import { highEntropyStringRule } from './definitions/security/high-entropy-strin
 import { technicalNamingRule } from './definitions/domain/technical-naming.js';
 import { frameworkInDomainRule } from './definitions/arch/framework-in-domain.js';
 import { deepInheritanceChainRule } from './definitions/arch/deep-inheritance-chain.js';
-import { standaloneExplicitRule } from './definitions/component/standalone-explicit.js';
 import { eventListenerWithoutDisposeRule } from './definitions/perf/event-listener-without-dispose.js';
 import { classFileNameMismatchRule } from './definitions/naming/class-file-name-mismatch.js';
 import { genericNameInContextRule } from './definitions/naming/generic-name-in-context.js';
@@ -303,10 +297,7 @@ export const ALL_RULES: RuleDefinition[] = [
   commentedOutCodeRule,
   unusedImportRule,
   deadCodeAfterReturnRule,
-  deprecatedInputDecoratorRule,
-  deprecatedOutputDecoratorRule,
   constructorInjectionRule,
-  deprecatedHostDecoratorRule,
   deprecatedStructuralDirectiveRule,
   forMissingTrackRule,
   ngclassInsteadOfClassBindingRule,
@@ -327,7 +318,6 @@ export const ALL_RULES: RuleDefinition[] = [
   elseAfterReturnRule,
   methodCallInTemplateRule,
   forWithoutEmptyRule,
-  noNgmoduleRule,
   booleanMissingPrefixRule,
   evalUsageRule,
   letReassignmentRule,
@@ -337,7 +327,6 @@ export const ALL_RULES: RuleDefinition[] = [
   sensitiveDataInLogRule,
   classTooManyMethodsRule,
   classTooManyFieldsRule,
-  deprecatedViewchildDecoratorRule,
   missingPathmatchFullRule,
   wildcardNotLastRule,
   missingIconAccessibilityRule,
@@ -353,7 +342,6 @@ export const ALL_RULES: RuleDefinition[] = [
   technicalNamingRule,
   frameworkInDomainRule,
   deepInheritanceChainRule,
-  standaloneExplicitRule,
   eventListenerWithoutDisposeRule,
   classFileNameMismatchRule,
   genericNameInContextRule,

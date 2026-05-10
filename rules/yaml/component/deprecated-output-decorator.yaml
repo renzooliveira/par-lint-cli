@@ -1,0 +1,15 @@
+rule:
+  id: component/deprecated-output-decorator
+  version: 1.0.0
+  category: component
+  severity: info
+  description: Detects @Output() decorator usage instead of output() function
+  principle: Angular output() function provides better type safety and consistency with signals
+  applicable_to: [is_component]
+
+  mode: regex
+  regex:
+    pattern: '@Output\s*\('
+
+  message_template: "Use output() function instead of @Output() decorator."
+  fix_complexity: L

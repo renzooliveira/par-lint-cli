@@ -1,0 +1,15 @@
+rule:
+  id: component/no-ngmodule
+  version: 1.0.0
+  category: component
+  severity: warning
+  description: Detects @NgModule usage instead of standalone components
+  principle: Standalone components reduce boilerplate and improve tree-shaking
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: '@NgModule\s*\('
+
+  message_template: "Migrate @NgModule to standalone components for simpler architecture."
+  fix_complexity: XL
