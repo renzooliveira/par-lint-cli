@@ -14,6 +14,7 @@ export interface YamlRegexConfig {
   pattern: string;
   capture_group?: number;
   multiline?: boolean;
+  multi_match?: boolean;
 }
 
 export interface YamlSuggestedFix {
@@ -110,29 +111,30 @@ function compileRegexRule(rule: YamlRule): RuleDefinition {
         }
 
         re.lastIndex = 0;
-        const match = re.exec(line);
-        if (!match) continue;
-
-        findings.push(createFinding({
-          rule_id: rule.id,
-          file: file.path,
-          line: i + 1,
-          severity: rule.severity,
-          message: interpolateMessage(rule.message_template, match),
-          source_principle: rule.principle ?? '',
-          category: rule.category,
-          fix_complexity: (rule.fix_complexity as 'S' | 'M' | 'L' | 'XL') ?? 'S',
-          suggested_fix: rule.suggested_fix
-            ? { kind: rule.suggested_fix.kind, description: interpolateMessage(rule.suggested_fix.description, match) }
-            : undefined,
-          evidence_trail: [{
-            tool: 'yaml-regex',
-            query: { pattern: rule.regex!.pattern, file: file.path },
-            result: { line: i + 1, match: match[0] },
-            timestamp: new Date().toISOString(),
-            cache_hit: false,
-          }],
-        }));
+        let match: RegExpExecArray | null;
+        while ((match = re.exec(line)) !== null) {
+          findings.push(createFinding({
+            rule_id: rule.id,
+            file: file.path,
+            line: i + 1,
+            severity: rule.severity,
+            message: interpolateMessage(rule.message_template, match),
+            source_principle: rule.principle ?? '',
+            category: rule.category,
+            fix_complexity: (rule.fix_complexity as 'S' | 'M' | 'L' | 'XL') ?? 'S',
+            suggested_fix: rule.suggested_fix
+              ? { kind: rule.suggested_fix.kind, description: interpolateMessage(rule.suggested_fix.description, match) }
+              : undefined,
+            evidence_trail: [{
+              tool: 'yaml-regex',
+              query: { pattern: rule.regex!.pattern, file: file.path },
+              result: { line: i + 1, match: match[0] },
+              timestamp: new Date().toISOString(),
+              cache_hit: false,
+            }],
+          }));
+          if (!rule.regex!.multi_match) break;
+        }
       }
 
       return findings;

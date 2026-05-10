@@ -221,6 +221,55 @@ describe('compileYamlRule', () => {
       expect(findings[0]!.fix_complexity).toBe('XL');
     });
 
+    it('finds only first match per line by default', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'test/word',
+          version: '1.0.0',
+          category: 'test',
+          severity: 'warning',
+          applicable_to: ['is_typescript'],
+          mode: 'regex',
+          regex: { pattern: '\\b(foo|bar)\\b' },
+          message_template: 'Found: {match[1]}',
+          fix_complexity: 'S',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockSource('foo and bar on same line');
+
+      const findings = await rule.run(makeFile('src/app.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.message).toBe('Found: foo');
+    });
+
+    it('finds all matches per line when multi_match: true', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'test/word-multi',
+          version: '1.0.0',
+          category: 'test',
+          severity: 'warning',
+          applicable_to: ['is_typescript'],
+          mode: 'regex',
+          regex: { pattern: '\\b(foo|bar)\\b', multi_match: true },
+          message_template: 'Found: {match[1]}',
+          fix_complexity: 'S',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockSource('foo and bar on same line\nbaz alone');
+
+      const findings = await rule.run(makeFile('src/app.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(2);
+      expect(findings[0]!.message).toBe('Found: foo');
+      expect(findings[1]!.message).toBe('Found: bar');
+      expect(findings[0]!.line).toBe(1);
+      expect(findings[1]!.line).toBe(1);
+    });
+
     it('supports match groups in message template', async () => {
       const doc: YamlRuleDocument = {
         rule: {
