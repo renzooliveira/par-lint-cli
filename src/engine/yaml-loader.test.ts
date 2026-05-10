@@ -681,6 +681,53 @@ describe('compileYamlRule', () => {
       const findings = await rule.run(makeFile('src/x.component.ts'), defaultConfig, '/tmp');
       expect(findings[0]!.fix_complexity).toBe('L');
     });
+
+    describe('guard_contains compound mode', () => {
+      const compoundDoc = (overrides: object = {}): YamlRuleDocument => ({
+        rule: {
+          id: 'test/compound',
+          version: '1.0.0',
+          category: 'test',
+          severity: 'warning',
+          applicable_to: ['is_template'],
+          mode: 'file-presence' as 'regex',
+          message_template: 'compound violation',
+          fix_complexity: 'S',
+          file_presence: { guard_contains: '\\|\\s*async', must_not_contain: 'error-state' },
+          ...overrides,
+        },
+      });
+
+      it('skips file when guard pattern is absent', async () => {
+        const rule = compileYamlRule(compoundDoc());
+        mockSource('<div>no async pipe here</div>');
+        const findings = await rule.run(makeFile('src/x.component.html'), defaultConfig, '/tmp');
+        expect(findings).toHaveLength(0);
+      });
+
+      it('skips file when guard present but violation pattern also present', async () => {
+        const rule = compileYamlRule(compoundDoc());
+        mockSource('<div *ngFor="let i of list$ | async"><div class="error-state"></div></div>');
+        const findings = await rule.run(makeFile('src/x.component.html'), defaultConfig, '/tmp');
+        expect(findings).toHaveLength(0);
+      });
+
+      it('flags file when guard present and violation pattern absent', async () => {
+        const rule = compileYamlRule(compoundDoc());
+        mockSource('<div *ngFor="let i of list$ | async">{{ i }}</div>');
+        const findings = await rule.run(makeFile('src/x.component.html'), defaultConfig, '/tmp');
+        expect(findings).toHaveLength(1);
+        expect(findings[0]!.line).toBe(1);
+        expect(findings[0]!.message).toBe('compound violation');
+      });
+
+      it('throws when guard_contains is combined with must_contain', () => {
+        const doc = compoundDoc({
+          file_presence: { guard_contains: 'async', must_contain: 'OnPush' },
+        });
+        expect(() => compileYamlRule(doc)).toThrow(/guard_contains/);
+      });
+    });
   });
 
   describe('loadYamlRules', () => {

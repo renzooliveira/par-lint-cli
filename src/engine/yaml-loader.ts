@@ -37,6 +37,7 @@ export interface YamlAstGrepConfig {
 export interface YamlFilePresenceConfig {
   must_contain?: string;
   must_not_contain?: string;
+  guard_contains?: string;
 }
 
 export interface YamlRule {
@@ -296,19 +297,22 @@ function compileFilePresenceRule(rule: YamlRule): RuleDefinition {
     throw new Error(`YAML rule "${rule.id}": mode "file-presence" requires a "file_presence" block`);
   }
 
-  const { must_contain, must_not_contain } = rule.file_presence;
+  const { must_contain, must_not_contain, guard_contains } = rule.file_presence;
   const hasContain = typeof must_contain === 'string' && must_contain.length > 0;
   const hasNotContain = typeof must_not_contain === 'string' && must_not_contain.length > 0;
+  const hasGuard = typeof guard_contains === 'string' && guard_contains.length > 0;
 
-  if (hasContain === hasNotContain) {
-    throw new Error(`YAML rule "${rule.id}": "file_presence" requires exactly one of "must_contain" or "must_not_contain"`);
+  if (!hasContain && !hasNotContain) {
+    throw new Error(`YAML rule "${rule.id}": "file_presence" requires at least one of "must_contain" or "must_not_contain"`);
+  }
+  if (hasContain && hasNotContain) {
+    throw new Error(`YAML rule "${rule.id}": "file_presence" cannot have both "must_contain" and "must_not_contain" — use "guard_contains" + "must_not_contain" for compound checks`);
+  }
+  if (hasGuard && hasContain) {
+    throw new Error(`YAML rule "${rule.id}": "guard_contains" is only supported with "must_not_contain", not "must_contain"`);
   }
 
-  const pattern = (hasContain ? must_contain : must_not_contain)!;
-  const expectMatch = hasContain;
-  const re = new RegExp(pattern);
-
-  return {
+  const base = {
     id: rule.id,
     version: rule.version,
     category: rule.category,
@@ -316,7 +320,49 @@ function compileFilePresenceRule(rule: YamlRule): RuleDefinition {
     description: rule.description,
     principle: rule.principle,
     applicable_to: rule.applicable_to,
+  };
 
+  if (hasGuard) {
+    const guardRe = new RegExp(guard_contains!);
+    const violationRe = new RegExp(must_not_contain!);
+
+    return {
+      ...base,
+      async run(file: CategorizedFile, _config: ParLintConfig, cwd: string): Promise<Finding[]> {
+        if (rule.exclude_patterns?.length && matchesExclude(file.path, rule.exclude_patterns)) return [];
+        const source = await readSource(file.path, cwd);
+        if (!guardRe.test(source)) return [];
+        if (violationRe.test(source)) return [];
+        return [createFinding({
+          rule_id: rule.id,
+          file: file.path,
+          line: 1,
+          severity: rule.severity,
+          message: rule.message_template,
+          source_principle: rule.principle ?? '',
+          category: rule.category,
+          fix_complexity: (rule.fix_complexity as 'S' | 'M' | 'L' | 'XL') ?? 'S',
+          suggested_fix: rule.suggested_fix
+            ? { kind: rule.suggested_fix.kind, description: rule.suggested_fix.description }
+            : undefined,
+          evidence_trail: [{
+            tool: 'yaml-file-presence',
+            query: { guard: guard_contains, pattern: must_not_contain, expect: 'absent', file: file.path },
+            result: { guardMatched: true, violationMatched: false },
+            timestamp: new Date().toISOString(),
+            cache_hit: false,
+          }],
+        })];
+      },
+    };
+  }
+
+  const pattern = (hasContain ? must_contain : must_not_contain)!;
+  const expectMatch = hasContain;
+  const re = new RegExp(pattern);
+
+  return {
+    ...base,
     async run(
       file: CategorizedFile,
       _config: ParLintConfig,

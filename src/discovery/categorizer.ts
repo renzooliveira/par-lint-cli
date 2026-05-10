@@ -9,6 +9,7 @@ export type FileTag =
   | 'is_entity'
   | 'is_model'
   | 'is_page'
+  | 'is_page_template'
   | 'is_template'
   | 'is_style'
   | 'is_typescript'
@@ -31,6 +32,7 @@ const TAG_RULES: TagRule[] = [
   { tag: 'is_entity', test: (f) => /\.(entity|model|domain)\.ts$/.test(f) },
   { tag: 'is_model', test: (f) => f.endsWith('.model.ts') },
   { tag: 'is_page', test: (f) => f.endsWith('.page.ts') || /\/pages\//.test(f) },
+  { tag: 'is_page_template', test: (f) => f.endsWith('.page.html') },
   { tag: 'is_template', test: (f) => f.endsWith('.component.html') || f.endsWith('.page.html') },
   { tag: 'is_style', test: (f) => /\.(scss|css)$/.test(f) },
   { tag: 'is_typescript', test: (f) => f.endsWith('.ts') },
