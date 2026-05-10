@@ -34,6 +34,11 @@ export interface YamlAstGrepConfig {
   language?: 'typescript' | 'html' | 'css';
 }
 
+export interface YamlFilePresenceConfig {
+  must_contain?: string;
+  must_not_contain?: string;
+}
+
 export interface YamlRule {
   id: string;
   version: string;
@@ -44,10 +49,11 @@ export interface YamlRule {
   applicable_to: string[];
   exclude_patterns?: string[];
   skip_comments?: boolean;
-  mode: 'regex' | 'metric' | 'ast-grep';
+  mode: 'regex' | 'metric' | 'ast-grep' | 'file-presence';
   regex?: YamlRegexConfig;
   metric?: YamlMetricConfig;
   ast_grep?: YamlAstGrepConfig;
+  file_presence?: YamlFilePresenceConfig;
   message_template: string;
   fix_complexity: string;
   suggested_fix?: YamlSuggestedFix;
@@ -285,6 +291,70 @@ function compileAstGrepRule(rule: YamlRule): RuleDefinition {
   };
 }
 
+function compileFilePresenceRule(rule: YamlRule): RuleDefinition {
+  if (!rule.file_presence) {
+    throw new Error(`YAML rule "${rule.id}": mode "file-presence" requires a "file_presence" block`);
+  }
+
+  const { must_contain, must_not_contain } = rule.file_presence;
+  const hasContain = typeof must_contain === 'string' && must_contain.length > 0;
+  const hasNotContain = typeof must_not_contain === 'string' && must_not_contain.length > 0;
+
+  if (hasContain === hasNotContain) {
+    throw new Error(`YAML rule "${rule.id}": "file_presence" requires exactly one of "must_contain" or "must_not_contain"`);
+  }
+
+  const pattern = (hasContain ? must_contain : must_not_contain)!;
+  const expectMatch = hasContain;
+  const re = new RegExp(pattern);
+
+  return {
+    id: rule.id,
+    version: rule.version,
+    category: rule.category,
+    severity: rule.severity,
+    description: rule.description,
+    principle: rule.principle,
+    applicable_to: rule.applicable_to,
+
+    async run(
+      file: CategorizedFile,
+      _config: ParLintConfig,
+      cwd: string,
+    ): Promise<Finding[]> {
+      if (rule.exclude_patterns?.length && matchesExclude(file.path, rule.exclude_patterns)) {
+        return [];
+      }
+
+      const source = await readSource(file.path, cwd);
+      const matches = re.test(source);
+
+      if (expectMatch ? matches : !matches) return [];
+
+      return [createFinding({
+        rule_id: rule.id,
+        file: file.path,
+        line: 1,
+        severity: rule.severity,
+        message: rule.message_template,
+        source_principle: rule.principle ?? '',
+        category: rule.category,
+        fix_complexity: (rule.fix_complexity as 'S' | 'M' | 'L' | 'XL') ?? 'S',
+        suggested_fix: rule.suggested_fix
+          ? { kind: rule.suggested_fix.kind, description: rule.suggested_fix.description }
+          : undefined,
+        evidence_trail: [{
+          tool: 'yaml-file-presence',
+          query: { pattern, expect: expectMatch ? 'present' : 'absent', file: file.path },
+          result: { matched: matches },
+          timestamp: new Date().toISOString(),
+          cache_hit: false,
+        }],
+      })];
+    },
+  };
+}
+
 export async function loadYamlRules(paths: string[], cwd: string): Promise<RuleDefinition[]> {
   const rules: RuleDefinition[] = [];
 
@@ -369,7 +439,9 @@ export function compileYamlRule(doc: YamlRuleDocument): RuleDefinition {
       return compileMetricRule(rule);
     case 'ast-grep':
       return compileAstGrepRule(rule);
+    case 'file-presence':
+      return compileFilePresenceRule(rule);
     default:
-      throw new Error(`YAML rule "${rule.id}": unsupported mode "${rule.mode}". Supported: regex, metric, ast-grep`);
+      throw new Error(`YAML rule "${rule.id}": unsupported mode "${rule.mode}". Supported: regex, metric, ast-grep, file-presence`);
   }
 }

@@ -559,6 +559,130 @@ describe('compileYamlRule', () => {
     });
   });
 
+  describe('mode: file-presence', () => {
+    const baseDoc = (overrides: Partial<YamlRuleDocument['rule']>): YamlRuleDocument => ({
+      rule: {
+        id: 'test/file-presence',
+        version: '1.0.0',
+        category: 'test',
+        severity: 'warning',
+        applicable_to: ['is_typescript'],
+        mode: 'file-presence' as 'regex',
+        message_template: 'file-presence violation',
+        fix_complexity: 'S',
+        ...overrides,
+      },
+    });
+
+    it('returns 0 findings when must_contain pattern is present', async () => {
+      const doc = baseDoc({
+        file_presence: { must_contain: 'changeDetection\\s*:\\s*ChangeDetectionStrategy\\.OnPush' },
+      } as Partial<YamlRuleDocument['rule']>);
+
+      const rule = compileYamlRule(doc);
+      mockSource('@Component({\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})');
+
+      const findings = await rule.run(makeFile('src/x.component.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(0);
+    });
+
+    it('returns 1 finding at line=1 when must_contain pattern is absent', async () => {
+      const doc = baseDoc({
+        file_presence: { must_contain: 'OnPush' },
+      } as Partial<YamlRuleDocument['rule']>);
+
+      const rule = compileYamlRule(doc);
+      mockSource('@Component({\n  selector: "x",\n})');
+
+      const findings = await rule.run(makeFile('src/x.component.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.line).toBe(1);
+      expect(findings[0]!.message).toBe('file-presence violation');
+    });
+
+    it('returns 1 finding when must_not_contain pattern is present', async () => {
+      const doc = baseDoc({
+        file_presence: { must_not_contain: '@deprecated' },
+      } as Partial<YamlRuleDocument['rule']>);
+
+      const rule = compileYamlRule(doc);
+      mockSource('// @deprecated\nexport const x = 1;');
+
+      const findings = await rule.run(makeFile('src/x.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.line).toBe(1);
+    });
+
+    it('returns 0 findings when must_not_contain pattern is absent', async () => {
+      const doc = baseDoc({
+        file_presence: { must_not_contain: '@deprecated' },
+      } as Partial<YamlRuleDocument['rule']>);
+
+      const rule = compileYamlRule(doc);
+      mockSource('export const x = 1;');
+
+      const findings = await rule.run(makeFile('src/x.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(0);
+    });
+
+    it('throws when neither must_contain nor must_not_contain is provided', () => {
+      const doc = baseDoc({ file_presence: {} } as Partial<YamlRuleDocument['rule']>);
+      expect(() => compileYamlRule(doc)).toThrow(/must_contain.*must_not_contain/);
+    });
+
+    it('throws when both must_contain and must_not_contain are provided', () => {
+      const doc = baseDoc({
+        file_presence: { must_contain: 'a', must_not_contain: 'b' },
+      } as Partial<YamlRuleDocument['rule']>);
+      expect(() => compileYamlRule(doc)).toThrow(/must_contain.*must_not_contain/);
+    });
+
+    it('throws when file_presence block is missing', () => {
+      const doc = baseDoc({});
+      expect(() => compileYamlRule(doc)).toThrow(/file_presence/);
+    });
+
+    it('respects exclude_patterns and skips readSource', async () => {
+      const doc = baseDoc({
+        exclude_patterns: ['*.spec.ts'],
+        file_presence: { must_contain: 'OnPush' },
+      } as Partial<YamlRuleDocument['rule']>);
+
+      const rule = compileYamlRule(doc);
+
+      const findings = await rule.run(makeFile('src/x.spec.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(0);
+      expect(mockReadSource).not.toHaveBeenCalled();
+    });
+
+    it('propagates suggested_fix when present', async () => {
+      const doc = baseDoc({
+        file_presence: { must_contain: 'OnPush' },
+        suggested_fix: { kind: 'manual', description: 'Add OnPush' },
+      } as Partial<YamlRuleDocument['rule']>);
+
+      const rule = compileYamlRule(doc);
+      mockSource('export const x = 1;');
+
+      const findings = await rule.run(makeFile('src/x.component.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.suggested_fix).toEqual({ kind: 'manual', description: 'Add OnPush' });
+    });
+
+    it('uses fix_complexity from rule definition', async () => {
+      const doc = baseDoc({
+        fix_complexity: 'L',
+        file_presence: { must_contain: 'OnPush' },
+      } as Partial<YamlRuleDocument['rule']>);
+
+      const rule = compileYamlRule(doc);
+      mockSource('export const x = 1;');
+
+      const findings = await rule.run(makeFile('src/x.component.ts'), defaultConfig, '/tmp');
+      expect(findings[0]!.fix_complexity).toBe('L');
+    });
+  });
+
   describe('loadYamlRules', () => {
     it('loads and compiles a real YAML rule file', async () => {
       const cwd = path.resolve(import.meta.dirname, '../..');
