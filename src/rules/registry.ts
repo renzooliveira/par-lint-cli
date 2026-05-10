@@ -48,10 +48,8 @@ import { missingTypeSuffixRule } from './definitions/naming/missing-type-suffix.
 import { indexBarrelOnlyRule } from './definitions/naming/index-barrel-only.js';
 import { abbreviationInIdentifierRule } from './definitions/naming/abbreviation-in-identifier.js';
 import { nonDescriptiveIdentifierRule } from './definitions/naming/non-descriptive-identifier.js';
-import { reservedWordCollisionRule } from './definitions/naming/reserved-word-collision.js';
 import { specFileMissingRule } from './definitions/naming/spec-file-missing.js';
 import { inconsistentObservableSuffixRule } from './definitions/naming/inconsistent-observable-suffix.js';
-import { cssCustomPropertyNoNamespaceRule } from './definitions/naming/css-custom-property-no-namespace.js';
 import { missingStyleFileRule } from './definitions/component/missing-style-file.js';
 import { filesNotColocatedRule } from './definitions/component/files-not-colocated.js';
 import { multipleComponentsPerFileRule } from './definitions/component/multiple-components-per-file.js';
@@ -209,10 +207,8 @@ export const ALL_RULES: RuleDefinition[] = [
   indexBarrelOnlyRule,
   abbreviationInIdentifierRule,
   nonDescriptiveIdentifierRule,
-  reservedWordCollisionRule,
   specFileMissingRule,
   inconsistentObservableSuffixRule,
-  cssCustomPropertyNoNamespaceRule,
   missingStyleFileRule,
   filesNotColocatedRule,
   multipleComponentsPerFileRule,

@@ -1,0 +1,15 @@
+rule:
+  id: naming/css-custom-property-no-namespace
+  version: 1.0.0
+  category: naming
+  severity: info
+  description: Detects CSS custom properties without design system namespace prefix
+  principle: Custom properties have namespace to avoid collisions
+  applicable_to: [is_scss]
+
+  mode: regex
+  regex:
+    pattern: '^\s*(--(?!par-|ion-|mat-|cdk-|mdc-)[a-zA-Z][a-zA-Z0-9-]*)\s*:'
+
+  message_template: 'Custom property "{match[1]}" missing namespace prefix "--par-"'
+  fix_complexity: S
