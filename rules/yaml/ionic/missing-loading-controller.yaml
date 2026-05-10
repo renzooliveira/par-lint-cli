@@ -1,0 +1,18 @@
+rule:
+  id: ionic/missing-loading-controller
+  version: "1.0.0"
+  category: ionic
+  severity: info
+  description: Detects HTTP calls without loading indicator in Ionic pages
+  principle: HTTP calls need visual loading feedback — users should know something is happening
+  applicable_to:
+    - is_page
+  exclude_patterns:
+    - "*.spec.ts"
+    - "*.test.ts"
+  mode: file-presence
+  file_presence:
+    guard_contains: "this\\.\\w+\\.(get|post|put|patch|delete)\\s*[<(]"
+    must_not_contain: "loadingController|LoadingController|loading\\.present|showLoading|isLoading"
+  message_template: "HTTP call without loading indicator. Use LoadingController or an isLoading flag for user feedback."
+  fix_complexity: S

@@ -115,7 +115,6 @@ import { temporaryFieldRule } from './definitions/domain/temporary-field.js';
 import { noCrossSliceImportRule } from './definitions/arch/no-cross-slice-import.js';
 import { mixedConcernsInDirectoryRule } from './definitions/arch/mixed-concerns-in-directory.js';
 import { wrongLifecycleRule } from './definitions/ionic/wrong-lifecycle.js';
-import { missingLoadingControllerRule } from './definitions/ionic/missing-loading-controller.js';
 import { missingRefresherRule } from './definitions/ionic/missing-refresher.js';
 import { preferIonGridRule } from './definitions/ionic/prefer-ion-grid.js';
 import { enforcePathAliasRule } from './definitions/imports/enforce-path-alias.js';
@@ -262,7 +261,6 @@ export const ALL_RULES: RuleDefinition[] = [
   noCrossSliceImportRule,
   mixedConcernsInDirectoryRule,
   wrongLifecycleRule,
-  missingLoadingControllerRule,
   missingRefresherRule,
   preferIonGridRule,
   enforcePathAliasRule,
