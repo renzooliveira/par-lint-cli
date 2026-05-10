@@ -45,6 +45,7 @@ import { inconsistentObservableSuffixRule } from './definitions/naming/inconsist
 import { missingStyleFileRule } from './definitions/component/missing-style-file.js';
 import { filesNotColocatedRule } from './definitions/component/files-not-colocated.js';
 import { multipleComponentsPerFileRule } from './definitions/component/multiple-components-per-file.js';
+import { missingEncapsulationStrategyRule } from './definitions/component/missing-encapsulation-strategy.js';
 import { selectorPrefixMismatchRule } from './definitions/component/selector-prefix-mismatch.js';
 import { deeplyNestedConditionalsRule } from './definitions/template/deeply-nested-conditionals.js';
 import { duplicateAttributeRule } from './definitions/template/duplicate-attribute.js';
@@ -191,6 +192,7 @@ export const ALL_RULES: RuleDefinition[] = [
   missingStyleFileRule,
   filesNotColocatedRule,
   multipleComponentsPerFileRule,
+  missingEncapsulationStrategyRule,
   selectorPrefixMismatchRule,
   deeplyNestedConditionalsRule,
   duplicateAttributeRule,
