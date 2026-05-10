@@ -4,9 +4,11 @@ import { createFinding } from '../../../engine/finding.js';
 
 const CONSECUTIVE_CAPS_RE = /[A-Z]{3,}/g;
 
-const DEFAULT_ALLOWLIST = new Set(['ID', 'URL', 'HTTP', 'API', 'DOM', 'HTML', 'CSS', 'SQL', 'JSON', 'JWT', 'UUID', 'XML', 'CSV', 'CLI', 'URI', 'DNS', 'SSH', 'TLS', 'SSL', 'TCP', 'UDP', 'IP']);
+const DEFAULT_ALLOWLIST = new Set(['ID', 'URL', 'HTTP', 'API', 'DOM', 'HTML', 'CSS', 'SQL', 'JSON', 'JWT', 'UUID', 'XML', 'CSV', 'CLI', 'URI', 'DNS', 'SSH', 'TLS', 'SSL', 'TCP', 'UDP', 'IP', 'ISO', 'ISOS', 'UTF', 'ASCII', 'RGB', 'HSL', 'SVG', 'PNG', 'JPEG', 'PDF']);
 
 const IDENTIFIER_RE = /\b([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g;
+
+const SCREAMING_CASE_RE = /^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$/;
 
 export const abbreviationInIdentifierRule: RuleDefinition = {
   id: 'naming/abbreviation-in-identifier',
@@ -38,6 +40,8 @@ export const abbreviationInIdentifierRule: RuleDefinition = {
       let identMatch: RegExpExecArray | null;
       while ((identMatch = IDENTIFIER_RE.exec(line)) !== null) {
         const ident = identMatch[1]!;
+
+        if (SCREAMING_CASE_RE.test(ident)) continue;
 
         CONSECUTIVE_CAPS_RE.lastIndex = 0;
         let capsMatch: RegExpExecArray | null;
