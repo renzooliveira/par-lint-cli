@@ -112,7 +112,6 @@ import { subscribeInServiceRule } from './definitions/rxjs/subscribe-in-service.
 import { subjectNeverCompletedRule } from './definitions/rxjs/subject-never-completed.js';
 import { noImportantRule } from './definitions/scss/no-important.js';
 import { alwaysTrueAssertionRule } from './definitions/test/always-true-assertion.js';
-import { tsIgnoreWithoutReasonRule } from './definitions/typescript/ts-ignore-without-reason.js';
 import { functionTooManyParamsRule } from './definitions/typescript/function-too-many-params.js';
 import { exhaustiveSwitchRule } from './definitions/typescript/exhaustive-switch.js';
 import { elseAfterReturnRule } from './definitions/hygiene/else-after-return.js';
@@ -296,7 +295,6 @@ export const ALL_RULES: RuleDefinition[] = [
   subjectNeverCompletedRule,
   noImportantRule,
   alwaysTrueAssertionRule,
-  tsIgnoreWithoutReasonRule,
   functionTooManyParamsRule,
   exhaustiveSwitchRule,
   elseAfterReturnRule,
