@@ -1,0 +1,15 @@
+rule:
+  id: test/thread-sleep-in-test
+  version: 1.0.0
+  category: test
+  severity: warning
+  description: Detects fixed setTimeout/sleep delays in tests
+  principle: Fixed delays make tests slow and flaky; use fakeAsync or waitFor
+  applicable_to: [is_test, is_spec]
+
+  mode: regex
+  regex:
+    pattern: 'setTimeout\s*\(.*\d{3,}|new\s+Promise.*setTimeout'
+
+  message_template: "Fixed delay in test. Use fakeAsync/tick, vi.advanceTimersByTime, or waitFor instead."
+  fix_complexity: M

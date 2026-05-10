@@ -1,0 +1,16 @@
+rule:
+  id: test/no-focused-test
+  version: 1.0.0
+  category: test
+  severity: error
+  description: Detects focused or skipped tests (fdescribe, fit, .only, .skip)
+  principle: Focused tests make CI run only a subset; skipped tests get forgotten
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: '\b(fdescribe|fit|describe\.only|it\.only|test\.only|xdescribe|xit|describe\.skip|it\.skip|test\.skip)\s*\('
+    multi_match: true
+
+  message_template: '"{match[1]}" detected. Remove focused/skipped test before committing.'
+  fix_complexity: S

@@ -82,7 +82,6 @@ import { missingAsReadonlyRule } from './definitions/signals/missing-asreadonly.
 import { computedSideEffectRule } from './definitions/signals/computed-side-effect.js';
 import { effectWithoutCleanupRule } from './definitions/signals/effect-without-cleanup.js';
 import { emptySpecRule } from './definitions/test/empty-spec.js';
-import { noFocusedTestRule } from './definitions/test/no-focused-test.js';
 import { tooManyAssertionsRule } from './definitions/test/too-many-assertions.js';
 import { noAssertionRule } from './definitions/test/no-assertion.js';
 import { emptyCatchRule } from './definitions/error/empty-catch.js';
@@ -102,7 +101,6 @@ import { tosignalMissingInitialvalueRule } from './definitions/signals/tosignal-
 import { subscribeInServiceRule } from './definitions/rxjs/subscribe-in-service.js';
 import { subjectNeverCompletedRule } from './definitions/rxjs/subject-never-completed.js';
 import { noImportantRule } from './definitions/scss/no-important.js';
-import { alwaysTrueAssertionRule } from './definitions/test/always-true-assertion.js';
 import { functionTooManyParamsRule } from './definitions/typescript/function-too-many-params.js';
 import { exhaustiveSwitchRule } from './definitions/typescript/exhaustive-switch.js';
 import { elseAfterReturnRule } from './definitions/hygiene/else-after-return.js';
@@ -110,14 +108,11 @@ import { methodCallInTemplateRule } from './definitions/template/method-call-in-
 import { forWithoutEmptyRule } from './definitions/template/for-without-empty.js';
 import { letReassignmentRule } from './definitions/fp/let-reassignment.js';
 import { varInLoopRule } from './definitions/fp/var-in-loop.js';
-import { commentedOutAssertionRule } from './definitions/test/commented-out-assertion.js';
 import { giantTestRule } from './definitions/test/giant-test.js';
 import { classTooManyMethodsRule } from './definitions/arch/class-too-many-methods.js';
 import { classTooManyFieldsRule } from './definitions/arch/class-too-many-fields.js';
 import { missingPathmatchFullRule } from './definitions/routing/missing-pathmatch-full.js';
 import { wildcardNotLastRule } from './definitions/routing/wildcard-not-last.js';
-import { poorTestNamingRule } from './definitions/test/poor-test-naming.js';
-import { threadSleepInTestRule } from './definitions/test/thread-sleep-in-test.js';
 import { imperativeLoopRule } from './definitions/fp/imperative-loop.js';
 import { nondeterministicInPureRule } from './definitions/fp/nondeterministic-in-pure.js';
 import { animateNonCompositableRule } from './definitions/perf/animate-non-compositable.js';
@@ -255,7 +250,6 @@ export const ALL_RULES: RuleDefinition[] = [
   computedSideEffectRule,
   effectWithoutCleanupRule,
   emptySpecRule,
-  noFocusedTestRule,
   tooManyAssertionsRule,
   noAssertionRule,
   emptyCatchRule,
@@ -275,7 +269,6 @@ export const ALL_RULES: RuleDefinition[] = [
   subscribeInServiceRule,
   subjectNeverCompletedRule,
   noImportantRule,
-  alwaysTrueAssertionRule,
   functionTooManyParamsRule,
   exhaustiveSwitchRule,
   elseAfterReturnRule,
@@ -283,14 +276,11 @@ export const ALL_RULES: RuleDefinition[] = [
   forWithoutEmptyRule,
   letReassignmentRule,
   varInLoopRule,
-  commentedOutAssertionRule,
   giantTestRule,
   classTooManyMethodsRule,
   classTooManyFieldsRule,
   missingPathmatchFullRule,
   wildcardNotLastRule,
-  poorTestNamingRule,
-  threadSleepInTestRule,
   imperativeLoopRule,
   nondeterministicInPureRule,
   animateNonCompositableRule,
