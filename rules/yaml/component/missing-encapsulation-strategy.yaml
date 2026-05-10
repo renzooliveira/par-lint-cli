@@ -1,0 +1,15 @@
+rule:
+  id: component/missing-encapsulation-strategy
+  version: "1.0.0"
+  category: component
+  severity: info
+  description: Detects @Component without explicit encapsulation property
+  principle: Explicit encapsulation forces a conscious decision about style scoping
+  applicable_to:
+    - is_component
+  mode: file-presence
+  file_presence:
+    guard_contains: "@Component"
+    must_not_contain: "encapsulation\\s*:"
+  message_template: "@Component missing explicit encapsulation property. Add encapsulation: ViewEncapsulation.* to make scoping intentional."
+  fix_complexity: S
