@@ -20,7 +20,6 @@ import { missingLabelRule } from './definitions/a11y/missing-label.js';
 import { nonButtonAsButtonRule } from './definitions/a11y/non-button-as-button.js';
 import { templateTooLongRule } from './definitions/component/template-too-long.js';
 import { excessiveInputOutputRule } from './definitions/component/excessive-input-output.js';
-import { noExplicitAnyRule } from './definitions/component/no-explicit-any.js';
 import { noBusinessLogicRule } from './definitions/component/no-business-logic.js';
 import { missingOnPushRule } from './definitions/component/missing-onpush.js';
 import { missingTrackByRule } from './definitions/component/missing-trackby.js';
@@ -33,7 +32,6 @@ import { anemicEntityRule } from './definitions/domain/anemic-entity.js';
 import { nPlusOneRule } from './definitions/perf/n-plus-one.js';
 import { destructiveWithoutConfirmationRule } from './definitions/ux/destructive-without-confirmation.js';
 import { redundantAriaRule } from './definitions/a11y/redundant-aria.js';
-import { inlineStylesRule } from './definitions/component/inline-styles.js';
 import { derivedStateAsPropertyRule } from './definitions/state/derived-state-as-property.js';
 import { componentStyleLeakRule } from './definitions/scss/component-style-leak.js';
 import { missingSuccessFeedbackRule } from './definitions/ux/missing-success-feedback.js';
@@ -90,7 +88,6 @@ import { commentedOutCodeRule } from './definitions/hygiene/commented-out-code.j
 import { unusedImportRule } from './definitions/hygiene/unused-import.js';
 import { deadCodeAfterReturnRule } from './definitions/hygiene/dead-code-after-return.js';
 import { constructorInjectionRule } from './definitions/component/constructor-injection.js';
-import { ngclassInsteadOfClassBindingRule } from './definitions/template/ngclass-instead-of-class-binding.js';
 import { typeAssertionWithoutGuardRule } from './definitions/typescript/type-assertion-without-guard.js';
 import { mutatingArrayMethodRule } from './definitions/fp/mutating-array-method.js';
 import { lawOfDemeterRule } from './definitions/domain/law-of-demeter.js';
@@ -192,11 +189,9 @@ export const ALL_RULES: RuleDefinition[] = [
   redundantAriaRule,
   templateTooLongRule,
   excessiveInputOutputRule,
-  noExplicitAnyRule,
   noBusinessLogicRule,
   missingOnPushRule,
   missingTrackByRule,
-  inlineStylesRule,
   missingIonContentRule,
   hardcodedPlatformCheckRule,
   missingLoadingStateRule,
@@ -258,7 +253,6 @@ export const ALL_RULES: RuleDefinition[] = [
   unusedImportRule,
   deadCodeAfterReturnRule,
   constructorInjectionRule,
-  ngclassInsteadOfClassBindingRule,
   typeAssertionWithoutGuardRule,
   mutatingArrayMethodRule,
   lawOfDemeterRule,

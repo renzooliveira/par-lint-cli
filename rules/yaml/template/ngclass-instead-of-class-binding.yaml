@@ -1,0 +1,16 @@
+rule:
+  id: template/ngclass-instead-of-class-binding
+  version: 1.0.0
+  category: template
+  severity: info
+  description: Detects [ngClass]/[ngStyle] instead of [class.x]/[style.x] bindings
+  principle: Direct class/style bindings are simpler and more performant
+  applicable_to: [is_template, is_html]
+
+  mode: regex
+  regex:
+    pattern: '\[(ngClass|ngStyle)\]'
+    multi_match: true
+
+  message_template: "Use [class.name]/[style.prop] binding instead of [{match[1]}] for simple cases."
+  fix_complexity: L
