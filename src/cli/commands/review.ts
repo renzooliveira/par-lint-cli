@@ -197,7 +197,7 @@ export const reviewCommand = new Command('review')
 
       if (formats.includes('claude-context')) {
         const maxIssues = parseInt(options.maxIssues, 10);
-        process.stdout.write(formatClaudeContext(report, { maxIssues }));
+        process.stdout.write(await formatClaudeContext(report, { maxIssues }));
       }
 
       if (options.profile && Object.keys(report.performance.by_tool).length > 0) {
