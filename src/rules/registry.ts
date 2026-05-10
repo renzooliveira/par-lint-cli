@@ -29,7 +29,6 @@ import { redundantAriaRule } from './definitions/a11y/redundant-aria.js';
 import { derivedStateAsPropertyRule } from './definitions/state/derived-state-as-property.js';
 import { missingSuccessFeedbackRule } from './definitions/ux/missing-success-feedback.js';
 import { missingMotionReduceRule } from './definitions/ux/missing-motion-reduce.js';
-import { formNotDisabledDuringSubmitRule } from './definitions/ux/form-not-disabled-during-submit.js';
 import { landmarkStructureRule } from './definitions/a11y/landmark-structure.js';
 import { primitiveObsessionRule } from './definitions/domain/primitive-obsession.js';
 import { missingPaginationRule } from './definitions/perf/missing-pagination.js';
@@ -180,7 +179,6 @@ export const ALL_RULES: RuleDefinition[] = [
   missingSuccessFeedbackRule,
   destructiveWithoutConfirmationRule,
   missingMotionReduceRule,
-  formNotDisabledDuringSubmitRule,
   externalMutationRule,
   anemicEntityRule,
   primitiveObsessionRule,
