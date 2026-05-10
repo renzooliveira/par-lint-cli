@@ -55,8 +55,6 @@ import { nonDescriptiveIdentifierRule } from './definitions/naming/non-descripti
 import { reservedWordCollisionRule } from './definitions/naming/reserved-word-collision.js';
 import { specFileMissingRule } from './definitions/naming/spec-file-missing.js';
 import { inconsistentObservableSuffixRule } from './definitions/naming/inconsistent-observable-suffix.js';
-import { cssClassNotBemRule } from './definitions/naming/css-class-not-bem.js';
-import { scssVariableNotKebabRule } from './definitions/naming/scss-variable-not-kebab.js';
 import { cssCustomPropertyNoNamespaceRule } from './definitions/naming/css-custom-property-no-namespace.js';
 import { missingStyleFileRule } from './definitions/component/missing-style-file.js';
 import { filesNotColocatedRule } from './definitions/component/files-not-colocated.js';
@@ -67,7 +65,6 @@ import { deeplyNestedConditionalsRule } from './definitions/template/deeply-nest
 import { duplicateAttributeRule } from './definitions/template/duplicate-attribute.js';
 import { eventWithoutKeyboardRule } from './definitions/template/event-without-keyboard.js';
 import { ionicGridWithoutResponsiveSizesRule } from './definitions/responsive/ionic-grid-without-responsive-sizes.js';
-import { magicNumberInScssRule } from './definitions/naming/magic-number-in-scss.js';
 import { fixedWidthContainerRule } from './definitions/responsive/fixed-width-container.js';
 import { hardcodedPxFontRule } from './definitions/responsive/hardcoded-px-font.js';
 import { noOverflowHandlingRule } from './definitions/responsive/no-overflow-handling.js';
@@ -232,8 +229,6 @@ export const ALL_RULES: RuleDefinition[] = [
   reservedWordCollisionRule,
   specFileMissingRule,
   inconsistentObservableSuffixRule,
-  cssClassNotBemRule,
-  scssVariableNotKebabRule,
   cssCustomPropertyNoNamespaceRule,
   missingStyleFileRule,
   filesNotColocatedRule,
@@ -244,7 +239,6 @@ export const ALL_RULES: RuleDefinition[] = [
   duplicateAttributeRule,
   eventWithoutKeyboardRule,
   ionicGridWithoutResponsiveSizesRule,
-  magicNumberInScssRule,
   fixedWidthContainerRule,
   hardcodedPxFontRule,
   noOverflowHandlingRule,
