@@ -1,0 +1,17 @@
+rule:
+  id: security/sensitive-data-in-log
+  version: 1.0.0
+  category: security
+  severity: error
+  description: Detects logging of sensitive data like passwords and tokens
+  principle: Never log credentials, tokens, or secrets
+  applicable_to: [is_typescript]
+  exclude_patterns: ["*.spec.ts", "*.test.ts"]
+
+  mode: regex
+  regex:
+    pattern: 'console\.(?:log|debug|info|warn|error)\s*\([^)]*\b(password|passwd|secret|token|apiKey|api_key|authorization|credential|private_key|privateKey)\b'
+    capture_group: 1
+
+  message_template: "Sensitive data \"{match[1]}\" found in console output. Remove or mask sensitive values."
+  fix_complexity: L

@@ -1,0 +1,17 @@
+rule:
+  id: security/direct-dom-manipulation
+  version: 1.0.0
+  category: security
+  severity: warning
+  description: Detects direct DOM manipulation bypassing framework abstractions
+  principle: Use framework APIs instead of direct DOM access
+  applicable_to: [is_typescript]
+  exclude_patterns: ["*.spec.ts", "*.test.ts"]
+  skip_comments: true
+
+  mode: regex
+  regex:
+    pattern: '\b(?:document\.(?:createElement|getElementById|querySelector|querySelectorAll)|\.nativeElement)\b|\.(?:innerHTML|outerHTML|insertAdjacentHTML|appendChild|removeChild|replaceChild|prepend|append)\s*[=(]'
+
+  message_template: "Direct DOM manipulation via '{match[0]}'. Use Renderer2 or framework bindings instead."
+  fix_complexity: M

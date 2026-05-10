@@ -119,12 +119,10 @@ import { elseAfterReturnRule } from './definitions/hygiene/else-after-return.js'
 import { methodCallInTemplateRule } from './definitions/template/method-call-in-template.js';
 import { forWithoutEmptyRule } from './definitions/template/for-without-empty.js';
 import { booleanMissingPrefixRule } from './definitions/naming/boolean-missing-prefix.js';
-import { evalUsageRule } from './definitions/security/eval-usage.js';
 import { letReassignmentRule } from './definitions/fp/let-reassignment.js';
 import { varInLoopRule } from './definitions/fp/var-in-loop.js';
 import { commentedOutAssertionRule } from './definitions/test/commented-out-assertion.js';
 import { giantTestRule } from './definitions/test/giant-test.js';
-import { sensitiveDataInLogRule } from './definitions/security/sensitive-data-in-log.js';
 import { classTooManyMethodsRule } from './definitions/arch/class-too-many-methods.js';
 import { classTooManyFieldsRule } from './definitions/arch/class-too-many-fields.js';
 import { missingPathmatchFullRule } from './definitions/routing/missing-pathmatch-full.js';
@@ -143,7 +141,6 @@ import { eventListenerWithoutDisposeRule } from './definitions/perf/event-listen
 import { classFileNameMismatchRule } from './definitions/naming/class-file-name-mismatch.js';
 import { genericNameInContextRule } from './definitions/naming/generic-name-in-context.js';
 import { similarBlockRule } from './definitions/duplication/similar-block.js';
-import { directDomManipulationRule } from './definitions/security/direct-dom-manipulation.js';
 import { hardcodedSecretRule } from './definitions/security/hardcoded-secret.js';
 import { mutableStateInComputedRule } from './definitions/state/mutable-state-in-computed.js';
 import { hardcodedTextRule } from './definitions/template/hardcoded-text.js';
@@ -306,12 +303,10 @@ export const ALL_RULES: RuleDefinition[] = [
   methodCallInTemplateRule,
   forWithoutEmptyRule,
   booleanMissingPrefixRule,
-  evalUsageRule,
   letReassignmentRule,
   varInLoopRule,
   commentedOutAssertionRule,
   giantTestRule,
-  sensitiveDataInLogRule,
   classTooManyMethodsRule,
   classTooManyFieldsRule,
   missingPathmatchFullRule,
@@ -330,7 +325,6 @@ export const ALL_RULES: RuleDefinition[] = [
   classFileNameMismatchRule,
   genericNameInContextRule,
   similarBlockRule,
-  directDomManipulationRule,
   hardcodedSecretRule,
   mutableStateInComputedRule,
   hardcodedTextRule,

@@ -1,0 +1,17 @@
+rule:
+  id: security/eval-usage
+  version: 1.0.0
+  category: security
+  severity: error
+  description: Detects eval() and new Function() usage
+  principle: Dynamic code execution enables injection attacks
+  applicable_to: [is_typescript]
+  exclude_patterns: ["*.spec.ts", "*.test.ts"]
+  skip_comments: true
+
+  mode: regex
+  regex:
+    pattern: '\beval\s*\(|new\s+Function\s*\('
+
+  message_template: "Dynamic code execution detected ({match[0]}). Use safer alternatives like JSON.parse or structured data."
+  fix_complexity: M
