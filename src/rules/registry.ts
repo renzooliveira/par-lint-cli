@@ -65,10 +65,7 @@ import { filesNotColocatedRule } from './definitions/component/files-not-colocat
 import { multipleComponentsPerFileRule } from './definitions/component/multiple-components-per-file.js';
 import { missingEncapsulationStrategyRule } from './definitions/component/missing-encapsulation-strategy.js';
 import { selectorPrefixMismatchRule } from './definitions/component/selector-prefix-mismatch.js';
-import { buttonMissingTypeRule } from './definitions/template/button-missing-type.js';
-import { imgMissingDimensionsRule } from './definitions/template/img-missing-dimensions.js';
 import { deeplyNestedConditionalsRule } from './definitions/template/deeply-nested-conditionals.js';
-import { missingNgSrcRule } from './definitions/template/missing-ng-src.js';
 import { duplicateAttributeRule } from './definitions/template/duplicate-attribute.js';
 import { eventWithoutKeyboardRule } from './definitions/template/event-without-keyboard.js';
 import { ionicGridWithoutResponsiveSizesRule } from './definitions/responsive/ionic-grid-without-responsive-sizes.js';
@@ -103,8 +100,6 @@ import { commentedOutCodeRule } from './definitions/hygiene/commented-out-code.j
 import { unusedImportRule } from './definitions/hygiene/unused-import.js';
 import { deadCodeAfterReturnRule } from './definitions/hygiene/dead-code-after-return.js';
 import { constructorInjectionRule } from './definitions/component/constructor-injection.js';
-import { deprecatedStructuralDirectiveRule } from './definitions/template/deprecated-structural-directive.js';
-import { forMissingTrackRule } from './definitions/template/for-missing-track.js';
 import { ngclassInsteadOfClassBindingRule } from './definitions/template/ngclass-instead-of-class-binding.js';
 import { typeAssertionWithoutGuardRule } from './definitions/typescript/type-assertion-without-guard.js';
 import { mutatingArrayMethodRule } from './definitions/fp/mutating-array-method.js';
@@ -257,10 +252,7 @@ export const ALL_RULES: RuleDefinition[] = [
   multipleComponentsPerFileRule,
   missingEncapsulationStrategyRule,
   selectorPrefixMismatchRule,
-  buttonMissingTypeRule,
-  imgMissingDimensionsRule,
   deeplyNestedConditionalsRule,
-  missingNgSrcRule,
   duplicateAttributeRule,
   eventWithoutKeyboardRule,
   ionicGridWithoutResponsiveSizesRule,
@@ -295,8 +287,6 @@ export const ALL_RULES: RuleDefinition[] = [
   unusedImportRule,
   deadCodeAfterReturnRule,
   constructorInjectionRule,
-  deprecatedStructuralDirectiveRule,
-  forMissingTrackRule,
   ngclassInsteadOfClassBindingRule,
   typeAssertionWithoutGuardRule,
   mutatingArrayMethodRule,

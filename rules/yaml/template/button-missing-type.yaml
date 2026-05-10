@@ -1,0 +1,15 @@
+rule:
+  id: template/button-missing-type
+  version: 1.0.0
+  category: template
+  severity: warning
+  description: Detects button without type attribute
+  principle: Explicit button type prevents accidental form submissions
+  applicable_to: [is_template, is_html]
+
+  mode: regex
+  regex:
+    pattern: '<button\b(?![^>]*\btype\s*=)[^>]*>'
+
+  message_template: '<button> without type attribute. Default is "submit" — add type="button" or type="submit" explicitly.'
+  fix_complexity: S

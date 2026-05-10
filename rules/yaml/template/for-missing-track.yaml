@@ -1,0 +1,15 @@
+rule:
+  id: template/for-missing-track
+  version: 1.0.0
+  category: template
+  severity: error
+  description: Detects @for without track expression
+  principle: track is required for performant DOM reconciliation
+  applicable_to: [is_template, is_html]
+
+  mode: regex
+  regex:
+    pattern: '@for\s*\((?![^)]*\btrack\b)[^)]*\)'
+
+  message_template: "@for requires a track expression for efficient DOM updates."
+  fix_complexity: L
