@@ -20,7 +20,6 @@ import { nonButtonAsButtonRule } from './definitions/a11y/non-button-as-button.j
 import { templateTooLongRule } from './definitions/component/template-too-long.js';
 import { excessiveInputOutputRule } from './definitions/component/excessive-input-output.js';
 import { noBusinessLogicRule } from './definitions/component/no-business-logic.js';
-import { missingOnPushRule } from './definitions/component/missing-onpush.js';
 import { missingTrackByRule } from './definitions/component/missing-trackby.js';
 import { missingIonContentRule } from './definitions/ionic/missing-ion-content.js';
 import { missingLoadingStateRule } from './definitions/ux/missing-loading-state.js';
@@ -180,7 +179,6 @@ export const ALL_RULES: RuleDefinition[] = [
   templateTooLongRule,
   excessiveInputOutputRule,
   noBusinessLogicRule,
-  missingOnPushRule,
   missingTrackByRule,
   missingIonContentRule,
   missingLoadingStateRule,
