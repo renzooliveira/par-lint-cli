@@ -62,6 +62,10 @@ export const nonDescriptiveIdentifierRule: RuleDefinition = {
           source_principle: 'Variable names should express purpose',
           category: 'naming',
           fix_complexity: 'S',
+          suggested_fix: {
+            kind: 'rename',
+            description: `Rename "${name}" to a descriptive name reflecting its purpose`,
+          },
           evidence_trail: [{
             tool: 'regex',
             query: { pattern: 'short/generic name', file: file.path },

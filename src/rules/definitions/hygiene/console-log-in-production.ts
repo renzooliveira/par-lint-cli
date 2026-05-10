@@ -35,6 +35,10 @@ export const consoleLogInProductionRule: RuleDefinition = {
         source_principle: 'Production code should not use console.log',
         category: 'hygiene',
         fix_complexity: 'S',
+        suggested_fix: {
+          kind: 'replace',
+          description: `Remove console.${match[1]}() or replace with logger service injection`,
+        },
         evidence_trail: [{
           tool: 'regex',
           query: { pattern: 'console.log', file: file.path },

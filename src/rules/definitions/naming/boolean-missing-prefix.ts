@@ -38,6 +38,10 @@ export const booleanMissingPrefixRule: RuleDefinition = {
         source_principle: 'Boolean verb prefix improves readability',
         category: 'naming',
         fix_complexity: 'L',
+        suggested_fix: {
+          kind: 'rename',
+          description: `Add prefix: "${name}" → "is${name.charAt(0).toUpperCase()}${name.slice(1)}"`,
+        },
         evidence_trail: [{
           tool: 'regex.booleanNaming',
           query: { file: file.path },

@@ -33,6 +33,10 @@ export const tsIgnoreWithoutReasonRule: RuleDefinition = {
             source_principle: 'Type suppressions need documented justification',
             category: 'typescript',
             fix_complexity: 'L',
+            suggested_fix: {
+              kind: 'replace',
+              description: `Add reason: "${match[0]} -- explanation of why this is needed"`,
+            },
             evidence_trail: [{
               tool: 'regex.tsIgnore',
               query: { file: file.path },

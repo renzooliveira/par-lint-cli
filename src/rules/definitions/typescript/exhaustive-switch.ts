@@ -34,6 +34,11 @@ export const exhaustiveSwitchRule: RuleDefinition = {
             source_principle: 'Exhaustive switches catch missing union members at compile time',
             category: 'typescript',
             fix_complexity: 'L',
+            suggested_fix: {
+              kind: 'replace',
+              description: 'Replace default return with assertNever(value) for compile-time exhaustiveness',
+              diff: '- default: return "unknown";\n+ default: return assertNever(value);',
+            },
             evidence_trail: [{
               tool: 'regex.defaultReturn',
               query: { file: file.path },

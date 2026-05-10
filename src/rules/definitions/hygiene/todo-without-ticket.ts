@@ -38,6 +38,10 @@ export const todoWithoutTicketRule: RuleDefinition = {
         source_principle: 'Track TODOs with tickets so they get resolved',
         category: 'hygiene',
         fix_complexity: 'S',
+        suggested_fix: {
+          kind: 'replace',
+          description: `Add ticket: "// ${match[1]}(PROJ-123): description"`,
+        },
         evidence_trail: [{
           tool: 'regex',
           query: { pattern: 'TODO without ticket', file: file.path },

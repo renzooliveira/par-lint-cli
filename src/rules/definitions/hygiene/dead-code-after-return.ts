@@ -46,6 +46,10 @@ export const deadCodeAfterReturnRule: RuleDefinition = {
           source_principle: 'Dead code should be removed',
           category: 'hygiene',
           fix_complexity: 'S',
+          suggested_fix: {
+            kind: 'replace',
+            description: 'Remove unreachable code after return/throw',
+          },
           evidence_trail: [{
             tool: 'regex',
             query: { pattern: 'dead code', file: file.path },

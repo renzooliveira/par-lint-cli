@@ -59,6 +59,10 @@ export const abbreviationInIdentifierRule: RuleDefinition = {
             source_principle: 'Consistent acronym casing improves readability',
             category: 'naming',
             fix_complexity: 'S',
+            suggested_fix: {
+              kind: 'rename',
+              description: `Use PascalCase for "${abbr}": e.g. "${abbr.charAt(0)}${abbr.slice(1).toLowerCase()}"`,
+            },
             evidence_trail: [{
               tool: 'regex',
               query: { pattern: '3+ uppercase', file: file.path },

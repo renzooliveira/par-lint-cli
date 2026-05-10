@@ -53,6 +53,10 @@ export const preferReadonlyParameterRule: RuleDefinition = {
           source_principle: 'Object parameters should be Readonly<T>',
           category: 'fp',
           fix_complexity: 'S',
+          suggested_fix: {
+            kind: 'replace',
+            description: `Change "${paramName}: ${typeName}" → "${paramName}: Readonly<${typeName}>"`,
+          },
           evidence_trail: [{
             tool: 'regex.readonlyParameter',
             query: { file: file.path },

@@ -36,6 +36,10 @@ export const functionTooManyParamsRule: RuleDefinition = {
           source_principle: 'Functions with many params are hard to call correctly',
           category: 'typescript',
           fix_complexity: 'M',
+          suggested_fix: {
+            kind: 'extract_method',
+            description: `Extract ${params.length} params into options object: fn(opts: FnOptions)`,
+          },
           evidence_trail: [{
             tool: 'regex.paramCount',
             query: { file: file.path },

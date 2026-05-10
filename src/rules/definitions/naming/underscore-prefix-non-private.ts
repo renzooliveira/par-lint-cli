@@ -43,6 +43,10 @@ export const underscorePrefixNonPrivateRule: RuleDefinition = {
         source_principle: 'Underscore prefix convention is reserved for private members',
         category: 'naming',
         fix_complexity: 'S',
+        suggested_fix: {
+          kind: 'replace',
+          description: `Add "private" keyword or rename "${name}" → "${name.slice(1)}"`,
+        },
         evidence_trail: [{
           tool: 'regex',
           query: { pattern: '_prefix without private', file: file.path },

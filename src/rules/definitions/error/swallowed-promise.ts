@@ -35,6 +35,10 @@ export const swallowedPromiseRule: RuleDefinition = {
         source_principle: 'Do not fire-and-forget promises',
         category: 'error',
         fix_complexity: 'S',
+        suggested_fix: {
+          kind: 'replace',
+          description: 'Add "await" before call or append .catch() to handle rejection',
+        },
         evidence_trail: [{
           tool: 'regex',
           query: { pattern: 'swallowed promise', file: file.path },

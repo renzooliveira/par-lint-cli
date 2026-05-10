@@ -42,6 +42,10 @@ export const typeAssertionWithoutGuardRule: RuleDefinition = {
           source_principle: 'Type assertions bypass the type system; type guards maintain safety',
           category: 'typescript',
           fix_complexity: 'M',
+          suggested_fix: {
+            kind: 'add_validation',
+            description: 'Add runtime type guard before assertion or use a validation function',
+          },
           evidence_trail: [{
             tool: 'regex.typeAssertion',
             query: { file: file.path },

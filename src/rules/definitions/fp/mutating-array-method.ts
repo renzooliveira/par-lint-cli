@@ -45,6 +45,10 @@ export const mutatingArrayMethodRule: RuleDefinition = {
           source_principle: 'Immutable operations prevent accidental state mutation',
           category: 'fp',
           fix_complexity: 'L',
+          suggested_fix: {
+            kind: 'replace',
+            description: `Use immutable alternative for .${match[2]}() — e.g. spread + new array`,
+          },
           evidence_trail: [{
             tool: 'regex.mutatingMethod',
             query: { file: file.path },

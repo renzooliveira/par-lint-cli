@@ -51,6 +51,10 @@ export const anemicEntityRule: RuleDefinition = {
       source_principle: 'Rich entities encapsulate behavior, not just data',
       category: 'domain',
       fix_complexity: 'L',
+      suggested_fix: {
+        kind: 'move_method',
+        description: `Add behavior to '${className}': move related logic from services into this entity`,
+      },
       evidence_trail: [{
         tool: 'ts-metrics + regex',
         query: { file: file.path },

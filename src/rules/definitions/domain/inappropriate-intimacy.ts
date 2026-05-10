@@ -89,6 +89,10 @@ export const inappropriateIntimacyRule: RuleDefinition = {
           source_principle: 'Classes should not know each other in excessive depth',
           category: 'domain',
           fix_complexity: 'L',
+          suggested_fix: {
+            kind: 'extract_method',
+            description: `Reduce coupling with '${typeName}': extract shared interface or mediator`,
+          },
           evidence_trail: [{
             tool: 'regex',
             query: { file: file.path },

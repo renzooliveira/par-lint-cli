@@ -55,6 +55,10 @@ export const featureEnvyRule: RuleDefinition = {
             source_principle: 'A method that uses more data from another class belongs in that class',
             category: 'domain',
             fix_complexity: 'M',
+            suggested_fix: {
+              kind: 'move_method',
+              description: `Move logic to '${obj}' — this method accesses ${data.props.size} of its properties`,
+            },
             evidence_trail: [{
               tool: 'regex',
               query: { file: file.path },

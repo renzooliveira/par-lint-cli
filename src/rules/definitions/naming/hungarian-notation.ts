@@ -40,6 +40,10 @@ export const hungarianNotationRule: RuleDefinition = {
           source_principle: 'Type prefix is redundant with TypeScript type system',
           category: 'naming',
           fix_complexity: 'S',
+          suggested_fix: {
+            kind: 'rename',
+            description: `Remove "${prefix}" prefix: "${name}" → "${name.slice(prefix.length, prefix.length + 1).toLowerCase()}${name.slice(prefix.length + 1)}"`,
+          },
           evidence_trail: [{
             tool: 'regex',
             query: { pattern: 'hungarian prefix', file: file.path },
@@ -70,6 +74,10 @@ export const hungarianNotationRule: RuleDefinition = {
           source_principle: 'Type prefix is redundant with TypeScript type system',
           category: 'naming',
           fix_complexity: 'S',
+          suggested_fix: {
+            kind: 'rename',
+            description: `Remove "${prefix}" prefix: "${name}" → "${name.slice(prefix.length, prefix.length + 1).toLowerCase()}${name.slice(prefix.length + 1)}"`,
+          },
           evidence_trail: [{
             tool: 'regex',
             query: { pattern: 'hungarian prefix', file: file.path },

@@ -54,6 +54,10 @@ export const reservedWordCollisionRule: RuleDefinition = {
           source_principle: 'Variable names should be specific to context',
           category: 'naming',
           fix_complexity: 'S',
+          suggested_fix: {
+            kind: 'rename',
+            description: `Add context prefix: "${name}" → e.g. "order${name[0]!.toUpperCase()}${name.slice(1)}"`,
+          },
           evidence_trail: [{
             tool: 'regex',
             query: { pattern: 'reserved word', file: file.path },

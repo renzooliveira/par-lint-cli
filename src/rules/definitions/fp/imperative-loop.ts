@@ -32,6 +32,10 @@ export const imperativeLoopRule: RuleDefinition = {
             source_principle: 'Declarative methods are more readable and composable',
             category: 'fp',
             fix_complexity: 'M',
+            suggested_fix: {
+              kind: 'replace',
+              description: 'Replace loop with .map()/.filter()/.reduce() pipeline',
+            },
             evidence_trail: [{
               tool: 'regex.imperativeLoop',
               query: { file: file.path },
