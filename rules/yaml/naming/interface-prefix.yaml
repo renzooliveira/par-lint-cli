@@ -1,0 +1,15 @@
+rule:
+  id: naming/interface-prefix
+  version: 1.0.0
+  category: naming
+  severity: warning
+  description: Detects interfaces with Hungarian "I" prefix
+  principle: Interfaces should not use I prefix (Google TS Style Guide)
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: '^\s*export\s+interface\s+(I[A-Z][a-zA-Z0-9]*)\b'
+
+  message_template: 'Interface "{match[1]}" uses I prefix. Drop the I prefix.'
+  fix_complexity: S

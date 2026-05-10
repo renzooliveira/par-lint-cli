@@ -49,9 +49,7 @@ import { shotgunSurgeryRule } from './definitions/arch/shotgun-surgery.js';
 import { fileNamingConventionRule } from './definitions/naming/file-naming-convention.js';
 import { missingTypeSuffixRule } from './definitions/naming/missing-type-suffix.js';
 import { indexBarrelOnlyRule } from './definitions/naming/index-barrel-only.js';
-import { interfacePrefixRule } from './definitions/naming/interface-prefix.js';
 import { hungarianNotationRule } from './definitions/naming/hungarian-notation.js';
-import { underscorePrefixNonPrivateRule } from './definitions/naming/underscore-prefix-non-private.js';
 import { abbreviationInIdentifierRule } from './definitions/naming/abbreviation-in-identifier.js';
 import { nonDescriptiveIdentifierRule } from './definitions/naming/non-descriptive-identifier.js';
 import { reservedWordCollisionRule } from './definitions/naming/reserved-word-collision.js';
@@ -114,7 +112,6 @@ import { exhaustiveSwitchRule } from './definitions/typescript/exhaustive-switch
 import { elseAfterReturnRule } from './definitions/hygiene/else-after-return.js';
 import { methodCallInTemplateRule } from './definitions/template/method-call-in-template.js';
 import { forWithoutEmptyRule } from './definitions/template/for-without-empty.js';
-import { booleanMissingPrefixRule } from './definitions/naming/boolean-missing-prefix.js';
 import { letReassignmentRule } from './definitions/fp/let-reassignment.js';
 import { varInLoopRule } from './definitions/fp/var-in-loop.js';
 import { commentedOutAssertionRule } from './definitions/test/commented-out-assertion.js';
@@ -229,9 +226,7 @@ export const ALL_RULES: RuleDefinition[] = [
   fileNamingConventionRule,
   missingTypeSuffixRule,
   indexBarrelOnlyRule,
-  interfacePrefixRule,
   hungarianNotationRule,
-  underscorePrefixNonPrivateRule,
   abbreviationInIdentifierRule,
   nonDescriptiveIdentifierRule,
   reservedWordCollisionRule,
@@ -294,7 +289,6 @@ export const ALL_RULES: RuleDefinition[] = [
   elseAfterReturnRule,
   methodCallInTemplateRule,
   forWithoutEmptyRule,
-  booleanMissingPrefixRule,
   letReassignmentRule,
   varInLoopRule,
   commentedOutAssertionRule,

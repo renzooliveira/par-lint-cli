@@ -1,0 +1,19 @@
+rule:
+  id: naming/boolean-missing-prefix
+  version: 1.0.0
+  category: naming
+  severity: info
+  description: Detects boolean properties without is/has/can/should prefix
+  principle: Boolean naming with verb prefix makes intent clear at call sites
+  applicable_to: [is_typescript]
+  exclude_patterns: ["*.spec.ts", "*.test.ts"]
+
+  mode: regex
+  regex:
+    pattern: '^\s*(?:private\s+|protected\s+|public\s+|readonly\s+)*(?!_|is|has|can|should|will|did|was|are|does|needs)(\w+)\s*(?::\s*boolean)?\s*=\s*(?:true|false)\s*;'
+
+  message_template: 'Boolean "{match[1]}" missing prefix (is/has/can/should/will/did/was/are/does/needs).'
+  fix_complexity: L
+  suggested_fix:
+    kind: rename
+    description: 'Add prefix to "{match[1]}" — e.g. "is{match[1]}" / "has{match[1]}"'
