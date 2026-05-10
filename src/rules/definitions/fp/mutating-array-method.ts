@@ -2,7 +2,7 @@ import type { RuleDefinition } from '../../../engine/runner.js';
 import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
-const MUTATING_METHODS = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse', 'fill'];
+const MUTATING_METHODS = ['push', 'pop', 'shift', 'unshift', 'splice', 'fill'];
 const PATTERN = new RegExp(`(\\w+)\\.(${MUTATING_METHODS.join('|')})\\s*\\(`, 'g');
 const LOCAL_ARRAY_INIT = /(?:const|let)\s+(\w+)(?:\s*:\s*\w+(?:<[^>]*>)?\[\])?\s*=\s*\[\s*\]/;
 

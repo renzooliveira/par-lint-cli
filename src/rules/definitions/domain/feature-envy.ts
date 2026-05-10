@@ -3,7 +3,7 @@ import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
 const PROP_ACCESS_RE = /(\w+)\.(\w+)/g;
-const SKIP_OBJECTS = new Set(['this', 'self', 'console', 'Math', 'JSON', 'Object', 'Array', 'Promise', 'Date', 'Number', 'String', 'Boolean', 'Error', 'Map', 'Set', 'RegExp', 'http', 'store', 'decider', 'router', 'route', 'fb', 'dialog']);
+const SKIP_OBJECTS = new Set(['this', 'self', 'console', 'Math', 'JSON', 'Object', 'Array', 'Promise', 'Date', 'Number', 'String', 'Boolean', 'Error', 'Map', 'Set', 'RegExp', 'http', 'store', 'decider', 'router', 'route', 'fb', 'dialog', 'config', 'options', 'opts', 'rule', 'finding', 'event', 'request', 'response', 'req', 'res']);
 const SKIP_FILE_RE = /\.(mapper|facade)\.|cli[\\/](commands|formatters)[\\/]/i;
 const FUNC_START_RE = /(?:function\s+\w+|(?:async\s+)?(?:\w+\s*)?)\s*\(([^)]*)\)\s*[:{]/;
 const ARROW_FUNC_RE = /(?:const|let|var)\s+\w+\s*=\s*(?:async\s+)?(?:\([^)]*\)|(\w+))\s*(?::\s*\w+)?\s*=>/;

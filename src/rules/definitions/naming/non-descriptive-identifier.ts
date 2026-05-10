@@ -3,11 +3,11 @@ import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
 const GENERIC_NAMES = new Set([
-  'temp', 'val', 'obj', 'arr', 'info', 'stuff', 'thing',
+  'temp', 'obj', 'arr', 'info', 'stuff', 'thing',
   'foo', 'baz', 'tmp', 'ret',
 ]);
 
-const ALLOWED_SHORT = new Set(['i', 'j', 'k', 'n', 'idx', 'id', 're', 'fp', 'rc', 'fn', 'db', 'io', 'fs', 'os', 'rx', 'el']);
+const ALLOWED_SHORT = new Set(['i', 'j', 'k', 'n', 'idx', 'id', 're', 'fp', 'rc', 'fn', 'db', 'io', 'fs', 'os', 'rx', 'el', 'r', 'm', 'l']);
 
 const DECLARATION_RE = /\b(?:const|let|var)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g;
 

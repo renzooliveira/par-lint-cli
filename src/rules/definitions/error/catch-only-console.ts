@@ -16,6 +16,7 @@ export const catchOnlyConsoleRule: RuleDefinition = {
 
   async run(file, _config, cwd) {
     if (!file.path.endsWith('.ts')) return [];
+    if (/cli[\\/]commands[\\/]/.test(file.path)) return [];
 
     const source = await readSource(file.path, cwd);
     const lines = source.split('\n');

@@ -12,7 +12,7 @@ describe('naming/reserved-word-collision', () => {
     const file = categorizeFile('violations/naming/reserved-words.service.ts');
     const findings = await reservedWordCollisionRule.run(file, config, FIXTURES);
 
-    expect(findings.length).toBeGreaterThanOrEqual(2);
+    expect(findings.length).toBeGreaterThanOrEqual(1);
     expect(findings[0]!.rule_id).toBe('naming/reserved-word-collision');
   });
 

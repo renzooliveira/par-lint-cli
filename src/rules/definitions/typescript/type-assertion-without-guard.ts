@@ -30,7 +30,9 @@ export const typeAssertionWithoutGuardRule: RuleDefinition = {
           !/\bas\s+Record</.test(line) &&
           !/config\.rules\[/.test(line) &&
           !/JSON\.parse\(/.test(line) &&
-          !/'\w+'\s+as\s+/.test(line)) {
+          !/'\w+'\s+as\s+/.test(line) &&
+          !/\bas\s+(object|unknown)\b/.test(line) &&
+          !/\bas\s+\w+\[/.test(line)) {
         findings.push(createFinding({
           rule_id: 'typescript/type-assertion-without-guard',
           file: file.path,

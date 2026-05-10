@@ -30,6 +30,7 @@ export const underscorePrefixNonPrivateRule: RuleDefinition = {
       if (!memberMatch) continue;
 
       if (PRIVATE_KEYWORD.test(line)) continue;
+      if (line.trimEnd().endsWith(',')) continue;
 
       const name = memberMatch[1]!;
 

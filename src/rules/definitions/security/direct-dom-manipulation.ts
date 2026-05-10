@@ -3,7 +3,7 @@ import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
 const DOM_ACCESS_RE = /\b(document\.(createElement|getElementById|querySelector|querySelectorAll)|\.nativeElement)\b/;
-const DOM_MUTATION_RE = /\.(innerHTML|outerHTML|insertAdjacentHTML|appendChild|removeChild|replaceChild|prepend|append)\b/;
+const DOM_MUTATION_RE = /\.(innerHTML|outerHTML|insertAdjacentHTML|appendChild|removeChild|replaceChild|prepend|append)\s*[=(]/;
 
 export const directDomManipulationRule: RuleDefinition = {
   id: 'security/direct-dom-manipulation',
