@@ -13,6 +13,6 @@ rule:
   mode: file-presence
   file_presence:
     guard_contains: "this\\.\\w+\\.(get|post|put|patch|delete)\\s*[<(]"
-    must_not_contain: "loadingController|LoadingController|loading\\.present|showLoading|isLoading"
+    must_not_contain: "[lL]oadingController|[lL]oading\\.present|[sS]how[lL]oading|[iI]s[lL]oading"
   message_template: "HTTP call without loading indicator. Use LoadingController or an isLoading flag for user feedback."
   fix_complexity: S
