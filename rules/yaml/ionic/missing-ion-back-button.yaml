@@ -1,0 +1,20 @@
+rule:
+  id: ionic/missing-ion-back-button
+  version: "1.0.0"
+  category: ionic
+  severity: warning
+  description: Detects Ionic pages with header but no back button
+  principle: Non-root pages need a back button for navigation — users get stuck without one
+  applicable_to:
+    - is_template
+  exclude_patterns:
+    - "*home*"
+    - "*tabs*"
+    - "*login*"
+    - "*dashboard*"
+  mode: file-presence
+  file_presence:
+    guard_contains: "<ion-header"
+    must_not_contain: "<ion-back-button"
+  message_template: "<ion-header> without <ion-back-button>. Non-root pages need a back button for navigation."
+  fix_complexity: S
