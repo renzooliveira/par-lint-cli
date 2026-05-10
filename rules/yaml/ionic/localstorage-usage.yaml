@@ -1,0 +1,16 @@
+rule:
+  id: ionic/localstorage-usage
+  version: 1.0.0
+  category: ionic
+  severity: warning
+  description: Detects localStorage usage in Ionic/Capacitor projects
+  principle: Mobile WebViews can clear localStorage unexpectedly
+  applicable_to: [is_typescript]
+  exclude_patterns: ["*.spec.ts", "*.test.ts"]
+
+  mode: regex
+  regex:
+    pattern: '\blocalStorage\.\w+'
+
+  message_template: "localStorage is unreliable on mobile. Use @capacitor/preferences instead."
+  fix_complexity: M

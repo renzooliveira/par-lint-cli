@@ -134,13 +134,10 @@ import { classTooManyMethodsRule } from './definitions/arch/class-too-many-metho
 import { classTooManyFieldsRule } from './definitions/arch/class-too-many-fields.js';
 import { missingPathmatchFullRule } from './definitions/routing/missing-pathmatch-full.js';
 import { wildcardNotLastRule } from './definitions/routing/wildcard-not-last.js';
-import { missingIconAccessibilityRule } from './definitions/ionic/missing-icon-accessibility.js';
 import { poorTestNamingRule } from './definitions/test/poor-test-naming.js';
 import { threadSleepInTestRule } from './definitions/test/thread-sleep-in-test.js';
 import { imperativeLoopRule } from './definitions/fp/imperative-loop.js';
 import { nondeterministicInPureRule } from './definitions/fp/nondeterministic-in-pure.js';
-import { localstorageUsageRule } from './definitions/ionic/localstorage-usage.js';
-import { cordovaPluginUsageRule } from './definitions/ionic/cordova-plugin-usage.js';
 import { animateNonCompositableRule } from './definitions/perf/animate-non-compositable.js';
 import { assertInCatchOnlyRule } from './definitions/test/assert-in-catch-only.js';
 import { highEntropyStringRule } from './definitions/security/high-entropy-string.js';
@@ -329,13 +326,10 @@ export const ALL_RULES: RuleDefinition[] = [
   classTooManyFieldsRule,
   missingPathmatchFullRule,
   wildcardNotLastRule,
-  missingIconAccessibilityRule,
   poorTestNamingRule,
   threadSleepInTestRule,
   imperativeLoopRule,
   nondeterministicInPureRule,
-  localstorageUsageRule,
-  cordovaPluginUsageRule,
   animateNonCompositableRule,
   assertInCatchOnlyRule,
   highEntropyStringRule,

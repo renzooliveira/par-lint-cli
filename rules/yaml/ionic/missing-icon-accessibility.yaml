@@ -1,0 +1,15 @@
+rule:
+  id: ionic/missing-icon-accessibility
+  version: 1.0.0
+  category: ionic
+  severity: warning
+  description: Detects ion-icon without aria-label or aria-hidden
+  principle: Decorative icons need aria-hidden; meaningful icons need aria-label
+  applicable_to: [is_html, is_template]
+
+  mode: regex
+  regex:
+    pattern: '<ion-icon\b(?![^>]*\baria-(?:label|hidden)\b)'
+
+  message_template: "ion-icon without aria-label or aria-hidden. Add accessibility attributes."
+  fix_complexity: L
