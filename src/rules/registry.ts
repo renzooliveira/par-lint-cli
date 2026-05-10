@@ -83,7 +83,6 @@ import { sortedImportsRule } from './definitions/imports/sorted-imports.js';
 import { nestedSubscribeRule } from './definitions/rxjs/nested-subscribe.js';
 import { subscribeInConstructorRule } from './definitions/rxjs/subscribe-in-constructor.js';
 import { missingErrorHandlerRule } from './definitions/rxjs/missing-error-handler.js';
-import { observableInTemplateCallRule } from './definitions/rxjs/observable-in-template-call.js';
 import { signalReadAfterAwaitRule } from './definitions/signals/signal-read-after-await.js';
 import { missingAsReadonlyRule } from './definitions/signals/missing-asreadonly.js';
 import { computedSideEffectRule } from './definitions/signals/computed-side-effect.js';
@@ -94,8 +93,6 @@ import { tooManyAssertionsRule } from './definitions/test/too-many-assertions.js
 import { noAssertionRule } from './definitions/test/no-assertion.js';
 import { emptyCatchRule } from './definitions/error/empty-catch.js';
 import { catchOnlyConsoleRule } from './definitions/error/catch-only-console.js';
-import { swallowedPromiseRule } from './definitions/error/swallowed-promise.js';
-import { genericErrorMessageRule } from './definitions/error/generic-error-message.js';
 import { commentedOutCodeRule } from './definitions/hygiene/commented-out-code.js';
 import { unusedImportRule } from './definitions/hygiene/unused-import.js';
 import { deadCodeAfterReturnRule } from './definitions/hygiene/dead-code-after-return.js';
@@ -266,7 +263,6 @@ export const ALL_RULES: RuleDefinition[] = [
   nestedSubscribeRule,
   subscribeInConstructorRule,
   missingErrorHandlerRule,
-  observableInTemplateCallRule,
   signalReadAfterAwaitRule,
   missingAsReadonlyRule,
   computedSideEffectRule,
@@ -277,8 +273,6 @@ export const ALL_RULES: RuleDefinition[] = [
   noAssertionRule,
   emptyCatchRule,
   catchOnlyConsoleRule,
-  swallowedPromiseRule,
-  genericErrorMessageRule,
   commentedOutCodeRule,
   unusedImportRule,
   deadCodeAfterReturnRule,

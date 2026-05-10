@@ -1,0 +1,15 @@
+rule:
+  id: error/generic-error-message
+  version: 1.0.0
+  category: error
+  severity: info
+  description: Detects throw new Error() with generic messages
+  principle: Error messages should describe what went wrong for debugging
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: 'throw\s+new\s+Error\(\s*[''"](Error|error|Something went wrong|Unknown error|Failed|Unexpected error|An error occurred)[''"]\s*\)'
+
+  message_template: 'Generic error message "{match[1]}". Use a descriptive message for debugging.'
+  fix_complexity: S

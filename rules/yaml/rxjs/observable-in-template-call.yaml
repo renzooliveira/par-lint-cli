@@ -1,0 +1,15 @@
+rule:
+  id: rxjs/observable-in-template-call
+  version: 1.0.0
+  category: rxjs
+  severity: error
+  description: Detects method() | async in template creating new Observable each change detection
+  principle: Method calls in templates with async pipe create new subscriptions on every CD cycle
+  applicable_to: [is_template, is_html]
+
+  mode: regex
+  regex:
+    pattern: '\{\{\s*(\w+)\(\)\s*\|\s*async\s*\}\}'
+
+  message_template: '{{ {match[1]}() | async }} creates new Observable each change detection. Use a property instead.'
+  fix_complexity: M

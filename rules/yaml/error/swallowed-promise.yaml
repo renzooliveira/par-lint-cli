@@ -1,0 +1,18 @@
+rule:
+  id: error/swallowed-promise
+  version: 1.0.0
+  category: error
+  severity: warning
+  description: Detects async function calls without await, .then(), .catch(), or assignment
+  principle: Fire-and-forget promises hide errors silently
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: '^(?!.*(?:\bawait\b|\.then\s*\(|\.catch\s*\(|\.subscribe\s*\(|=\s))\s*(this\.\w+\.\w+|fetch)\s*\([^)]*\)\s*;'
+
+  message_template: 'Async call without await/.then()/.catch(). Promise result is silently discarded.'
+  fix_complexity: S
+  suggested_fix:
+    kind: replace
+    description: 'Add "await" before call or append .catch() to handle rejection'
