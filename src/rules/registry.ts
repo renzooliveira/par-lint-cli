@@ -49,7 +49,6 @@ import { shotgunSurgeryRule } from './definitions/arch/shotgun-surgery.js';
 import { fileNamingConventionRule } from './definitions/naming/file-naming-convention.js';
 import { missingTypeSuffixRule } from './definitions/naming/missing-type-suffix.js';
 import { indexBarrelOnlyRule } from './definitions/naming/index-barrel-only.js';
-import { hungarianNotationRule } from './definitions/naming/hungarian-notation.js';
 import { abbreviationInIdentifierRule } from './definitions/naming/abbreviation-in-identifier.js';
 import { nonDescriptiveIdentifierRule } from './definitions/naming/non-descriptive-identifier.js';
 import { reservedWordCollisionRule } from './definitions/naming/reserved-word-collision.js';
@@ -223,7 +222,6 @@ export const ALL_RULES: RuleDefinition[] = [
   fileNamingConventionRule,
   missingTypeSuffixRule,
   indexBarrelOnlyRule,
-  hungarianNotationRule,
   abbreviationInIdentifierRule,
   nonDescriptiveIdentifierRule,
   reservedWordCollisionRule,
