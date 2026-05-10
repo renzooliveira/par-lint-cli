@@ -124,7 +124,6 @@ import { enforcePathAliasRule } from './definitions/imports/enforce-path-alias.j
 import { noCircularTypeImportRule } from './definitions/imports/no-circular-type-import.js';
 import { contextMismatchRule } from './definitions/naming/context-mismatch.js';
 import { fileClassMismatchRule } from './definitions/naming/file-class-mismatch.js';
-import { missingBreakpointsRule } from './definitions/responsive/missing-breakpoints.js';
 import { touchTargetTooSmallRule } from './definitions/responsive/touch-target-too-small.js';
 import { noObjectMutationRule } from './definitions/fp/no-object-mutation.js';
 import { preferReadonlyPropertyRule } from './definitions/fp/prefer-readonly-property.js';
@@ -274,7 +273,6 @@ export const ALL_RULES: RuleDefinition[] = [
   noCircularTypeImportRule,
   contextMismatchRule,
   fileClassMismatchRule,
-  missingBreakpointsRule,
   touchTargetTooSmallRule,
   noObjectMutationRule,
   preferReadonlyPropertyRule,

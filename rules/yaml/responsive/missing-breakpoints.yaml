@@ -1,0 +1,20 @@
+rule:
+  id: responsive/missing-breakpoints
+  version: "1.0.0"
+  category: responsive
+  severity: info
+  description: Detects layout styles without responsive breakpoints
+  principle: Flex/grid layouts should include media or container queries for responsive behavior
+  applicable_to:
+    - is_scss
+    - is_css
+  exclude_patterns:
+    - "*variables*"
+    - "*mixins*"
+    - "*global*"
+  mode: file-presence
+  file_presence:
+    guard_contains: "display\\s*:\\s*(flex|grid)"
+    must_not_contain: "@media|@container"
+  message_template: "Layout 'display: flex|grid' without any media/container query in file. Add responsive breakpoints."
+  fix_complexity: M
