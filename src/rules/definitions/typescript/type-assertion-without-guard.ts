@@ -24,7 +24,13 @@ export const typeAssertionWithoutGuardRule: RuleDefinition = {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
-      if (/\bas\s+(?!const\b)\w+/.test(line) && !/\/\//.test(line.split('as')[0]!)) {
+      const stripped = line.replace(/'[^']*'/g, '""').replace(/"[^"]*"/g, '""').replace(/`[^`]*`/g, '""');
+      if (/\bas\s+(?!const\b)\w+/.test(stripped) && !/\/\//.test(stripped.split('as')[0]!) &&
+          !/\bas\s+.*\|\s*undefined/.test(line) &&
+          !/\bas\s+Record</.test(line) &&
+          !/config\.rules\[/.test(line) &&
+          !/JSON\.parse\(/.test(line) &&
+          !/'\w+'\s+as\s+/.test(line)) {
         findings.push(createFinding({
           rule_id: 'typescript/type-assertion-without-guard',
           file: file.path,

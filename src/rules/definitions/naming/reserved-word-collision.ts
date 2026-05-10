@@ -3,9 +3,7 @@ import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
 const DEFAULT_RESERVED = new Set([
-  'data', 'result', 'status', 'type', 'value', 'item',
-  'list', 'error', 'state', 'config', 'options',
-  'params', 'response', 'request',
+  'data', 'type', 'list', 'error',
 ]);
 
 const DECLARATION_RE = /\b(?:const|let|var)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g;

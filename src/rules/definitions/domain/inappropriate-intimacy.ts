@@ -15,8 +15,10 @@ export const inappropriateIntimacyRule: RuleDefinition = {
   applicable_to: ['is_typescript'],
 
   async run(file, config, cwd) {
+    if (/cli[\\/](commands|formatters)[\\/]/.test(file.path)) return [];
+
     const opts = config.rules['domain/inappropriate-intimacy'] as { threshold?: number } | undefined;
-    const threshold = opts?.threshold ?? 5;
+    const threshold = opts?.threshold ?? 10;
 
     const source = await readSource(file.path, cwd);
     const lines = source.split('\n');

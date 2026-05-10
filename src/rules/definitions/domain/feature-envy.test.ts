@@ -23,7 +23,8 @@ class OrderService {
     const email = customer.email;
     const phone = customer.phone;
     const address = customer.address;
-    return { name, email, phone, address };
+    const age = customer.age;
+    return { name, email, phone, address, age };
   }
 }
 `);
