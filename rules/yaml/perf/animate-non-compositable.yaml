@@ -1,0 +1,15 @@
+rule:
+  id: perf/animate-non-compositable
+  version: 1.0.0
+  category: perf
+  severity: info
+  description: Detects CSS animations on non-compositable properties (height, width, etc.)
+  principle: Animate only transform and opacity for 60fps; other properties trigger layout
+  applicable_to: [is_scss, is_style]
+
+  mode: regex
+  regex:
+    pattern: '\b(transition|animation)\s*:.*\b(height|width|top|left|right|bottom|margin|padding)\b'
+
+  message_template: "Animating non-compositable property (triggers layout). Use transform/opacity instead."
+  fix_complexity: M

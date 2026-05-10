@@ -16,7 +16,7 @@ describe('integration: full pipeline', () => {
   it('registers all rules', () => {
     const runner = new RuleRunner();
     runner.registerMany(ALL_RULES);
-    expect(runner.registeredRules).toHaveLength(163);
+    expect(runner.registeredRules).toHaveLength(159);
   });
 
   it('runs all rules against violation fixtures and produces findings', async () => {

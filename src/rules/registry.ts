@@ -1,5 +1,4 @@
 import type { RuleDefinition } from '../engine/runner.js';
-import { manualChangeDetectionRule } from './definitions/state/manual-change-detection.js';
 import { subscribeWithoutCleanupRule } from './definitions/state/subscribe-without-cleanup.js';
 import { externalSignalMutationRule } from './definitions/state/external-signal-mutation.js';
 import { twoWayBindingLargeFormRule } from './definitions/state/two-way-binding-large-form.js';
@@ -70,7 +69,6 @@ import { fixedHeightContentRule } from './definitions/responsive/fixed-height-co
 import { fontDisplayMissingRule } from './definitions/perf/font-display-missing.js';
 import { duplicateCssClassRule } from './definitions/duplication/duplicate-css-class.js';
 import { noRelativeParentBeyondTwoRule } from './definitions/imports/no-relative-parent-beyond-two.js';
-import { enforceBarrelImportRule } from './definitions/imports/enforce-barrel-import.js';
 import { sortedImportsRule } from './definitions/imports/sorted-imports.js';
 import { nestedSubscribeRule } from './definitions/rxjs/nested-subscribe.js';
 import { subscribeInConstructorRule } from './definitions/rxjs/subscribe-in-constructor.js';
@@ -112,10 +110,8 @@ import { missingPathmatchFullRule } from './definitions/routing/missing-pathmatc
 import { wildcardNotLastRule } from './definitions/routing/wildcard-not-last.js';
 import { imperativeLoopRule } from './definitions/fp/imperative-loop.js';
 import { nondeterministicInPureRule } from './definitions/fp/nondeterministic-in-pure.js';
-import { animateNonCompositableRule } from './definitions/perf/animate-non-compositable.js';
 import { assertInCatchOnlyRule } from './definitions/test/assert-in-catch-only.js';
 import { highEntropyStringRule } from './definitions/security/high-entropy-string.js';
-import { technicalNamingRule } from './definitions/domain/technical-naming.js';
 import { frameworkInDomainRule } from './definitions/arch/framework-in-domain.js';
 import { deepInheritanceChainRule } from './definitions/arch/deep-inheritance-chain.js';
 import { eventListenerWithoutDisposeRule } from './definitions/perf/event-listener-without-dispose.js';
@@ -164,7 +160,6 @@ import { crossAggregateDirectCallRule } from './definitions/arch/cross-aggregate
 import { arrayAsCollectionAnemicRule } from './definitions/domain/array-as-collection-anemic.js';
 
 export const ALL_RULES: RuleDefinition[] = [
-  manualChangeDetectionRule,
   subscribeWithoutCleanupRule,
   externalSignalMutationRule,
   twoWayBindingLargeFormRule,
@@ -235,7 +230,6 @@ export const ALL_RULES: RuleDefinition[] = [
   fontDisplayMissingRule,
   duplicateCssClassRule,
   noRelativeParentBeyondTwoRule,
-  enforceBarrelImportRule,
   sortedImportsRule,
   nestedSubscribeRule,
   subscribeInConstructorRule,
@@ -277,10 +271,8 @@ export const ALL_RULES: RuleDefinition[] = [
   wildcardNotLastRule,
   imperativeLoopRule,
   nondeterministicInPureRule,
-  animateNonCompositableRule,
   assertInCatchOnlyRule,
   highEntropyStringRule,
-  technicalNamingRule,
   frameworkInDomainRule,
   deepInheritanceChainRule,
   eventListenerWithoutDisposeRule,
