@@ -23,7 +23,6 @@ import { noBusinessLogicRule } from './definitions/component/no-business-logic.j
 import { missingOnPushRule } from './definitions/component/missing-onpush.js';
 import { missingTrackByRule } from './definitions/component/missing-trackby.js';
 import { missingIonContentRule } from './definitions/ionic/missing-ion-content.js';
-import { hardcodedPlatformCheckRule } from './definitions/ionic/hardcoded-platform-check.js';
 import { missingLoadingStateRule } from './definitions/ux/missing-loading-state.js';
 import { missingErrorStateRule } from './definitions/ux/missing-error-state.js';
 import { externalMutationRule } from './definitions/domain/external-mutation.js';
@@ -32,7 +31,6 @@ import { nPlusOneRule } from './definitions/perf/n-plus-one.js';
 import { destructiveWithoutConfirmationRule } from './definitions/ux/destructive-without-confirmation.js';
 import { redundantAriaRule } from './definitions/a11y/redundant-aria.js';
 import { derivedStateAsPropertyRule } from './definitions/state/derived-state-as-property.js';
-import { componentStyleLeakRule } from './definitions/scss/component-style-leak.js';
 import { missingSuccessFeedbackRule } from './definitions/ux/missing-success-feedback.js';
 import { missingMotionReduceRule } from './definitions/ux/missing-motion-reduce.js';
 import { formNotDisabledDuringSubmitRule } from './definitions/ux/form-not-disabled-during-submit.js';
@@ -172,7 +170,6 @@ export const ALL_RULES: RuleDefinition[] = [
   hardcodedColorRule,
   hardcodedSpacingRule,
   scssFileTooLongRule,
-  componentStyleLeakRule,
   circularDependencyRule,
   layerViolationRule,
   godFileRule,
@@ -186,7 +183,6 @@ export const ALL_RULES: RuleDefinition[] = [
   missingOnPushRule,
   missingTrackByRule,
   missingIonContentRule,
-  hardcodedPlatformCheckRule,
   missingLoadingStateRule,
   missingErrorStateRule,
   missingSuccessFeedbackRule,
