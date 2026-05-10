@@ -144,6 +144,83 @@ describe('compileYamlRule', () => {
       expect(findings[0]!.message).toBe('debugger statement found');
     });
 
+    it('respects skip_comments to skip lines starting with // or *', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'security/eval',
+          version: '1.0.0',
+          category: 'security',
+          severity: 'error',
+          applicable_to: ['is_typescript'],
+          mode: 'regex',
+          regex: { pattern: '\\beval\\s*\\(' },
+          message_template: 'eval found',
+          fix_complexity: 'M',
+          skip_comments: true,
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockSource("// eval('skip me');\n  * eval('skip me too');\neval('detect');");
+
+      const findings = await rule.run(makeFile('src/app.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.line).toBe(3);
+    });
+
+    it('propagates suggested_fix when present', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'typescript/ts-ignore',
+          version: '1.0.0',
+          category: 'typescript',
+          severity: 'warning',
+          applicable_to: ['is_typescript'],
+          mode: 'regex',
+          regex: { pattern: '@ts-(ignore|expect-error)' },
+          message_template: '@ts-{match[1]} without reason',
+          fix_complexity: 'L',
+          suggested_fix: {
+            kind: 'replace',
+            description: 'Add reason: @ts-{match[1]} -- explanation',
+          },
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockSource('// @ts-ignore');
+
+      const findings = await rule.run(makeFile('src/app.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.suggested_fix).toEqual({
+        kind: 'replace',
+        description: 'Add reason: @ts-ignore -- explanation',
+      });
+    });
+
+    it('supports fix_complexity XL', async () => {
+      const doc: YamlRuleDocument = {
+        rule: {
+          id: 'component/no-ngmodule',
+          version: '1.0.0',
+          category: 'component',
+          severity: 'warning',
+          applicable_to: ['is_typescript'],
+          mode: 'regex',
+          regex: { pattern: '@NgModule\\s*\\(' },
+          message_template: 'NgModule found',
+          fix_complexity: 'XL',
+        },
+      };
+
+      const rule = compileYamlRule(doc);
+      mockSource('@NgModule({})');
+
+      const findings = await rule.run(makeFile('src/app.ts'), defaultConfig, '/tmp');
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.fix_complexity).toBe('XL');
+    });
+
     it('supports match groups in message template', async () => {
       const doc: YamlRuleDocument = {
         rule: {

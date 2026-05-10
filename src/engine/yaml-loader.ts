@@ -16,6 +16,11 @@ export interface YamlRegexConfig {
   multiline?: boolean;
 }
 
+export interface YamlSuggestedFix {
+  kind: 'replace' | 'extract_method' | 'move_method' | 'rename' | 'add_validation' | 'manual';
+  description: string;
+}
+
 export interface YamlMetricConfig {
   measure: 'line_count' | 'function_count' | 'cyclomatic_complexity' | 'parameter_count' | 'export_count';
   scope: 'file' | 'function' | 'class' | 'method';
@@ -37,12 +42,14 @@ export interface YamlRule {
   principle?: string;
   applicable_to: string[];
   exclude_patterns?: string[];
+  skip_comments?: boolean;
   mode: 'regex' | 'metric' | 'ast-grep';
   regex?: YamlRegexConfig;
   metric?: YamlMetricConfig;
   ast_grep?: YamlAstGrepConfig;
   message_template: string;
   fix_complexity: string;
+  suggested_fix?: YamlSuggestedFix;
 }
 
 export interface YamlRuleDocument {
@@ -96,8 +103,14 @@ function compileRegexRule(rule: YamlRule): RuleDefinition {
       const findings: Finding[] = [];
 
       for (let i = 0; i < lines.length; i++) {
+        const line = lines[i]!;
+        if (rule.skip_comments) {
+          const trimmed = line.trimStart();
+          if (trimmed.startsWith('//') || trimmed.startsWith('*')) continue;
+        }
+
         re.lastIndex = 0;
-        const match = re.exec(lines[i]!);
+        const match = re.exec(line);
         if (!match) continue;
 
         findings.push(createFinding({
@@ -108,7 +121,10 @@ function compileRegexRule(rule: YamlRule): RuleDefinition {
           message: interpolateMessage(rule.message_template, match),
           source_principle: rule.principle ?? '',
           category: rule.category,
-          fix_complexity: (rule.fix_complexity as 'S' | 'M' | 'L') ?? 'S',
+          fix_complexity: (rule.fix_complexity as 'S' | 'M' | 'L' | 'XL') ?? 'S',
+          suggested_fix: rule.suggested_fix
+            ? { kind: rule.suggested_fix.kind, description: interpolateMessage(rule.suggested_fix.description, match) }
+            : undefined,
           evidence_trail: [{
             tool: 'yaml-regex',
             query: { pattern: rule.regex!.pattern, file: file.path },
@@ -193,7 +209,10 @@ function compileMetricRule(rule: YamlRule): RuleDefinition {
         message,
         source_principle: rule.principle ?? '',
         category: rule.category,
-        fix_complexity: (rule.fix_complexity as 'S' | 'M' | 'L') ?? 'S',
+        fix_complexity: (rule.fix_complexity as 'S' | 'M' | 'L' | 'XL') ?? 'S',
+        suggested_fix: rule.suggested_fix
+          ? { kind: rule.suggested_fix.kind, description: rule.suggested_fix.description }
+          : undefined,
         evidence_trail: [{
           tool: 'yaml-metric',
           query: { measure, threshold, operator, file: file.path },
@@ -247,7 +266,10 @@ function compileAstGrepRule(rule: YamlRule): RuleDefinition {
           message,
           source_principle: rule.principle ?? '',
           category: rule.category,
-          fix_complexity: (rule.fix_complexity as 'S' | 'M' | 'L') ?? 'S',
+          fix_complexity: (rule.fix_complexity as 'S' | 'M' | 'L' | 'XL') ?? 'S',
+          suggested_fix: rule.suggested_fix
+            ? { kind: rule.suggested_fix.kind, description: rule.suggested_fix.description.replace(/\{match\[0\]\}/g, m.text) }
+            : undefined,
           evidence_trail: [{
             tool: 'yaml-ast-grep',
             query: { pattern, file: file.path },
