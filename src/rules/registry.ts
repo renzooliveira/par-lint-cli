@@ -21,9 +21,6 @@ import { templateTooLongRule } from './definitions/component/template-too-long.j
 import { excessiveInputOutputRule } from './definitions/component/excessive-input-output.js';
 import { noBusinessLogicRule } from './definitions/component/no-business-logic.js';
 import { missingTrackByRule } from './definitions/component/missing-trackby.js';
-import { missingIonContentRule } from './definitions/ionic/missing-ion-content.js';
-import { missingLoadingStateRule } from './definitions/ux/missing-loading-state.js';
-import { missingErrorStateRule } from './definitions/ux/missing-error-state.js';
 import { externalMutationRule } from './definitions/domain/external-mutation.js';
 import { anemicEntityRule } from './definitions/domain/anemic-entity.js';
 import { nPlusOneRule } from './definitions/perf/n-plus-one.js';
@@ -180,9 +177,6 @@ export const ALL_RULES: RuleDefinition[] = [
   excessiveInputOutputRule,
   noBusinessLogicRule,
   missingTrackByRule,
-  missingIonContentRule,
-  missingLoadingStateRule,
-  missingErrorStateRule,
   missingSuccessFeedbackRule,
   destructiveWithoutConfirmationRule,
   missingMotionReduceRule,

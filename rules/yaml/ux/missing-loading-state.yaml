@@ -1,0 +1,16 @@
+rule:
+  id: ux/missing-loading-state
+  version: 1.0.0
+  category: ux
+  severity: warning
+  description: Detects async operations in templates without loading indicator
+  principle: Async operations must show visual progress feedback to the user
+  applicable_to: [is_template]
+
+  mode: file-presence
+  file_presence:
+    guard_contains: '\|\s*async\b'
+    must_not_contain: 'loading|isLoading|spinner|ion-spinner|skeleton|shimmer'
+
+  message_template: 'Template uses async pipe but has no loading state indicator. Add a loading spinner or skeleton.'
+  fix_complexity: M
