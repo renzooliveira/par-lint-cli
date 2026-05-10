@@ -68,7 +68,6 @@ import { signalReadAfterAwaitRule } from './definitions/signals/signal-read-afte
 import { missingAsReadonlyRule } from './definitions/signals/missing-asreadonly.js';
 import { computedSideEffectRule } from './definitions/signals/computed-side-effect.js';
 import { effectWithoutCleanupRule } from './definitions/signals/effect-without-cleanup.js';
-import { emptySpecRule } from './definitions/test/empty-spec.js';
 import { tooManyAssertionsRule } from './definitions/test/too-many-assertions.js';
 import { noAssertionRule } from './definitions/test/no-assertion.js';
 import { emptyCatchRule } from './definitions/error/empty-catch.js';
@@ -220,7 +219,6 @@ export const ALL_RULES: RuleDefinition[] = [
   missingAsReadonlyRule,
   computedSideEffectRule,
   effectWithoutCleanupRule,
-  emptySpecRule,
   tooManyAssertionsRule,
   noAssertionRule,
   emptyCatchRule,

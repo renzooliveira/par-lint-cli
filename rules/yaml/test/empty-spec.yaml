@@ -1,0 +1,15 @@
+rule:
+  id: test/empty-spec
+  version: 1.0.0
+  category: test
+  severity: warning
+  description: Detects spec files without any it()/test()/expect()
+  principle: Empty spec files give false sense of test coverage
+  applicable_to: [is_spec, is_test]
+
+  mode: file-presence
+  file_presence:
+    must_contain: '\b(it|test|expect)\s*\('
+
+  message_template: 'Spec file has no it()/test()/expect(). Add real tests or remove placeholder.'
+  fix_complexity: M

@@ -14,7 +14,9 @@ export type FileTag =
   | 'is_style'
   | 'is_typescript'
   | 'is_html'
-  | 'is_scss';
+  | 'is_scss'
+  | 'is_spec'
+  | 'is_test';
 
 interface TagRule {
   tag: FileTag;
@@ -38,6 +40,8 @@ const TAG_RULES: TagRule[] = [
   { tag: 'is_typescript', test: (f) => f.endsWith('.ts') },
   { tag: 'is_html', test: (f) => f.endsWith('.html') },
   { tag: 'is_scss', test: (f) => f.endsWith('.scss') },
+  { tag: 'is_spec', test: (f) => f.endsWith('.spec.ts') },
+  { tag: 'is_test', test: (f) => f.endsWith('.test.ts') || f.endsWith('.spec.ts') },
 ];
 
 export interface CategorizedFile {
