@@ -1,12 +1,31 @@
-# par-lint
+# par-lint-cli
 
-Deterministic code pattern validation CLI for Angular, Ionic, TypeScript and SCSS projects.
+> **This is a study project.** An experiment exploring whether deterministic, structured linting can effectively feed AI coding agents — and what problems emerge when you try.
 
-par-lint detects architectural violations, performance anti-patterns, accessibility issues, and UX gaps that ESLint and Stylelint miss — patterns that require cross-file analysis, domain knowledge, or structural reasoning.
+Deterministic code pattern validation CLI that outputs structured findings optimized for consumption by LLM-based coding assistants (Claude Code, Cursor, Copilot, etc).
 
-**Designed for AI agents.** The primary consumer is Claude Code, Cursor, or Copilot — not a human staring at terminal output. The `--format=claude-context` output delivers structured findings in minimal tokens so agents can fix issues efficiently.
+## What this project is about
+
+The hypothesis: AI agents waste tokens and hallucinate when asked to "find problems" in code. What if instead you give them **deterministic, reproducible, structured evidence** — same input, same output, every time — and let the agent reason only about the fix?
+
+This project tests that hypothesis by building a linter from scratch that:
+- Detects patterns ESLint/Stylelint can't (architecture, UX, domain, cross-file)
+- Outputs findings in a format optimized for agent token budgets
+- Measures whether agents fix code faster/better with structured input vs raw code
+
+**Current state:** functional CLI with 208 rules across 24 categories. Built entirely with AI pair programming (Claude Code) in ~20 hours as an exercise in human-AI collaboration velocity.
+
+**What I'm studying:**
+- How effective is deterministic linting as agent input vs asking the LLM directly?
+- What's the false positive rate? Which patterns resist deterministic detection?
+- Can YAML-declarative rules replace complex TypeScript logic? Where does it break?
+- Token economy: how much context do agents save with pre-digested findings?
 
 Inspired by [Clean Code para Agentes de IA](https://akitaonrails.com/2026/04/20/clean-code-para-agentes-de-ia/) by Fabio Akita.
+
+## Current focus
+
+Built for Angular/Ionic/TypeScript/SCSS projects (my stack), but the engine and approach are framework-agnostic. The YAML rules engine can express patterns for any language that ast-grep supports.
 
 ## Install
 

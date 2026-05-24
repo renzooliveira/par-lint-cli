@@ -1,7 +1,7 @@
 {
   "name": "par-lint-cli",
   "version": "0.2.0",
-  "description": "Deterministic code pattern validation CLI for Angular/Ionic/TS/SCSS — AI-first output for agents",
+  "description": "Experimental deterministic linter for AI agents — studying structured code validation as input for LLM assistants",
   "type": "module",
   "bin": {
     "par-lint": "./dist/index.js"
