@@ -1,0 +1,5 @@
+<div>
+  <img src="banner.png">
+  <button (click)="loadItems()">Refresh</button>
+  <div *ngFor="let item of items">{{ item.name }}</div>
+</div>
