@@ -2,12 +2,19 @@
 
 Deterministic code pattern validation CLI for Angular, Ionic, TypeScript and SCSS projects.
 
-par-lint detects architectural violations, performance anti-patterns, accessibility issues, and UX gaps that ESLint and Stylelint miss — patterns that require cross-file analysis, domain knowledge, or multi-perspective reasoning.
+par-lint detects architectural violations, performance anti-patterns, accessibility issues, and UX gaps that ESLint and Stylelint miss — patterns that require cross-file analysis, domain knowledge, or structural reasoning.
+
+**Designed for AI agents.** The primary consumer is Claude Code, Cursor, or Copilot — not a human staring at terminal output. The `--format=claude-context` output delivers structured findings in minimal tokens so agents can fix issues efficiently.
+
+Inspired by [Clean Code para Agentes de IA](https://akitaonrails.com/2026/04/20/clean-code-para-agentes-de-ia/) by Fabio Akita.
 
 ## Install
 
 ```bash
-npm install @par/lint
+git clone https://github.com/renzooliveira/par-lint.git
+cd par-lint
+npm install
+npm run build
 ```
 
 Requires Node.js >= 20.
@@ -16,14 +23,28 @@ Requires Node.js >= 20.
 
 ```bash
 # Initialize config file
-par-lint init
+node dist/index.js init
 
 # Run analysis
-par-lint review
+node dist/index.js review --target /path/to/your/project
+
+# AI-optimized output
+node dist/index.js review --target . --output claude-context
 
 # Watch mode
-par-lint watch
+node dist/index.js watch --target .
 ```
+
+## Why par-lint?
+
+| Tool | What it checks | What it misses |
+|------|---------------|----------------|
+| ESLint | Syntax, formatting, simple patterns | Architecture, UX, domain, cross-file |
+| Stylelint | CSS/SCSS syntax | Design tokens, responsive patterns |
+| CodeRabbit | Everything (via LLM) | Determinism, reproducibility, token economy |
+| **par-lint** | **Architecture + UX + Domain + Patterns** | Nothing it claims to check — deterministic |
+
+par-lint produces the **same output for the same input**, every time. No LLM variance. Structured findings that agents can iterate on without hallucination.
 
 ## Commands
 
@@ -38,52 +59,141 @@ par-lint watch
 | `hook` | Install/uninstall git pre-commit hook |
 | `diff` | Compare two analysis reports and show delta |
 | `ci` | All-in-one CI pipeline: review + baseline + SARIF output |
+| `init-claude-md` | Generate CLAUDE.md section with active rules |
 
-### review
+## Output Formats
 
-```bash
-par-lint review [options]
+| Format | Use case |
+|--------|----------|
+| **Console** | Human-readable colored terminal output |
+| **JSON** | Full structured report for automation |
+| **SARIF** | GitHub Code Scanning / VS Code integration |
+| **Markdown** | PR comments, documentation |
+| **Claude Context** | AI-optimized — minimal tokens, max signal |
 
-Options:
-  --target <path>        Target project directory
-  --file <path>          Analyze a single file
-  --severity <level>     Minimum severity: info, warning, error (default: info)
-  --category <cats>      Filter by category (comma-separated)
-  --rule <ids>           Filter by rule ID (comma-separated)
-  --incremental [base]   Only analyze changed files since base ref (default: HEAD~1)
-  --no-cache             Disable file hash caching
-  --baseline             Filter out findings present in baseline
-  --save-baseline        Save current findings as baseline
-  --profile              Show rule execution time profiling
-  --output <formats>     Output formats: json, sarif, markdown (default: console)
-  --json                 Output JSON to stdout
-  --dry-run              Run without writing state
+### Claude Context Format
+
+```json
+{
+  "scan": {
+    "files": 42,
+    "issues": 7,
+    "rules_v": "0.1.0",
+    "by_severity": { "error": 2, "warning": 4, "info": 1 }
+  },
+  "issues": [
+    {
+      "id": "F1",
+      "rule": "arch/layer-violation",
+      "loc": "src/domain/user.service.ts:14",
+      "severity": "error",
+      "snippet": "13| import { HttpClient } from '@angular/common/http';\n14> import { UserStore } from '../../infra/store';",
+      "evidence": "Layer violation: domain → infra",
+      "principle": "Domain must not depend on infrastructure",
+      "fix": { "complexity": "M" },
+      "confidence": 1
+    }
+  ]
+}
 ```
 
-### ci
+## Rules (208 rules, 24 categories)
 
-```bash
-par-lint ci [options]
+### Rule Engine
 
-Options:
-  --target <path>        Target project directory
-  --incremental [base]   Only analyze changed files
-  --baseline             Filter by baseline
-  --save-baseline        Save current findings as baseline
+Rules are implemented in two formats:
+- **TypeScript rules** (146) — complex logic: cross-file analysis, AST traversal, metrics, data flow
+- **YAML rules** (62) — declarative: regex matching, file-presence checks, ast-grep patterns
+
+### Categories
+
+| Category | Rules | Focus |
+|----------|-------|-------|
+| arch | 13 | Layer violations, circular deps, god files, shotgun surgery |
+| domain | 13 | Anemic entities, feature envy, data clumps, Tell-Don't-Ask |
+| component | 21 | OnPush, encapsulation, trackBy, input/output count |
+| naming | 20 | Hungarian notation, abbreviations, file/class mismatch |
+| perf | 11 | N+1, listener leaks, long functions, complexity |
+| fp | 11 | Mutations, imperative loops, readonly enforcement |
+| duplication | 8 | Similar blocks, structural clones, duplicate shapes |
+| responsive | 8 | Fixed dimensions, missing breakpoints, touch targets |
+| ionic | 13 | Missing components, lifecycle, platform checks |
+| template | 12 | Missing types, deprecated directives, accessibility |
+| scss | 10 | Hardcoded values, deep nesting, style leaks |
+| signals | 5 | Computed side effects, signal reads after await |
+| rxjs | 7 | Nested subscribes, missing error handlers |
+| state | 6 | Subscribe without cleanup, two-way binding |
+| ux | 7 | Missing loading/error states, destructive actions |
+| test | 10 | Focused tests, missing assertions, giant tests |
+| a11y | 5 | Missing alt, labels, keyboard support |
+| hygiene | 7 | Console.log, dead code, commented code |
+| imports | 5 | Path aliases, circular types, barrel enforcement |
+| security | 5 | Hardcoded secrets, eval, DOM manipulation |
+| typescript | 4 | Exhaustive switch, ts-ignore without reason |
+| routing | 2 | PathMatch, wildcard order |
+| error | 4 | Empty catch, swallowed promises |
+| i18n | 1 | Missing translate-no |
+
+### YAML Rules Engine
+
+Create declarative rules in YAML with 4 modes:
+
+```yaml
+# Mode: regex — pattern matching on source
+rule:
+  id: hygiene/console-log-in-production
+  severity: warning
+  applicable_to: [is_typescript]
+  mode: regex
+  regex:
+    pattern: '\bconsole\.(log|debug|info)\s*\('
+  message_template: "console.{match[1]}() in production code."
 ```
 
-Generates SARIF output for GitHub Code Scanning integration.
+```yaml
+# Mode: file-presence — file must/must not contain pattern
+rule:
+  id: component/missing-onpush
+  severity: warning
+  applicable_to: [is_component]
+  mode: file-presence
+  file_presence:
+    must_contain: 'ChangeDetectionStrategy\.OnPush'
+  message_template: "Component missing OnPush."
+```
+
+```yaml
+# Mode: metric — threshold-based checks
+rule:
+  id: perf/long-function
+  severity: warning
+  mode: metric
+  metric:
+    measure: function_count
+    threshold: 20
+    operator: ">"
+```
+
+```yaml
+# Mode: ast-grep — AST pattern matching
+rule:
+  id: test/no-focused-test
+  severity: error
+  mode: ast-grep
+  ast_grep:
+    pattern: "fdescribe($$$)"
+    language: typescript
+```
 
 ## Configuration
 
-Create `par-lint.config.yaml` in your project root:
-
 ```yaml
+# par-lint.config.yaml
 schema_version: "1.0"
 
 project:
   name: my-app
-  stack: angular  # angular | angular-ionic | react | dotnet | mixed
+  stack: angular  # angular | angular-ionic | react | dotnet
 
 rules:
   perf/long-function:
@@ -91,10 +201,6 @@ rules:
     severity: error
     options:
       maxLines: 40
-  component/template-too-long:
-    enabled: true
-    options:
-      maxLines: 80
 
 layers:
   - name: domain
@@ -105,144 +211,7 @@ layers:
 layer_rules:
   - from: domain
     cannot_import_from: [infra]
-
-performance:
-  cache_enabled: true
-  parallel_workers: 4
-  incremental: auto  # auto | always | never
-
-custom_rules:
-  - ./rules/my-custom-rule.js
 ```
-
-## Custom Rules (Plugin System)
-
-Create a `.js` file exporting a `RuleDefinition`:
-
-```js
-// rules/no-console-log.js
-export default {
-  id: 'custom/no-console-log',
-  version: '1.0.0',
-  category: 'custom',
-  severity: 'warning',
-  description: 'Detects console.log calls',
-  principle: 'Use structured logging instead of console.log',
-  applicable_to: ['is_typescript'],
-  async run(file, config, cwd) {
-    // Return Finding[] — see src/types/finding.ts for shape
-    return [];
-  },
-};
-```
-
-Register in config:
-
-```yaml
-custom_rules:
-  - ./rules/no-console-log.js
-```
-
-## Rules (47)
-
-### state (5 rules)
-
-| Rule | Severity | Description |
-|------|----------|-------------|
-| `state/manual-change-detection` | warning | Detects manual ChangeDetectorRef calls indicating broken state model |
-| `state/subscribe-without-cleanup` | error | Detects .subscribe() in components without cleanup |
-| `state/external-signal-mutation` | error | Detects signal.set()/update() calls outside the declaring class |
-| `state/two-way-binding-on-large-form` | warning | Detects templates with too many [(ngModel)] bindings |
-| `state/derived-state-as-property` | warning | Detects derived state assigned in ngOnInit instead of computed() |
-
-### perf (7 rules)
-
-| Rule | Severity | Description |
-|------|----------|-------------|
-| `perf/sync-in-async-path` | error | Detects synchronous blocking calls in async context |
-| `perf/long-function` | warning | Detects functions exceeding maximum line count |
-| `perf/high-cyclomatic-complexity` | warning | Detects functions with cyclomatic complexity above threshold |
-| `perf/listener-leak` | error | Detects addEventListener/subscribe without matching cleanup |
-| `perf/heavy-computation-in-render` | warning | Detects function calls in template interpolations without pure pipe |
-| `perf/n-plus-one` | error | Detects HTTP/repository calls inside loops (N+1 pattern) |
-| `perf/missing-pagination` | warning | Detects collection endpoints without pagination parameters |
-
-### scss (5 rules)
-
-| Rule | Severity | Description |
-|------|----------|-------------|
-| `scss/deep-nesting` | warning | Detects SCSS selectors nested deeper than threshold |
-| `scss/hardcoded-color` | warning | Detects literal color values instead of design tokens |
-| `scss/hardcoded-spacing` | warning | Detects literal spacing values instead of design tokens |
-| `scss/file-too-long` | error | Detects SCSS files exceeding maximum line count |
-| `scss/component-style-leak` | warning | Detects ::ng-deep usage that leaks component styles |
-
-### arch (5 rules)
-
-| Rule | Severity | Description |
-|------|----------|-------------|
-| `arch/circular-dependency` | error | Detects circular import cycles between modules |
-| `arch/layer-violation` | error | Detects imports crossing configured layer boundaries |
-| `arch/god-file` | warning | Detects files with excessive LOC, methods or exports |
-| `arch/dead-abstraction` | info | Exported type/interface with no consumers outside its file |
-| `arch/shotgun-surgery-candidate` | info | File co-changes frequently with many others in git history |
-
-### a11y (5 rules)
-
-| Rule | Severity | Description |
-|------|----------|-------------|
-| `a11y/missing-alt` | error | Detects \<img\> elements without alt attribute |
-| `a11y/missing-label` | error | Detects \<input\> elements without associated label or aria-label |
-| `a11y/non-button-as-button` | error | Detects div/span with click handler missing role and keyboard support |
-| `a11y/redundant-aria` | warning | Detects ARIA roles that duplicate native element semantics |
-| `a11y/landmark-structure` | warning | Detects pages missing landmark elements (main, nav, header) |
-
-### component (7 rules)
-
-| Rule | Severity | Description |
-|------|----------|-------------|
-| `component/template-too-long` | warning | Detects HTML templates exceeding maximum line count |
-| `component/excessive-input-output` | info | Detects components with too many @Input/@Output declarations |
-| `component/no-explicit-any` | warning | Detects explicit "any" type annotations |
-| `component/no-business-logic` | warning | Detects business logic in presentational components |
-| `component/missing-onpush` | warning | Detects components without OnPush change detection |
-| `component/missing-trackby` | warning | Detects *ngFor without trackBy function |
-| `component/inline-styles` | warning | Detects inline style attributes in HTML templates |
-
-### ionic (2 rules)
-
-| Rule | Severity | Description |
-|------|----------|-------------|
-| `ionic/missing-ion-content` | warning | Detects Ionic page templates missing \<ion-content\> wrapper |
-| `ionic/hardcoded-platform-check` | warning | Detects hardcoded Platform.is() checks |
-
-### ux (6 rules)
-
-| Rule | Severity | Description |
-|------|----------|-------------|
-| `ux/missing-loading-state` | warning | Detects async operations in templates without loading indicator |
-| `ux/missing-error-state` | error | Detects async pipe usage without error state handling |
-| `ux/missing-success-feedback` | warning | Detects mutation handlers without success feedback |
-| `ux/destructive-without-confirmation` | error | Detects delete/remove handlers without confirmation dialog |
-| `ux/missing-motion-reduce` | warning | Detects animations without prefers-reduced-motion |
-| `ux/form-not-disabled-during-submit` | warning | Detects forms not disabled during submission |
-
-### domain (5 rules)
-
-| Rule | Severity | Description |
-|------|----------|-------------|
-| `domain/external-mutation` | error | Detects direct property assignment from outside the class |
-| `domain/anemic-entity` | warning | Detects entities with many properties but few methods |
-| `domain/primitive-obsession` | info | Detects methods with too many primitive parameters |
-| `domain/feature-envy` | warning | Method accesses too many properties of another object |
-| `domain/inappropriate-intimacy` | warning | Two classes reference each other in excessive depth |
-
-## Output Formats
-
-- **Console** — colored terminal output (default)
-- **JSON** — structured findings report
-- **SARIF** — for GitHub Code Scanning / VS Code integration
-- **Markdown** — human-readable report
 
 ## CI Integration
 
@@ -263,6 +232,53 @@ jobs:
       - uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: .par-lint/findings.sarif
+```
+
+## Integration with Claude Code
+
+Add to your `CLAUDE.md`:
+
+```bash
+# Generate par-lint section for CLAUDE.md
+node dist/index.js init-claude-md --append CLAUDE.md
+```
+
+Or run directly in Claude Code sessions:
+
+```bash
+node /path/to/par-lint/dist/index.js review --target . --output claude-context --severity error --max-issues 0
+```
+
+## Architecture
+
+```
+src/
+├── cli/           Commands (review, init, ci, watch, etc.)
+├── engine/        Core: runner, cache, baseline, YAML loader
+├── discovery/     File scanner + categorizer (is_component, is_service, etc.)
+├── rules/         146 TypeScript rule definitions
+├── adapters/      ast-grep, dependency analysis, git history, metrics
+├── types/         Shared types (Finding, Config)
+└── suppression/   Inline suppression (// par-lint-disable-next-line)
+
+rules/yaml/        62 declarative YAML rules (auto-loaded)
+```
+
+## Custom Rules
+
+```js
+// rules/my-rule.js
+export default {
+  id: 'custom/my-rule',
+  version: '1.0.0',
+  category: 'custom',
+  severity: 'warning',
+  description: 'My custom rule',
+  applicable_to: ['is_typescript'],
+  async run(file, config, cwd) {
+    return []; // Return Finding[]
+  },
+};
 ```
 
 ## License
