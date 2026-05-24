@@ -111,4 +111,23 @@ describe('FileCache', () => {
     const written = JSON.parse(mockedWrite.mock.calls[0]![1] as string);
     expect(written.entries['src/app.ts'].hash).toBe('h1');
   });
+
+  it('invalidates cache when rules version changes', async () => {
+    const cached = {
+      version: 'old-rules-version',
+      entries: {
+        'src/app.ts': {
+          hash: 'abc123',
+          findings: [fakeFinding('src/app.ts')],
+        },
+      },
+    };
+    mockedRead.mockResolvedValue(JSON.stringify(cached) as any);
+
+    const cache = new FileCache('/fake/.par-lint/cache.json', 'new-rules-version');
+    await cache.load();
+
+    const result = cache.lookup('src/app.ts', 'abc123');
+    expect(result).toBeNull();
+  });
 });

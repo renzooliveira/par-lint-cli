@@ -14,6 +14,7 @@ import { formatSarif } from '../formatters/sarif.js';
 import { formatJson } from '../formatters/json.js';
 import { ALL_RULES } from '../../rules/registry.js';
 import { loadCustomRules } from '../../engine/plugin-loader.js';
+import { loadBuiltinYamlRules } from '../../engine/yaml-loader.js';
 
 export interface CiStats {
   total: number;
@@ -68,6 +69,9 @@ export const ciCommand = new Command('ci')
       const categorized = categorizeFiles(files);
       const runner = new RuleRunner();
       runner.registerMany(ALL_RULES);
+
+      const builtinYaml = await loadBuiltinYamlRules();
+      runner.registerMany(builtinYaml);
 
       if (config.custom_rules.length > 0) {
         const customRules = await loadCustomRules(config.custom_rules, cwd);

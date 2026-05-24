@@ -7,7 +7,7 @@ const CLASS_SELECTOR_RE = /^\s*\.([a-zA-Z_][a-zA-Z0-9_-]*)\s*[{,]/;
 
 export const duplicateCssClassRule: RuleDefinition = {
   id: 'duplication/duplicate-css-class',
-  version: '1.0.0',
+  version: '1.1.0',
   category: 'duplication',
   severity: 'warning',
   description: 'Detects same CSS class name defined in multiple SCSS files',
@@ -22,6 +22,7 @@ export const duplicateCssClassRule: RuleDefinition = {
 
     const myClasses = extractClasses(source);
     if (myClasses.size === 0) return [];
+    const mediaClasses = extractMediaClasses(source);
 
     const dir = path.dirname(absPath);
     const siblings = await findScssFiles(dir);
@@ -33,8 +34,11 @@ export const duplicateCssClassRule: RuleDefinition = {
       const otherSource = await readFile(otherFile, 'utf-8');
       const otherClasses = extractClasses(otherSource);
 
+      const otherMediaClasses = extractMediaClasses(otherSource);
+
       for (const [className, line] of myClasses) {
         if (!otherClasses.has(className)) continue;
+        if (otherMediaClasses.has(className) || mediaClasses.has(className)) continue;
 
         findings.push(createFinding({
           rule_id: 'duplication/duplicate-css-class',
@@ -71,6 +75,22 @@ function extractClasses(source: string): Map<string, number> {
       const name = match[1]!;
       if (!classes.has(name)) classes.set(name, i + 1);
     }
+  }
+  return classes;
+}
+
+function extractMediaClasses(source: string): Set<string> {
+  const classes = new Set<string>();
+  const lines = source.split('\n');
+  let inMedia = 0;
+  for (const line of lines) {
+    if (/^\s*@media\b/.test(line)) inMedia++;
+    if (inMedia > 0) {
+      const match = CLASS_SELECTOR_RE.exec(line);
+      if (match) classes.add(match[1]!);
+    }
+    const closeBraces = (line.match(/}/g) || []).length;
+    for (let b = 0; b < closeBraces && inMedia > 0; b++) inMedia--;
   }
   return classes;
 }

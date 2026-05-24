@@ -1,0 +1,19 @@
+rule:
+  id: ux/form-not-disabled-during-submit
+  version: 1.0.0
+  category: ux
+  severity: warning
+  description: Detects form submit handlers without disabling the form/button during submission
+  principle: Forms in submission must prevent double-submit
+  applicable_to: [is_template]
+
+  mode: file-presence
+  file_presence:
+    guard_contains: '\(ngSubmit\)|type\s*=\s*"submit"'
+    must_not_contain: '\[disabled\]\s*=\s*"|isSubmitting|submitting|form\.disable\(\)|\[attr\.disabled\]|ion-spinner|loading'
+
+  message_template: 'Form submit handler without disable pattern. Prevent double submission with [disabled]="isSubmitting()" or form.disable().'
+  fix_complexity: S
+  suggested_fix:
+    kind: add_validation
+    description: Add [disabled]="isSubmitting()" to submit button or call form.disable() during submission

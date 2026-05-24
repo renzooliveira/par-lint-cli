@@ -4,6 +4,8 @@ import { createFinding } from '../../../engine/finding.js';
 import path from 'node:path';
 
 const RE_EXPORT_LINE = /^\s*(export\s+\*\s+from\s|export\s+\{[^}]*\}\s+from\s|export\s+type\s+\{[^}]*\}\s+from\s)/;
+const INLINE_EXPORT_LINE = /^\s*export\s+(const|let|function|async\s+function|class|type|interface|enum|abstract\s+class|default)\b/;
+const IMPORT_LINE = /^\s*import\s/;
 const EMPTY_OR_COMMENT = /^\s*($|\/\/|\/\*|\*)/;
 
 export const indexBarrelOnlyRule: RuleDefinition = {
@@ -21,12 +23,18 @@ export const indexBarrelOnlyRule: RuleDefinition = {
 
     const source = await readSource(file.path, cwd);
     const lines = source.split('\n');
+
+    const hasReExport = lines.some((l) => RE_EXPORT_LINE.test(l));
+    if (!hasReExport) return [];
+
     const findings = [];
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
       if (EMPTY_OR_COMMENT.test(line)) continue;
       if (RE_EXPORT_LINE.test(line)) continue;
+      if (INLINE_EXPORT_LINE.test(line)) continue;
+      if (IMPORT_LINE.test(line)) continue;
 
       findings.push(createFinding({
         rule_id: 'naming/index-barrel-only',

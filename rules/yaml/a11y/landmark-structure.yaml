@@ -1,0 +1,15 @@
+rule:
+  id: a11y/landmark-structure
+  version: 1.0.0
+  category: a11y
+  severity: warning
+  description: Detects pages missing landmark elements (main, nav, header)
+  principle: Pages must have proper landmark structure for assistive technology navigation
+  applicable_to: [is_page_template]
+
+  mode: file-presence
+  file_presence:
+    must_contain: '<main[\s>]|<nav[\s>]|<header[\s>]|role="main"|role="navigation"|role="banner"'
+
+  message_template: 'Page template has no landmark elements (<main>, <nav>, <header>). Add landmarks for screen reader navigation.'
+  fix_complexity: S

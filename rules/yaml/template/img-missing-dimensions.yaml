@@ -1,0 +1,15 @@
+rule:
+  id: template/img-missing-dimensions
+  version: 1.0.0
+  category: template
+  severity: warning
+  description: Detects img without width and height attributes
+  principle: Explicit image dimensions prevent CLS
+  applicable_to: [is_template, is_html]
+
+  mode: regex
+  regex:
+    pattern: '<img\b(?:(?![^>]*\bwidth\s*=)|(?![^>]*\bheight\s*=))[^>]*>'
+
+  message_template: '<img> missing width and/or height attribute(s). Add both to prevent layout shift.'
+  fix_complexity: S

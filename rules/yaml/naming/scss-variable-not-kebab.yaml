@@ -1,0 +1,15 @@
+rule:
+  id: naming/scss-variable-not-kebab
+  version: 1.0.0
+  category: naming
+  severity: warning
+  description: Detects SCSS variables not using $kebab-case
+  principle: SCSS variables follow $kebab-case for consistency
+  applicable_to: [is_scss, is_style]
+
+  mode: regex
+  regex:
+    pattern: '^\s*\$(?![a-z][a-z0-9]*(?:-[a-z0-9]+)*\s*:)([a-zA-Z_][a-zA-Z0-9_-]*)\s*:'
+
+  message_template: 'SCSS variable "${match[1]}" is not $kebab-case'
+  fix_complexity: S

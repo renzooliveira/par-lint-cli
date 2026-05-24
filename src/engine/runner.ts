@@ -3,7 +3,7 @@ import type { ParLintConfig } from '../types/config.js';
 import type { CategorizedFile } from '../discovery/categorizer.js';
 import type { Report, ReportDiff, ReportPerformance, ReportSummary } from '../types/report.js';
 import type { FileCache } from './cache.js';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 
 export interface RuleDefinition {
   id: string;
@@ -27,6 +27,11 @@ export class RuleRunner {
     for (const rule of rules) {
       this.register(rule);
     }
+  }
+
+  getRulesVersion(): string {
+    const ids = this.rules.map((r) => `${r.id}@${r.version}`).sort().join(',');
+    return createHash('sha256').update(ids).digest('hex').slice(0, 12);
   }
 
   getApplicableRules(file: CategorizedFile, config: ParLintConfig): RuleDefinition[] {

@@ -1,0 +1,15 @@
+rule:
+  id: component/deprecated-viewchild-decorator
+  version: 1.0.0
+  category: component
+  severity: info
+  description: Detects @ViewChild/@ViewChildren decorator instead of viewChild()/viewChildren() signal queries
+  principle: Signal-based queries integrate with the reactive graph
+  applicable_to: [is_component]
+
+  mode: regex
+  regex:
+    pattern: '@(ViewChild|ViewChildren)\s*\('
+
+  message_template: "Use signal query instead of @{match[1]} decorator."
+  fix_complexity: L

@@ -70,7 +70,7 @@ describe('CLI E2E', () => {
   it('rules command lists all registered rules', () => {
     const { stdout, exitCode } = run('rules');
     expect(exitCode).toBe(0);
-    expect(stdout).toContain('state/manual-change-detection');
+    expect(stdout).toContain('state/subscribe-without-cleanup');
     expect(stdout).toContain('perf/n-plus-one');
     expect(stdout).toContain('a11y/missing-alt');
   });

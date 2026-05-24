@@ -40,6 +40,9 @@ export const highEntropyStringRule: RuleDefinition = {
         const content = str.slice(1, -1);
         if (/^https?:\/\//.test(content)) continue;
         if (/^[a-z]+([A-Z][a-z]+)+$/.test(content)) continue;
+        if (/\//.test(content)) continue;
+        if (/\\[dswDSWbB(.+]|\\\\/.test(content)) continue;
+        if (/new\s+RegExp|RegExp\(/.test(line)) continue;
 
         const entropy = shannonEntropy(content);
         if (entropy > 4.0 && content.length >= 20) {

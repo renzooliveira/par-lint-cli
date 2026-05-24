@@ -1,5 +1,8 @@
 node_modules/
 dist/
 .par-lint/
+.par/
 *.tgz
 .DS_Store
+.claude/handoffs/
+tmp-scan.json

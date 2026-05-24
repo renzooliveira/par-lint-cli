@@ -1,0 +1,15 @@
+rule:
+  id: component/missing-onpush
+  version: 1.0.0
+  category: component
+  severity: warning
+  description: Detects Angular components without OnPush change detection strategy
+  principle: OnPush reduces unnecessary change detection cycles
+  applicable_to: [is_component]
+
+  mode: file-presence
+  file_presence:
+    must_contain: 'changeDetection\s*:\s*ChangeDetectionStrategy\.OnPush'
+
+  message_template: "Component missing ChangeDetectionStrategy.OnPush. Add changeDetection: ChangeDetectionStrategy.OnPush."
+  fix_complexity: S

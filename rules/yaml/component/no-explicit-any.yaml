@@ -1,0 +1,17 @@
+rule:
+  id: component/no-explicit-any
+  version: 1.0.0
+  category: component
+  severity: warning
+  description: Detects explicit "any" type annotations
+  principle: Explicit any bypasses type safety — use specific types or unknown
+  applicable_to: [is_typescript]
+  skip_comments: true
+
+  mode: regex
+  regex:
+    pattern: ':\s*any\b(?!\w)'
+    multi_match: true
+
+  message_template: "Explicit 'any' type. Use a specific type or 'unknown'."
+  fix_complexity: S

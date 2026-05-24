@@ -58,4 +58,20 @@ describe('naming/missing-type-suffix', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('passes lib-style suffixes like loader, runner, scanner', async () => {
+    for (const name of ['file.loader.ts', 'rule.runner.ts', 'file.scanner.ts', 'data.cache.ts']) {
+      const file = categorizeFile(name);
+      const findings = await missingTypeSuffixRule.run(file, config, FIXTURES);
+      expect(findings, `${name} should pass`).toHaveLength(0);
+    }
+  });
+
+  it('passes exempt basenames like defaults.ts, types.ts', async () => {
+    for (const name of ['defaults.ts', 'types.ts', 'constants.ts', 'utils.ts']) {
+      const file = categorizeFile(name);
+      const findings = await missingTypeSuffixRule.run(file, config, FIXTURES);
+      expect(findings, `${name} should pass`).toHaveLength(0);
+    }
+  });
 });

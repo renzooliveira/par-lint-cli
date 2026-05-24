@@ -32,6 +32,10 @@ export const longFunctionRule: RuleDefinition = {
         source_principle: 'Long functions are hard to test, read and maintain',
         category: 'perf',
         fix_complexity: 'M',
+        suggested_fix: {
+          kind: 'extract_method',
+          description: `Extract '${fn.name}' (${fn.lineCount} lines) into smaller focused functions`,
+        },
         evidence_trail: [{
           tool: 'ts-metrics.extractFunctions',
           query: { file: file.path },

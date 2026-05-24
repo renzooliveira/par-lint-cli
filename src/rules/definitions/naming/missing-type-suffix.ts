@@ -9,12 +9,37 @@ const RECOGNIZED_SUFFIXES = new Set([
   'interceptor', 'resolver', 'store', 'modal', 'widget',
   'util', 'constant', 'enum', 'interface', 'type',
   'module', 'routes', 'config',
+  'schema', 'loader', 'runner', 'scanner', 'cache', 'plugin',
+  'registry', 'handler', 'helper', 'mapper', 'validator',
+  'strategy', 'builder', 'command', 'formatter', 'parser',
+  'transformer', 'converter', 'provider', 'gateway', 'repository',
+  'listener', 'observer', 'emitter', 'middleware', 'filter',
+  'serializer', 'deserializer', 'encoder', 'decoder',
+  'categorizer', 'finding', 'report', 'baseline', 'state', 'suppression',
+  'worker', 'context', 'manager', 'controller', 'facade', 'proxy',
+  'decorator', 'wrapper', 'client', 'server', 'connection', 'session',
+  'pool', 'queue', 'stack', 'pipeline', 'chain', 'aggregator',
+  'collector', 'dispatcher', 'scheduler', 'fixture', 'seed', 'migration',
+  'effect', 'action', 'reducer', 'selector', 'dto', 'vo',
 ]);
 
 const EXEMPT_BASENAMES = new Set([
   'index.ts', 'main.ts', 'polyfills.ts',
   'environment.ts', 'environment.prod.ts', 'environment.development.ts',
   'setup-jest.ts', 'jest.config.ts', 'vitest.config.ts',
+  'types.ts', 'constants.ts', 'defaults.ts', 'utils.ts', 'helpers.ts',
+]);
+
+const TYPE_DIRECTORIES = new Set([
+  'adapters', 'commands', 'formatters', 'services', 'components',
+  'directives', 'pipes', 'guards', 'interceptors', 'resolvers',
+  'models', 'entities', 'interfaces', 'types', 'enums',
+  'stores', 'effects', 'actions', 'reducers', 'selectors',
+  'pages', 'modals', 'widgets', 'layouts',
+  'validators', 'transformers', 'converters', 'mappers',
+  'handlers', 'listeners', 'observers', 'middlewares', 'filters',
+  'factories', 'builders', 'strategies', 'providers',
+  'helpers', 'utils', 'hooks', 'fixtures', 'seeds', 'migrations',
 ]);
 
 function extractTypeSuffix(basename: string): string | null {
@@ -43,8 +68,16 @@ export const missingTypeSuffixRule: RuleDefinition = {
     if (EXEMPT_BASENAMES.has(basename)) return [];
     if (basename.endsWith('.d.ts')) return [];
 
+    const parentDir = path.basename(path.dirname(file.path));
+    if (TYPE_DIRECTORIES.has(parentDir)) return [];
+
     const suffix = extractTypeSuffix(basename);
     if (suffix && RECOGNIZED_SUFFIXES.has(suffix)) return [];
+
+    const baseName = basename.replace(/\.ts$/, '');
+    const kebabParts = baseName.split('-');
+    const lastKebabPart = kebabParts[kebabParts.length - 1]!;
+    if (RECOGNIZED_SUFFIXES.has(lastKebabPart)) return [];
 
     return [createFinding({
       rule_id: 'naming/missing-type-suffix',

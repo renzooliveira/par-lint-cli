@@ -1,0 +1,16 @@
+rule:
+  id: naming/magic-number-in-scss
+  version: 1.0.0
+  category: naming
+  severity: info
+  description: Detects magic numbers in SCSS properties instead of variables/tokens
+  principle: Numeric literals should be design tokens for consistency and maintainability
+  applicable_to: [is_scss, is_style]
+  skip_comments: true
+
+  mode: regex
+  regex:
+    pattern: '^\s*(?!\$)([\w-]+)\s*:\s*(?!(?:0|1|100)(?:px|em|rem|vh|vw|vmin|vmax|ch|ex)\s*;)(-?\d+(?:\.\d+)?)(px|em|rem|vh|vw|vmin|vmax|ch|ex)\s*;'
+
+  message_template: 'Magic number "{match[2]}{match[3]}" in property "{match[1]}". Use a variable or design token.'
+  fix_complexity: S

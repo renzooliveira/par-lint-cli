@@ -1,0 +1,7 @@
+<ion-icon
+  [name]="releaseDetail()!.status === 'error' ? 'alert-circle-outline' : 'time-outline'"
+  [color]="releaseDetail()!.status === 'error' ? 'danger' : 'warning'"
+/>
+<div class="uat-scenario" [class.uat-scenario--passed]="scenario.status === 'passed'" [class.uat-scenario--problem]="scenario.status === 'problem'">
+  <span>Content</span>
+</div>

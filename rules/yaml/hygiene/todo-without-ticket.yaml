@@ -1,0 +1,15 @@
+rule:
+  id: hygiene/todo-without-ticket
+  version: 1.0.0
+  category: hygiene
+  severity: info
+  description: Detects TODO/FIXME/HACK/XXX without ticket reference
+  principle: TODOs without tickets are forgotten; link to a tracker
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: '\/\/\s*(TODO|FIXME|HACK|XXX)\b(?!.*(?:#\d+|[A-Z]+-\d+|https?://))'
+
+  message_template: "{match[1]} without ticket reference. Add #123, PROJ-456, or URL."
+  fix_complexity: S

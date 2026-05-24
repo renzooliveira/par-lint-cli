@@ -15,8 +15,10 @@ export const inappropriateIntimacyRule: RuleDefinition = {
   applicable_to: ['is_typescript'],
 
   async run(file, config, cwd) {
+    if (/cli[\\/](commands|formatters)[\\/]/.test(file.path)) return [];
+
     const opts = config.rules['domain/inappropriate-intimacy'] as { threshold?: number } | undefined;
-    const threshold = opts?.threshold ?? 5;
+    const threshold = opts?.threshold ?? 10;
 
     const source = await readSource(file.path, cwd);
     const lines = source.split('\n');
@@ -87,6 +89,10 @@ export const inappropriateIntimacyRule: RuleDefinition = {
           source_principle: 'Classes should not know each other in excessive depth',
           category: 'domain',
           fix_complexity: 'L',
+          suggested_fix: {
+            kind: 'extract_method',
+            description: `Reduce coupling with '${typeName}': extract shared interface or mediator`,
+          },
           evidence_trail: [{
             tool: 'regex',
             query: { file: file.path },

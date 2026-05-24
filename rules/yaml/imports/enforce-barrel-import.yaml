@@ -1,0 +1,15 @@
+rule:
+  id: imports/enforce-barrel-import
+  version: 1.0.0
+  category: imports
+  severity: error
+  description: Detects imports that bypass barrel files (direct internal file access)
+  principle: Barrel imports are the public API of a module; bypass breaks encapsulation
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: '^\s*import\s+.*from\s+[''"](@[a-zA-Z]+\/[a-zA-Z-]+\/[a-zA-Z-]+\/.+\.[a-zA-Z]+)[''"]'
+
+  message_template: 'Direct import "{match[1]}" bypasses barrel. Import from the module''s index instead.'
+  fix_complexity: S

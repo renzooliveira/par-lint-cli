@@ -14,8 +14,11 @@ import { formatJson } from '../formatters/json.js';
 import { formatConsole } from '../formatters/console.js';
 import { formatSarif } from '../formatters/sarif.js';
 import { formatMarkdown } from '../formatters/markdown.js';
+import { formatClaudeContext } from '../formatters/claude-context.js';
 import { ALL_RULES } from '../../rules/registry.js';
 import { loadCustomRules } from '../../engine/plugin-loader.js';
+import { loadYamlRules, loadBuiltinYamlRules } from '../../engine/yaml-loader.js';
+import { globby } from 'globby';
 
 export const reviewCommand = new Command('review')
   .description('Analyze codebase for pattern violations')
@@ -32,11 +35,13 @@ export const reviewCommand = new Command('review')
   .option('--baseline', 'Filter out findings present in baseline')
   .option('--save-baseline', 'Save current findings as baseline')
   .option('--profile', 'Show rule execution time profiling')
+  .option('--max-issues <n>', 'Max issues in claude-context output (default: 10)', '10')
   .action(async (options: {
     output: string;
     file?: string;
     severity: string;
     json: boolean;
+    maxIssues: string;
     dryRun: boolean;
     target?: string;
     category?: string;
@@ -74,15 +79,28 @@ export const reviewCommand = new Command('review')
       const runner = new RuleRunner();
       runner.registerMany(ALL_RULES);
 
+      const builtinYaml = await loadBuiltinYamlRules();
+      runner.registerMany(builtinYaml);
+
       if (config.custom_rules.length > 0) {
-        const customRules = await loadCustomRules(config.custom_rules, cwd);
-        runner.registerMany(customRules);
+        const resolved = await globby(config.custom_rules, { cwd, absolute: false });
+        const yamlPaths = resolved.filter((p) => p.endsWith('.yaml') || p.endsWith('.yml'));
+        const jsPaths = resolved.filter((p) => !p.endsWith('.yaml') && !p.endsWith('.yml'));
+
+        if (yamlPaths.length > 0) {
+          const yamlRules = await loadYamlRules(yamlPaths, cwd);
+          runner.registerMany(yamlRules);
+        }
+        if (jsPaths.length > 0) {
+          const customRules = await loadCustomRules(jsPaths, cwd);
+          runner.registerMany(customRules);
+        }
       }
 
       let cache: FileCache | undefined;
       if (options.cache && config.performance.cache_enabled) {
         const cachePath = path.resolve(cwd, '.par-lint/cache.json');
-        cache = new FileCache(cachePath);
+        cache = new FileCache(cachePath, runner.getRulesVersion());
         await cache.load();
       }
 
@@ -178,6 +196,11 @@ export const reviewCommand = new Command('review')
         await mkdir(path.dirname(mdPath), { recursive: true });
         await writeFile(mdPath, formatMarkdown(report), 'utf-8');
         console.log(`  Markdown written to ${path.relative(cwd, mdPath)}`);
+      }
+
+      if (formats.includes('claude-context')) {
+        const maxIssues = parseInt(options.maxIssues, 10);
+        process.stdout.write(await formatClaudeContext(report, { maxIssues }));
       }
 
       if (options.profile && Object.keys(report.performance.by_tool).length > 0) {

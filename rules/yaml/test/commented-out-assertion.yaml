@@ -1,0 +1,15 @@
+rule:
+  id: test/commented-out-assertion
+  version: 1.0.0
+  category: test
+  severity: warning
+  description: Detects commented-out assertions in test files
+  principle: Commented assertions hide failing tests and reduce coverage
+  applicable_to: [is_test, is_spec]
+
+  mode: regex
+  regex:
+    pattern: '^\s*//\s*expect\s*\('
+
+  message_template: "Commented-out assertion. Either fix and uncomment or remove it."
+  fix_complexity: L

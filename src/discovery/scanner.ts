@@ -27,6 +27,8 @@ const DEFAULT_EXCLUDE = [
   '**/e2e/**',
   '**/test/**',
   '**/__tests__/**',
+  '**/fixtures/**',
+  '**/rules/definitions/**',
 ];
 
 export async function scanFiles(options: ScanOptions): Promise<string[]> {

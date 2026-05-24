@@ -1,0 +1,18 @@
+rule:
+  id: typescript/ts-ignore-without-reason
+  version: 1.0.0
+  category: typescript
+  severity: warning
+  description: Detects @ts-ignore/@ts-expect-error without an explanatory comment
+  principle: Type suppressions need documented justification
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: '@ts-(ignore|expect-error)(?!\s+--?\s*\S)'
+
+  message_template: "@ts-{match[1]} without explanation. Add a reason: @ts-{match[1]} -- reason here"
+  fix_complexity: L
+  suggested_fix:
+    kind: replace
+    description: "Add reason: @ts-{match[1]} -- explanation of why this is needed"

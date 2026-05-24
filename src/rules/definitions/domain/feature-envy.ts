@@ -3,8 +3,8 @@ import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
 const PROP_ACCESS_RE = /(\w+)\.(\w+)/g;
-const SKIP_OBJECTS = new Set(['this', 'self', 'console', 'Math', 'JSON', 'Object', 'Array', 'Promise', 'Date', 'Number', 'String', 'Boolean', 'Error', 'Map', 'Set', 'RegExp', 'http', 'store', 'decider', 'router', 'route', 'fb', 'dialog']);
-const SKIP_FILE_RE = /\.(mapper|facade)\./i;
+const SKIP_OBJECTS = new Set(['this', 'self', 'console', 'Math', 'JSON', 'Object', 'Array', 'Promise', 'Date', 'Number', 'String', 'Boolean', 'Error', 'Map', 'Set', 'RegExp', 'http', 'store', 'decider', 'router', 'route', 'fb', 'dialog', 'config', 'options', 'opts', 'rule', 'finding', 'event', 'request', 'response', 'req', 'res']);
+const SKIP_FILE_RE = /\.(mapper|facade)\.|cli[\\/](commands|formatters)[\\/]/i;
 const FUNC_START_RE = /(?:function\s+\w+|(?:async\s+)?(?:\w+\s*)?)\s*\(([^)]*)\)\s*[:{]/;
 const ARROW_FUNC_RE = /(?:const|let|var)\s+\w+\s*=\s*(?:async\s+)?(?:\([^)]*\)|(\w+))\s*(?::\s*\w+)?\s*=>/;
 const METHOD_RE = /^\s*(?:async\s+)?(?:public\s+|private\s+|protected\s+)?(\w+)\s*\(([^)]*)\)/;
@@ -32,7 +32,7 @@ export const featureEnvyRule: RuleDefinition = {
     if (SKIP_FILE_RE.test(file.path)) return [];
 
     const opts = config.rules['domain/feature-envy'] as { threshold?: number } | undefined;
-    const threshold = opts?.threshold ?? 3;
+    const threshold = opts?.threshold ?? 4;
 
     const source = await readSource(file.path, cwd);
     const lines = source.split('\n');
@@ -55,6 +55,10 @@ export const featureEnvyRule: RuleDefinition = {
             source_principle: 'A method that uses more data from another class belongs in that class',
             category: 'domain',
             fix_complexity: 'M',
+            suggested_fix: {
+              kind: 'move_method',
+              description: `Move logic to '${obj}' — this method accesses ${data.props.size} of its properties`,
+            },
             evidence_trail: [{
               tool: 'regex',
               query: { file: file.path },

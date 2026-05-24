@@ -16,6 +16,7 @@ export const catchOnlyConsoleRule: RuleDefinition = {
 
   async run(file, _config, cwd) {
     if (!file.path.endsWith('.ts')) return [];
+    if (/cli[\\/]commands[\\/]/.test(file.path)) return [];
 
     const source = await readSource(file.path, cwd);
     const lines = source.split('\n');
@@ -54,6 +55,10 @@ export const catchOnlyConsoleRule: RuleDefinition = {
         source_principle: 'Console logging is not error handling',
         category: 'error',
         fix_complexity: 'S',
+        suggested_fix: {
+          kind: 'replace',
+          description: 'Add real error handling: rethrow, return error result, or report to monitoring',
+        },
         evidence_trail: [{
           tool: 'regex',
           query: { pattern: 'catch only console', file: file.path },

@@ -1,0 +1,16 @@
+rule:
+  id: component/inline-styles
+  version: 1.0.0
+  category: component
+  severity: warning
+  description: Detects inline style attributes in HTML templates
+  principle: Styles belong in SCSS files, not inline in templates
+  applicable_to: [is_template, is_html]
+
+  mode: regex
+  regex:
+    pattern: '\bstyle\s*=\s*"'
+    multi_match: true
+
+  message_template: "Inline style attribute. Move styles to SCSS file."
+  fix_complexity: S

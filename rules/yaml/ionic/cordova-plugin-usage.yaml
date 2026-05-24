@@ -1,0 +1,15 @@
+rule:
+  id: ionic/cordova-plugin-usage
+  version: 1.0.0
+  category: ionic
+  severity: warning
+  description: Detects Cordova/ionic-native plugin imports instead of Capacitor
+  principle: Capacitor plugins are actively maintained and better integrated
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: '@ionic-native/'
+
+  message_template: "Cordova @ionic-native plugin detected. Migrate to @capacitor/* equivalent."
+  fix_complexity: M

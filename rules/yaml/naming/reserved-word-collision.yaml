@@ -1,0 +1,24 @@
+rule:
+  id: naming/reserved-word-collision
+  version: 1.1.0
+  category: naming
+  severity: warning
+  description: Detects variables using generic domain-reserved words
+  principle: Variable names should be specific to their context, not generic placeholders
+  applicable_to: [is_typescript]
+  skip_comments: true
+  exclude_patterns:
+    - '*.spec.ts'
+    - '*.test.ts'
+    - '*.config.ts'
+
+  mode: regex
+  regex:
+    pattern: '\b(?:const|let|var)\s+(type|list|error)\b'
+    multi_match: true
+
+  message_template: 'Generic name "{match[1]}" — use a context-specific name'
+  fix_complexity: S
+  suggested_fix:
+    kind: rename
+    description: 'Add context prefix: "{match[1]}" → e.g. "order{match[1]}"'

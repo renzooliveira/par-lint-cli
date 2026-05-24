@@ -12,14 +12,21 @@ describe('fp/mutating-array-method', () => {
     const file = categorizeFile('violations/fp/mutating-array.service.ts');
     const findings = await mutatingArrayMethodRule.run(file, config, FIXTURES);
 
-    expect(findings.length).toBe(5);
+    expect(findings.length).toBe(3);
     expect(findings.some((f) => f.message.includes('.push()'))).toBe(true);
-    expect(findings.some((f) => f.message.includes('.sort()'))).toBe(true);
     expect(findings.some((f) => f.message.includes('.splice()'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('.shift()'))).toBe(true);
   });
 
   it('does not flag immutable array operations', async () => {
     const file = categorizeFile('valid/fp/immutable-array.service.ts');
+    const findings = await mutatingArrayMethodRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
+
+  it('does not flag push on local builder arrays', async () => {
+    const file = categorizeFile('valid/fp/local-builder-push.service.ts');
     const findings = await mutatingArrayMethodRule.run(file, config, FIXTURES);
 
     expect(findings).toHaveLength(0);

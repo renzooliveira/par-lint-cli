@@ -40,6 +40,10 @@ export const commentedOutCodeRule: RuleDefinition = {
             source_principle: 'Git is history, not comments',
             category: 'hygiene',
             fix_complexity: 'S',
+            suggested_fix: {
+              kind: 'replace',
+              description: `Delete ${consecutiveCodeComments} commented lines — git preserves history`,
+            },
             evidence_trail: [{
               tool: 'regex',
               query: { pattern: 'commented code', file: file.path },

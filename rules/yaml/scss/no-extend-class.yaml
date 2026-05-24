@@ -1,0 +1,15 @@
+rule:
+  id: scss/no-extend-class
+  version: 1.0.0
+  category: scss
+  severity: info
+  description: Detects @extend .class instead of @extend %placeholder
+  principle: Extending classes bloats output; placeholders produce cleaner CSS
+  applicable_to: [is_scss, is_style]
+
+  mode: regex
+  regex:
+    pattern: '@extend\s+\.'
+
+  message_template: "Use @extend %placeholder instead of @extend .class to avoid output bloat."
+  fix_complexity: L

@@ -1,0 +1,17 @@
+rule:
+  id: domain/technical-naming
+  version: 1.0.0
+  category: domain
+  severity: info
+  description: Detects generic/technical class names instead of domain language
+  principle: Use ubiquitous language from the domain, not technical implementation terms
+  applicable_to: [is_typescript]
+  skip_comments: true
+
+  mode: regex
+  regex:
+    pattern: '(?:class|interface)\s+(DataManager|ProcessorService|HelperUtil|HandlerService|ManagerService|BaseService|GenericService|AbstractProcessor|DataProcessor|InfoService|UtilService|CommonHelper)\b'
+    multi_match: true
+
+  message_template: '"{match[1]}" is a generic technical name. Use domain-specific terminology.'
+  fix_complexity: M

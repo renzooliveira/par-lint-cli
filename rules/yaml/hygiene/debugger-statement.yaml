@@ -1,0 +1,15 @@
+rule:
+  id: hygiene/debugger-statement
+  version: 1.0.0
+  category: hygiene
+  severity: error
+  description: Detects debugger statements left in code
+  principle: debugger statements must not reach production
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: '^\s*debugger\s*;'
+
+  message_template: "debugger statement. Remove before committing."
+  fix_complexity: S

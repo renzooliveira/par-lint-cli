@@ -1,0 +1,16 @@
+rule:
+  id: ionic/hardcoded-platform-check
+  version: 1.0.0
+  category: ionic
+  severity: warning
+  description: Detects hardcoded Platform.is() checks instead of abstraction
+  principle: Platform-specific logic should be abstracted for testability and portability
+  applicable_to: [is_typescript]
+
+  mode: regex
+  regex:
+    pattern: '\.is\(\s*[''"](\w+)[''"]\s*\)'
+    multi_match: true
+
+  message_template: "Hardcoded platform check: platform.is('{match[1]}'). Use a platform-agnostic service or abstraction."
+  fix_complexity: M

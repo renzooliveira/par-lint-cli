@@ -16,15 +16,21 @@ interface CacheFile {
 export class FileCache {
   private cachePath: string;
   private entries: Record<string, CacheEntry> = {};
+  private version: string;
 
-  constructor(cachePath: string) {
+  constructor(cachePath: string, rulesVersion?: string) {
     this.cachePath = cachePath;
+    this.version = rulesVersion ?? '1.0';
   }
 
   async load(): Promise<void> {
     try {
       const content = await readFile(this.cachePath, 'utf-8');
       const data = JSON.parse(content) as CacheFile;
+      if (data.version !== this.version) {
+        this.entries = {};
+        return;
+      }
       this.entries = data.entries ?? {};
     } catch {
       this.entries = {};
@@ -44,7 +50,7 @@ export class FileCache {
   async save(): Promise<void> {
     const dir = path.dirname(this.cachePath);
     await mkdir(dir, { recursive: true });
-    const data: CacheFile = { version: '1.0', entries: this.entries };
+    const data: CacheFile = { version: this.version, entries: this.entries };
     await writeFile(this.cachePath, JSON.stringify(data, null, 2), 'utf-8');
   }
 }

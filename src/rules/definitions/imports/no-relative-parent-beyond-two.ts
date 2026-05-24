@@ -1,12 +1,31 @@
 import type { RuleDefinition } from '../../../engine/runner.js';
 import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 
 const IMPORT_RE = /^\s*import\s+.*from\s+['"](\.\.\/(?:\.\.\/){2,}[^'"]+)['"]/;
 
+const tsconfigCache = new Map<string, boolean>();
+function hasPathAliases(cwd: string): boolean {
+  if (tsconfigCache.has(cwd)) return tsconfigCache.get(cwd)!;
+  const tsconfig = path.join(cwd, 'tsconfig.json');
+  let result = false;
+  if (existsSync(tsconfig)) {
+    try {
+      const raw = readFileSync(tsconfig, 'utf-8').replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+      const parsed = JSON.parse(raw);
+      const paths = parsed?.compilerOptions?.paths;
+      result = paths != null && Object.keys(paths).length > 0;
+    } catch { /* ignore parse errors */ }
+  }
+  tsconfigCache.set(cwd, result);
+  return result;
+}
+
 export const noRelativeParentBeyondTwoRule: RuleDefinition = {
   id: 'imports/no-relative-parent-beyond-two',
-  version: '1.0.0',
+  version: '1.1.0',
   category: 'imports',
   severity: 'warning',
   description: 'Detects relative imports with more than 2 parent traversals (../)',
@@ -15,6 +34,7 @@ export const noRelativeParentBeyondTwoRule: RuleDefinition = {
 
   async run(file, _config, cwd) {
     if (!file.path.endsWith('.ts')) return [];
+    if (!hasPathAliases(cwd)) return [];
 
     const source = await readSource(file.path, cwd);
     const lines = source.split('\n');

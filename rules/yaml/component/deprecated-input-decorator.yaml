@@ -1,0 +1,15 @@
+rule:
+  id: component/deprecated-input-decorator
+  version: 1.0.0
+  category: component
+  severity: info
+  description: Detects @Input() decorator usage instead of input() signal function
+  principle: Angular signal inputs provide better type safety and reactivity
+  applicable_to: [is_component]
+
+  mode: regex
+  regex:
+    pattern: '@Input\s*\('
+
+  message_template: "Use input() signal function instead of @Input() decorator."
+  fix_complexity: L

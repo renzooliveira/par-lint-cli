@@ -4,7 +4,7 @@ import { createFinding } from '../../../engine/finding.js';
 
 export const noImportantRule: RuleDefinition = {
   id: 'scss/no-important',
-  version: '1.0.0',
+  version: '1.1.0',
   category: 'scss',
   severity: 'warning',
   description: 'Detects !important usage in SCSS',
@@ -17,9 +17,16 @@ export const noImportantRule: RuleDefinition = {
     const source = await readSource(file.path, cwd);
     const findings = [];
     const lines = source.split('\n');
+    let shadowDomBlock = false;
 
     for (let i = 0; i < lines.length; i++) {
-      if (/!important/.test(lines[i]!) && !/\/\//.test(lines[i]!.split('!important')[0]!)) {
+      const trimmed = lines[i]!.trimStart();
+      if (/shadow\s*dom/i.test(trimmed) && (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*'))) {
+        shadowDomBlock = true;
+      }
+      if (lines[i]!.includes('}')) shadowDomBlock = false;
+
+      if (/!important/.test(lines[i]!) && !/\/\//.test(lines[i]!.split('!important')[0]!) && !shadowDomBlock) {
         findings.push(createFinding({
           rule_id: 'scss/no-important',
           file: file.path,

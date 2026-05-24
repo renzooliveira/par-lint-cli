@@ -24,4 +24,12 @@ describe('perf/n-plus-one', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('does not flag Map/Set operations inside loops', async () => {
+    const config = parLintConfigSchema.parse({ project: { name: 'test' } });
+    const file = categorizeFile('valid/perf/map-in-loop.service.ts');
+    const findings = await nPlusOneRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

@@ -1,0 +1,15 @@
+rule:
+  id: template/missing-ngSrc
+  version: 1.0.0
+  category: template
+  severity: info
+  description: Detects img src when NgOptimizedImage should be used (ngSrc)
+  principle: NgOptimizedImage provides automatic optimization
+  applicable_to: [is_template, is_html]
+
+  mode: regex
+  regex:
+    pattern: '<img\b(?![^>]*\bngSrc\s*=)[^>]*\bsrc\s*='
+
+  message_template: '<img src="..."> should use ngSrc for NgOptimizedImage benefits (lazy-loading, srcset, priority).'
+  fix_complexity: S

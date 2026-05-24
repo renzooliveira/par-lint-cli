@@ -1,0 +1,15 @@
+rule:
+  id: scss/deprecated-import
+  version: 1.0.0
+  category: scss
+  severity: warning
+  description: Detects @import in SCSS instead of @use/@forward
+  principle: Sass @import is deprecated; @use/@forward provide proper namespacing
+  applicable_to: [is_scss, is_style]
+
+  mode: regex
+  regex:
+    pattern: '^\s*@import\s'
+
+  message_template: "Use @use or @forward instead of deprecated @import."
+  fix_complexity: M

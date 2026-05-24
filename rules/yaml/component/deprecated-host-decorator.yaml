@@ -1,0 +1,15 @@
+rule:
+  id: component/deprecated-host-decorator
+  version: 1.0.0
+  category: component
+  severity: warning
+  description: Detects @HostBinding/@HostListener instead of host metadata
+  principle: host metadata is more declarative and co-located
+  applicable_to: [is_component]
+
+  mode: regex
+  regex:
+    pattern: '@(HostBinding|HostListener)\s*\('
+
+  message_template: "Use host metadata in @Component instead of @{match[1]}."
+  fix_complexity: L

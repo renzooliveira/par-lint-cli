@@ -1,0 +1,20 @@
+rule:
+  id: naming/hungarian-notation
+  version: 1.0.0
+  category: naming
+  severity: warning
+  description: Detects Hungarian notation type prefixes in identifiers
+  principle: Type info comes from the type system, not the name
+  applicable_to: [is_typescript]
+  skip_comments: true
+
+  mode: regex
+  regex:
+    pattern: '(?:(?:const|let|var|private|public|protected|readonly)\s+|[,({]\s*|\.|^\s+(?=\w+\s*[=:]))(str|num|bool|arr|obj|int|fn)([A-Z][a-zA-Z0-9]*)\b'
+    multi_match: true
+
+  message_template: 'Hungarian notation "{match[1]}{match[2]}" — remove "{match[1]}" prefix'
+  fix_complexity: S
+  suggested_fix:
+    kind: rename
+    description: 'Remove "{match[1]}" prefix from "{match[1]}{match[2]}"'

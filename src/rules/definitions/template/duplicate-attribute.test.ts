@@ -24,4 +24,25 @@ describe('template/duplicate-attribute', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  it('does not flag Angular binding syntax as duplicate of plain attribute', async () => {
+    const file = categorizeFile('valid/template/angular-bindings.component.html');
+    const findings = await duplicateAttributeRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
+
+  it('does not flag class + [class.xxx] (Angular class binding merge)', async () => {
+    const file = categorizeFile('valid/template/class-with-class-binding.component.html');
+    const findings = await duplicateAttributeRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
+
+  it('does not flag words inside expression values as attributes', async () => {
+    const file = categorizeFile('valid/template/expression-with-equals.component.html');
+    const findings = await duplicateAttributeRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

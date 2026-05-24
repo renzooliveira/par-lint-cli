@@ -1,0 +1,15 @@
+rule:
+  id: ionic/missing-ion-content
+  version: 1.0.0
+  category: ionic
+  severity: warning
+  description: Detects Ionic page templates missing <ion-content> wrapper
+  principle: Ionic pages must wrap content in <ion-content> for proper scrolling and layout
+  applicable_to: [is_page_template]
+
+  mode: file-presence
+  file_presence:
+    must_not_contain: '<ion-content'
+
+  message_template: 'Ionic page missing <ion-content>. Pages should wrap content in <ion-content> for proper scrolling and layout.'
+  fix_complexity: S

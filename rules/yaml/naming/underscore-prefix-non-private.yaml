@@ -1,0 +1,19 @@
+rule:
+  id: naming/underscore-prefix-non-private
+  version: 1.0.0
+  category: naming
+  severity: warning
+  description: Detects _prefixed members that are not declared private
+  principle: Underscore prefix is reserved for private members
+  applicable_to: [is_typescript]
+  skip_comments: true
+
+  mode: regex
+  regex:
+    pattern: '^(?!.*\bprivate\b)(?!.*,\s*$)\s*(?:public\s+|protected\s+|readonly\s+)*(_[a-zA-Z][a-zA-Z0-9]*)\s*[=:(]'
+
+  message_template: '"{match[1]}" has underscore prefix but is not private'
+  fix_complexity: S
+  suggested_fix:
+    kind: replace
+    description: 'Add "private" keyword to "{match[1]}" or rename it (drop underscore)'

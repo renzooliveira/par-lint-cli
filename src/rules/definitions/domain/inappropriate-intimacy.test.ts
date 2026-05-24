@@ -26,6 +26,11 @@ class Order {
     c.address;
     c.status;
     c.validate();
+    c.age;
+    c.country;
+    c.city;
+    c.zip;
+    c.active;
   }
 }
 `);

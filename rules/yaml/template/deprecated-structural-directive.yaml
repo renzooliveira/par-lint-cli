@@ -1,0 +1,15 @@
+rule:
+  id: template/deprecated-structural-directive
+  version: 1.0.0
+  category: template
+  severity: warning
+  description: Detects *ngIf/*ngFor/*ngSwitch instead of @if/@for/@switch
+  principle: Built-in control flow is more performant and type-safe
+  applicable_to: [is_template, is_html]
+
+  mode: regex
+  regex:
+    pattern: '\*ng(If|For|Switch|SwitchCase)\b'
+
+  message_template: "Use built-in control flow (@if/@for/@switch) instead of *ng{match[1]}."
+  fix_complexity: M

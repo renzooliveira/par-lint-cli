@@ -1,0 +1,9 @@
+// Shadow DOM override — ionic component encapsulation
+.ion-button {
+  --background: var(--primary) !important;
+}
+
+/* Shadow DOM override */
+ion-toolbar {
+  --padding-start: 0 !important;
+}

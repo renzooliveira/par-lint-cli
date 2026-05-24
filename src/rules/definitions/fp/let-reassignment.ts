@@ -44,6 +44,10 @@ export const letReassignmentRule: RuleDefinition = {
           source_principle: 'const communicates intent and prevents accidental mutation',
           category: 'fp',
           fix_complexity: 'L',
+          suggested_fix: {
+            kind: 'replace',
+            description: `Restructure "${name}" to use const with ternary or conditional expression`,
+          },
           evidence_trail: [{
             tool: 'regex.letReassignment',
             query: { file: file.path },

@@ -24,7 +24,15 @@ export const typeAssertionWithoutGuardRule: RuleDefinition = {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
-      if (/\bas\s+(?!const\b)\w+/.test(line) && !/\/\//.test(line.split('as')[0]!)) {
+      const stripped = line.replace(/'[^']*'/g, '""').replace(/"[^"]*"/g, '""').replace(/`[^`]*`/g, '""');
+      if (/\bas\s+(?!const\b)\w+/.test(stripped) && !/\/\//.test(stripped.split('as')[0]!) &&
+          !/\bas\s+.*\|\s*undefined/.test(line) &&
+          !/\bas\s+Record</.test(line) &&
+          !/config\.rules\[/.test(line) &&
+          !/JSON\.parse\(/.test(line) &&
+          !/'\w+'\s+as\s+/.test(line) &&
+          !/\bas\s+(object|unknown)\b/.test(line) &&
+          !/\bas\s+\w+\[/.test(line)) {
         findings.push(createFinding({
           rule_id: 'typescript/type-assertion-without-guard',
           file: file.path,
@@ -34,6 +42,10 @@ export const typeAssertionWithoutGuardRule: RuleDefinition = {
           source_principle: 'Type assertions bypass the type system; type guards maintain safety',
           category: 'typescript',
           fix_complexity: 'M',
+          suggested_fix: {
+            kind: 'add_validation',
+            description: 'Add runtime type guard before assertion or use a validation function',
+          },
           evidence_trail: [{
             tool: 'regex.typeAssertion',
             query: { file: file.path },

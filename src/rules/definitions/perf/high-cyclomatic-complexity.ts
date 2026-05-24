@@ -32,6 +32,10 @@ export const highCyclomaticComplexityRule: RuleDefinition = {
         source_principle: 'High cyclomatic complexity correlates with bugs and hard-to-test code',
         category: 'perf',
         fix_complexity: 'M',
+        suggested_fix: {
+          kind: 'extract_method',
+          description: `Simplify '${fn.name}' (complexity ${fn.cyclomaticComplexity}): extract branches into helpers or use strategy pattern`,
+        },
         evidence_trail: [{
           tool: 'ts-metrics.extractFunctions',
           query: { file: file.path },

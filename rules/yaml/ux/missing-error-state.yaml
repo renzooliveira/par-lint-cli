@@ -1,0 +1,16 @@
+rule:
+  id: ux/missing-error-state
+  version: 1.0.0
+  category: ux
+  severity: error
+  description: Detects async pipe usage in templates without error state handling
+  principle: Async operation failures must be shown to the user, not silently ignored
+  applicable_to: [is_template]
+
+  mode: file-presence
+  file_presence:
+    guard_contains: '\|\s*async\b'
+    must_not_contain: 'error|errorState|err-message|error-message|\*ngIf=".*error'
+
+  message_template: 'Template uses async pipe but has no error state handling. Add error feedback for failed requests.'
+  fix_complexity: M

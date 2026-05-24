@@ -3,15 +3,16 @@ import { readSource } from '../../../adapters/ast-grep.js';
 import { createFinding } from '../../../engine/finding.js';
 
 const GENERIC_NAMES = new Set([
-  'temp', 'val', 'obj', 'arr', 'data', 'info', 'stuff', 'thing',
-  'foo', 'bar', 'baz', 'tmp', 'ret', 'res', 'req', 'cb', 'fn', 'el',
+  'temp', 'obj', 'arr', 'info', 'stuff', 'thing',
+  'foo', 'baz', 'tmp', 'ret',
 ]);
 
-const LOOP_VARS = new Set(['i', 'j', 'k', 'n', 'idx']);
+const ALLOWED_SHORT = new Set(['i', 'j', 'k', 'n', 'idx', 'id', 're', 'fp', 'rc', 'fn', 'db', 'io', 'fs', 'os', 'rx', 'el', 'r', 'm', 'l']);
 
 const DECLARATION_RE = /\b(?:const|let|var)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g;
 
 const FOR_LOOP_RE = /\bfor\s*\(/;
+const CALLBACK_RE = /[.,(]\s*(?:async\s+)?(?:\([^)]*\)|[a-zA-Z_$]\w*)\s*=>/;
 
 export const nonDescriptiveIdentifierRule: RuleDefinition = {
   id: 'naming/non-descriptive-identifier',
@@ -35,15 +36,18 @@ export const nonDescriptiveIdentifierRule: RuleDefinition = {
       if (line.trimStart().startsWith('//') || line.trimStart().startsWith('*')) continue;
 
       const isForLoop = FOR_LOOP_RE.test(line);
+      const isCallback = CALLBACK_RE.test(line);
 
       DECLARATION_RE.lastIndex = 0;
       let match: RegExpExecArray | null;
       while ((match = DECLARATION_RE.exec(line)) !== null) {
         const name = match[1]!;
 
-        if (isForLoop && LOOP_VARS.has(name)) continue;
+        if (ALLOWED_SHORT.has(name)) continue;
+        if (isForLoop && name.length <= 2) continue;
+        if (isCallback && name.length <= 2) continue;
 
-        const isShort = name.length <= 2 && !LOOP_VARS.has(name);
+        const isShort = name.length <= 2;
         const isGeneric = GENERIC_NAMES.has(name);
 
         if (!isShort && !isGeneric) continue;
@@ -58,6 +62,10 @@ export const nonDescriptiveIdentifierRule: RuleDefinition = {
           source_principle: 'Variable names should express purpose',
           category: 'naming',
           fix_complexity: 'S',
+          suggested_fix: {
+            kind: 'rename',
+            description: `Rename "${name}" to a descriptive name reflecting its purpose`,
+          },
           evidence_trail: [{
             tool: 'regex',
             query: { pattern: 'short/generic name', file: file.path },
