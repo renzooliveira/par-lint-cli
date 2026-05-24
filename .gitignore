@@ -4,5 +4,5 @@ dist/
 .par/
 *.tgz
 .DS_Store
-.claude/handoffs/
+.claude/
 tmp-scan.json
