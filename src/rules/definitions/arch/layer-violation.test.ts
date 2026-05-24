@@ -17,4 +17,11 @@ describe('arch/layer-violation', () => {
     expect(findings[0]!.message).toContain('core');
     expect(findings[0]!.message).toContain('features');
   });
+
+  it('does not flag imports within same layer', async () => {
+    const file = categorizeFile('valid/arch/core-internal-import.service.ts');
+    const findings = await layerViolationRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });

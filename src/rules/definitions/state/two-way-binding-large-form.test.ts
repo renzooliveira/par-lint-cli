@@ -16,4 +16,11 @@ describe('state/two-way-binding-on-large-form', () => {
     expect(findings[0]!.message).toContain('5');
     expect(findings[0]!.rule_id).toBe('state/two-way-binding-on-large-form');
   });
+
+  it('does not flag form with few ngModel bindings', async () => {
+    const file = categorizeFile('valid/state/small-form.component.html');
+    const findings = await twoWayBindingLargeFormRule.run(file, config, FIXTURES);
+
+    expect(findings).toHaveLength(0);
+  });
 });
