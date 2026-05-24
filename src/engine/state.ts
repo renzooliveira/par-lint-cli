@@ -42,7 +42,7 @@ export async function saveState(statePath: string, findings: Finding[]): Promise
     schema_version: '1.0',
     last_execution: {
       timestamp: new Date().toISOString(),
-      par_lint_version: '0.1.0',
+      par_lint_version: '0.2.0',
     },
     active_findings: {},
   };

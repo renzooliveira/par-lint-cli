@@ -13,7 +13,7 @@ import { initClaudeMdCommand } from './commands/init-claude-md.js';
 const program = new Command()
   .name('par-lint')
   .description('Deterministic code pattern validation for Angular/Ionic/TS/SCSS')
-  .version('0.1.0');
+  .version('0.2.0');
 
 program.addCommand(reviewCommand);
 program.addCommand(initCommand);

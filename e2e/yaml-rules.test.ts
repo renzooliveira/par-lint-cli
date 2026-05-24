@@ -130,7 +130,7 @@ describe('YAML Rules E2E', () => {
       expect(output).toHaveProperty('issues');
       expect(output.scan.files).toBeGreaterThan(0);
       expect(output.scan.issues).toBeGreaterThan(0);
-      expect(output.scan.rules_v).toBe('0.1.0');
+      expect(output.scan.rules_v).toBe('0.2.0');
       expect(output.scan.by_category).toBeDefined();
       expect(output.scan.by_severity).toBeDefined();
     });

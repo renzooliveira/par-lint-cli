@@ -11,8 +11,8 @@ Inspired by [Clean Code para Agentes de IA](https://akitaonrails.com/2026/04/20/
 ## Install
 
 ```bash
-git clone https://github.com/renzooliveira/par-lint.git
-cd par-lint
+git clone https://github.com/renzooliveira/par-lint-cli.git
+cd par-lint-cli
 npm install
 npm run build
 ```

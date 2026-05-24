@@ -163,7 +163,7 @@ function buildReport(
   return {
     report_id: randomUUID(),
     schema_version: '1.0',
-    par_lint_version: '0.1.0',
+    par_lint_version: '0.2.0',
     timestamp: new Date().toISOString(),
     project: {
       name: config.project.name,
