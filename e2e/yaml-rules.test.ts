@@ -76,9 +76,9 @@ describe('YAML Rules E2E', () => {
       const report: Report = JSON.parse(stdout);
 
       expect(report.findings.length).toBeGreaterThanOrEqual(1);
-      const finding = report.findings[0]!;
-      expect(finding.file).toContain('dashboard.component.html');
-      expect(finding.message).toBeTruthy();
+      const dashFinding = report.findings.find(f => f.file.includes('dashboard.component.html'));
+      expect(dashFinding).toBeDefined();
+      expect(dashFinding!.message).toBeTruthy();
     });
 
     it('detects button-missing-type via template/button-missing-type', { timeout: 20000 }, () => {
@@ -105,10 +105,11 @@ describe('YAML Rules E2E', () => {
       const { stdout } = run(`review --target "${FIXTURE}" --json --no-cache --rule component/missing-onpush`);
       const report: Report = JSON.parse(stdout);
 
-      expect(report.findings.length).toBe(1);
-      expect(report.findings[0]!.file).toContain('dashboard.component.ts');
-      expect(report.findings[0]!.line).toBe(1);
-      expect(report.findings[0]!.message).toContain('OnPush');
+      expect(report.findings.length).toBeGreaterThanOrEqual(1);
+      const dashFinding = report.findings.find(f => f.file.includes('dashboard.component.ts'));
+      expect(dashFinding).toBeDefined();
+      expect(dashFinding!.line).toBe(1);
+      expect(dashFinding!.message).toContain('OnPush');
     });
 
     it('does not flag service files for component rules', { timeout: 20000 }, () => {
@@ -139,17 +140,24 @@ describe('YAML Rules E2E', () => {
       const output: ClaudeContextOutput = JSON.parse(stdout);
 
       for (const issue of output.issues) {
-        expect(issue.id).toMatch(/^F\d+$/);
+        expect(issue.id).toMatch(/^[A-Z]\d+$/);
         expect(issue.rule).toBeTruthy();
-        expect(issue.loc).toMatch(/\w+:\d+/);
         expect(issue.severity).toMatch(/^(error|warning|info)$/);
-        expect(issue.snippet).toBeTruthy();
-        expect(issue.evidence).toBeTruthy();
         expect(issue.principle).toBeTruthy();
         expect(issue.fix).toHaveProperty('complexity');
         expect(typeof issue.confidence).toBe('number');
         expect(issue.confidence).toBeGreaterThanOrEqual(0);
         expect(issue.confidence).toBeLessThanOrEqual(1);
+
+        const isGrouped = 'occurrences' in issue;
+        if (isGrouped) {
+          expect((issue as any).file).toBeTruthy();
+          expect((issue as any).occurrences.length).toBeGreaterThan(0);
+        } else {
+          expect(issue.loc).toMatch(/\w+:\d+/);
+          expect(issue.snippet).toBeTruthy();
+          expect(issue.evidence).toBeTruthy();
+        }
       }
     });
 
@@ -213,6 +221,44 @@ describe('YAML Rules E2E', () => {
       expect(finding.suggested_fix).toBeDefined();
       expect(finding.suggested_fix!.kind).toBe('replace');
       expect(finding.suggested_fix!.description).toContain('reason');
+    });
+  });
+
+  describe('guard_contains compound mode', () => {
+    it('flags template with async pipe but no loading state', { timeout: 20000 }, () => {
+      const { stdout } = run(`review --target "${FIXTURE}" --json --no-cache --rule ux/missing-loading-state`);
+      const report: Report = JSON.parse(stdout);
+
+      const asyncListFinding = report.findings.find(f => f.file.includes('async-list.component.html'));
+      expect(asyncListFinding).toBeDefined();
+      expect(asyncListFinding!.message).toContain('loading');
+    });
+
+    it('skips template with async pipe AND loading indicator', { timeout: 20000 }, () => {
+      const { stdout } = run(`review --target "${FIXTURE}" --json --no-cache --rule ux/missing-loading-state`);
+      const report: Report = JSON.parse(stdout);
+
+      const okFinding = report.findings.find(f => f.file.includes('async-list-ok.component.html'));
+      expect(okFinding).toBeUndefined();
+    });
+
+    it('skips template without async pipe (guard not satisfied)', { timeout: 20000 }, () => {
+      const { stdout } = run(`review --target "${FIXTURE}" --json --no-cache --rule ux/missing-loading-state`);
+      const report: Report = JSON.parse(stdout);
+
+      const dashFinding = report.findings.find(f => f.file.includes('dashboard.component.html'));
+      expect(dashFinding).toBeUndefined();
+    });
+  });
+
+  describe('multi_match mode', () => {
+    it('reports multiple findings per file when multi_match is true', { timeout: 20000 }, () => {
+      const { stdout } = run(`review --target "${FIXTURE}" --json --no-cache --rule component/no-explicit-any`);
+      const report: Report = JSON.parse(stdout);
+
+      const multiFindings = report.findings.filter(f => f.file.includes('multi-any.component.ts'));
+      expect(multiFindings.length).toBe(3);
+      expect(multiFindings.map(f => f.line)).toEqual([8, 9, 10]);
     });
   });
 
