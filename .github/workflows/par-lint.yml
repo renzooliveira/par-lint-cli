@@ -25,7 +25,7 @@ jobs:
       - run: npm run build
 
       - name: Run par-lint
-        run: node dist/cli/index.js ci --target .
+        run: node dist/index.js ci --target .
 
       - name: Upload SARIF
         if: always()
