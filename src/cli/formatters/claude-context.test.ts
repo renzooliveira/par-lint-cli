@@ -46,6 +46,8 @@ describe('formatClaudeContext', () => {
       rules_v: '0.1.0',
       by_category: { rxjs: 1 },
       by_severity: { error: 1 },
+      by_fix_complexity: { S: 1 },
+      files_affected: 1,
     });
   });
 
@@ -133,6 +135,68 @@ describe('formatClaudeContext', () => {
 
     const raw = await formatClaudeContext(makeReport([finding]));
     expect(() => JSON.parse(raw)).not.toThrow();
+  });
+
+  it('includes by_fix_complexity and files_affected in scan', async () => {
+    const findings = [
+      createFinding({ rule_id: 'test/a', file: 'a.ts', line: 1, severity: 'error', message: 'a', source_principle: 'p', category: 'test', fix_complexity: 'S' }),
+      createFinding({ rule_id: 'test/b', file: 'a.ts', line: 2, severity: 'error', message: 'b', source_principle: 'p', category: 'test', fix_complexity: 'S' }),
+      createFinding({ rule_id: 'test/c', file: 'b.ts', line: 1, severity: 'warning', message: 'c', source_principle: 'p', category: 'test', fix_complexity: 'M' }),
+      createFinding({ rule_id: 'test/d', file: 'c.ts', line: 1, severity: 'warning', message: 'd', source_principle: 'p', category: 'test', fix_complexity: 'L' }),
+      createFinding({ rule_id: 'test/e', file: 'd.ts', line: 1, severity: 'error', message: 'e', source_principle: 'p', category: 'test', fix_complexity: 'XL' }),
+    ];
+
+    const report = makeReport(findings);
+    const output = JSON.parse(await formatClaudeContext(report));
+
+    expect(output.scan.by_fix_complexity).toEqual({ S: 2, M: 1, L: 1, XL: 1 });
+    expect(output.scan.files_affected).toBe(4);
+  });
+
+  it('counts files_affected once per file even with grouped findings in the same file', async () => {
+    const findings = [
+      createFinding({ rule_id: 'hygiene/dead-code', file: 'a.ts', line: 10, severity: 'warning', message: 'dead code', source_principle: 'p', category: 'hygiene', fix_complexity: 'S' }),
+      createFinding({ rule_id: 'hygiene/dead-code', file: 'a.ts', line: 20, severity: 'warning', message: 'dead code', source_principle: 'p', category: 'hygiene', fix_complexity: 'S' }),
+      createFinding({ rule_id: 'hygiene/dead-code', file: 'a.ts', line: 30, severity: 'warning', message: 'dead code', source_principle: 'p', category: 'hygiene', fix_complexity: 'S' }),
+    ];
+
+    const report = makeReport(findings);
+    const output = JSON.parse(await formatClaudeContext(report));
+
+    expect(output.scan.files_affected).toBe(1);
+    expect(output.scan.by_fix_complexity).toEqual({ S: 3 });
+  });
+
+  it('by_fix_complexity and files_affected reflect only the surviving (maxIssues-truncated) subset', async () => {
+    const findings = [
+      createFinding({ rule_id: 'test/a', file: 'a.ts', line: 1, severity: 'error', message: 'a', source_principle: 'p', category: 'test', fix_complexity: 'S' }),
+      createFinding({ rule_id: 'test/b', file: 'b.ts', line: 1, severity: 'error', message: 'b', source_principle: 'p', category: 'test', fix_complexity: 'M' }),
+      createFinding({ rule_id: 'test/c', file: 'c.ts', line: 1, severity: 'warning', message: 'c', source_principle: 'p', category: 'test', fix_complexity: 'L' }),
+    ];
+
+    const report = makeReport(findings);
+    const output = JSON.parse(await formatClaudeContext(report, { maxIssues: 2 }));
+
+    expect(output.issues).toHaveLength(2);
+    expect(output.scan.by_fix_complexity).toEqual({ S: 1, M: 1 });
+    expect(output.scan.files_affected).toBe(2);
+  });
+
+  it('by_fix_complexity and files_affected reflect only the surviving (maxTokens-truncated) subset', async () => {
+    const findings = Array.from({ length: 5 }, (_, i) =>
+      createFinding({ rule_id: `test/r${i}`, file: `f${i}.ts`, line: i + 1, severity: 'warning', message: `message number ${i} with some extra padding to add length`, source_principle: 'p', category: 'test', fix_complexity: 'M' }),
+    );
+    const report = makeReport(findings);
+
+    const unlimited = JSON.parse(await formatClaudeContext(report));
+    const tokensPerIssue = unlimited.issues.map((issue: unknown) => Math.ceil(JSON.stringify(issue).length / 4));
+    const budget = tokensPerIssue[0] + tokensPerIssue[1];
+
+    const output = JSON.parse(await formatClaudeContext(report, { maxTokens: budget }));
+
+    expect(output.issues).toHaveLength(2);
+    expect(output.scan.by_fix_complexity).toEqual({ M: 2 });
+    expect(output.scan.files_affected).toBe(2);
   });
 
   it('includes category summary in scan', async () => {

@@ -48,6 +48,8 @@ interface ClaudeContextScan {
   rules_v: string;
   by_category: Record<string, number>;
   by_severity: Record<string, number>;
+  by_fix_complexity: Record<string, number>;
+  files_affected: number;
   truncated?: {
     total_issues: number;
     total_by_category: Record<string, number>;
@@ -118,10 +120,10 @@ async function findingToIssue(
   };
 }
 
-function countBy(findings: Finding[], key: 'category' | 'severity'): Record<string, number> {
+function countBy(findings: Finding[], key: 'category' | 'severity' | 'fix_complexity'): Record<string, number> {
   const counts: Record<string, number> = {};
   for (const f of findings) {
-    const val = key === 'category' ? f.category : f.severity;
+    const val = f[key];
     counts[val] = (counts[val] ?? 0) + 1;
   }
   return counts;
@@ -176,6 +178,8 @@ export async function formatClaudeContext(report: Report, options?: ClaudeContex
     rules_v: report.par_lint_version,
     by_category: countBy(survivingFindings, 'category'),
     by_severity: countBy(survivingFindings, 'severity'),
+    by_fix_complexity: countBy(survivingFindings, 'fix_complexity'),
+    files_affected: new Set(survivingFindings.map(f => f.file)).size,
   };
 
   if (truncated) {
