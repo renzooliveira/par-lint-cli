@@ -4,7 +4,12 @@ import path from 'node:path';
 import os from 'node:os';
 import { formatClaudeContext } from './claude-context.js';
 import type { Report } from '../../types/report.js';
+import type { Finding, FindingStatus } from '../../types/finding.js';
 import { createFinding } from '../../engine/finding.js';
+
+function withStatus(finding: Finding, status: FindingStatus): Finding {
+  return { ...finding, status };
+}
 
 function makeReport(findings: Report['findings'], root = '/tmp'): Report {
   return {
@@ -359,6 +364,54 @@ describe('formatClaudeContext', () => {
       expect(grouped.occurrences).toHaveLength(2);
       expect(single.id).toMatch(/^F/);
       expect(single.loc).toBe('b.ts:5');
+    });
+  });
+
+  describe('status', () => {
+    it('carries status from finding onto a single issue', async () => {
+      const finding = withStatus(
+        createFinding({
+          rule_id: 'hygiene/dead-code',
+          file: 'a.ts',
+          line: 10,
+          severity: 'warning',
+          message: 'dead code',
+          source_principle: 'p',
+          category: 'hygiene',
+        }),
+        'persistent',
+      );
+
+      const report = makeReport([finding]);
+      const output = JSON.parse(await formatClaudeContext(report));
+
+      expect(output.issues[0].id).toBe('F1');
+      expect(output.issues[0].status).toBe('persistent');
+    });
+
+    it('carries per-occurrence status when grouping findings with different statuses', async () => {
+      const findings = [
+        withStatus(
+          createFinding({ rule_id: 'hygiene/dead-code', file: 'a.ts', line: 10, severity: 'warning', message: 'dead code', source_principle: 'p', category: 'hygiene' }),
+          'new',
+        ),
+        withStatus(
+          createFinding({ rule_id: 'hygiene/dead-code', file: 'a.ts', line: 20, severity: 'warning', message: 'dead code', source_principle: 'p', category: 'hygiene' }),
+          'persistent',
+        ),
+      ];
+
+      const report = makeReport(findings);
+      const output = JSON.parse(await formatClaudeContext(report));
+
+      expect(output.issues).toHaveLength(1);
+      const grouped = output.issues[0];
+      expect(grouped.id).toBe('G1');
+      expect(grouped.occurrences[0].line).toBe(10);
+      expect(grouped.occurrences[0].status).toBe('new');
+      expect(grouped.occurrences[1].line).toBe(20);
+      expect(grouped.occurrences[1].status).toBe('persistent');
+      expect(grouped.status).toBeUndefined();
     });
   });
 });

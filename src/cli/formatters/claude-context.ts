@@ -17,12 +17,14 @@ interface ClaudeContextIssue {
     example: string;
   };
   confidence: number;
+  status: string;
 }
 
 interface ClaudeContextOccurrence {
   line: number;
   snippet: string;
   evidence: string;
+  status: string;
 }
 
 interface ClaudeContextGroupedIssue {
@@ -111,6 +113,7 @@ async function findingToIssue(
       example: finding.suggested_fix?.diff ?? '',
     },
     confidence: finding.confidence,
+    status: finding.status,
   };
 }
 
@@ -186,6 +189,7 @@ export async function formatClaudeContext(report: Report, options?: ClaudeContex
           line: parseInt(g.loc.split(':').pop()!, 10),
           snippet: g.snippet,
           evidence: g.evidence,
+          status: g.status,
         })),
       });
     }
