@@ -185,6 +185,20 @@ describe('YAML Rules E2E', () => {
       expect(totalIssues).toBeGreaterThan(3);
     });
 
+    it('--max-tokens truncates output more aggressively than --max-issues alone', { timeout: 20000 }, () => {
+      const allStdout = run(`review --target "${FIXTURE}" --output claude-context --no-cache --max-issues 0`);
+      const allOutput: ClaudeContextOutput = JSON.parse(allStdout.stdout);
+      const totalIssues = allOutput.scan.issues;
+
+      const { stdout } = run(`review --target "${FIXTURE}" --output claude-context --no-cache --max-issues 0 --max-tokens 50`);
+      const output: ClaudeContextOutput = JSON.parse(stdout);
+
+      expect(output).toHaveProperty('scan');
+      expect(output).toHaveProperty('issues');
+      expect(output.scan.files).toBeGreaterThan(0);
+      expect(output.issues.length).toBeLessThan(totalIssues);
+    });
+
     it('snippets contain context lines around finding', { timeout: 20000 }, () => {
       const { stdout } = run(`review --target "${FIXTURE}" --output claude-context --no-cache --max-issues 0`);
       const output: ClaudeContextOutput = JSON.parse(stdout);

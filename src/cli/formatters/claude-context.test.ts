@@ -213,6 +213,97 @@ describe('formatClaudeContext', () => {
     });
   });
 
+  describe('maxTokens option', () => {
+    it('cuts issues further than maxIssues alone would, and sets truncated', async () => {
+      const findings = Array.from({ length: 5 }, (_, i) =>
+        createFinding({ rule_id: `test/r${i}`, file: `f${i}.ts`, line: i + 1, severity: 'warning', message: `message number ${i} with some extra padding to add length`, source_principle: 'p', category: 'test' }),
+      );
+      const report = makeReport(findings);
+
+      const unlimited = JSON.parse(await formatClaudeContext(report));
+      const tokensPerIssue = unlimited.issues.map((issue: unknown) => Math.ceil(JSON.stringify(issue).length / 4));
+      const budget = tokensPerIssue[0] + tokensPerIssue[1];
+
+      const output = JSON.parse(await formatClaudeContext(report, { maxTokens: budget }));
+
+      expect(output.issues).toHaveLength(2);
+      expect(output.scan.issues).toBe(2);
+      expect(output.scan.truncated).toEqual({
+        total_issues: 5,
+        total_by_category: { test: 5 },
+        total_by_severity: { warning: 5 },
+      });
+    });
+
+    it('keeps at least one issue even when maxTokens is smaller than a single issue', async () => {
+      const findings = Array.from({ length: 5 }, (_, i) =>
+        createFinding({ rule_id: `test/r${i}`, file: `f${i}.ts`, line: i + 1, severity: 'warning', message: `msg${i}`, source_principle: 'p', category: 'test' }),
+      );
+      const report = makeReport(findings);
+
+      const output = JSON.parse(await formatClaudeContext(report, { maxTokens: 1 }));
+
+      expect(output.issues).toHaveLength(1);
+      expect(output.scan.issues).toBe(1);
+      expect(output.scan.truncated?.total_issues).toBe(5);
+    });
+
+    it('treats maxTokens 0 as no limit', async () => {
+      const findings = Array.from({ length: 5 }, (_, i) =>
+        createFinding({ rule_id: `test/r${i}`, file: `f${i}.ts`, line: i + 1, severity: 'error', message: `msg${i}`, source_principle: 'p', category: 'test' }),
+      );
+      const report = makeReport(findings);
+
+      const output = JSON.parse(await formatClaudeContext(report, { maxTokens: 0 }));
+
+      expect(output.issues).toHaveLength(5);
+      expect(output.scan.truncated).toBeUndefined();
+    });
+
+    it('scan counts reflect the token-truncated subset, not the full set', async () => {
+      const findings = [
+        createFinding({ rule_id: 'ux/a', file: 'a.ts', line: 1, severity: 'error', message: 'a', source_principle: 'p', category: 'ux' }),
+        createFinding({ rule_id: 'ux/b', file: 'b.ts', line: 2, severity: 'error', message: 'b', source_principle: 'p', category: 'ux' }),
+        createFinding({ rule_id: 'imports/c', file: 'c.ts', line: 3, severity: 'error', message: 'c', source_principle: 'p', category: 'imports' }),
+        createFinding({ rule_id: 'imports/d', file: 'd.ts', line: 4, severity: 'warning', message: 'd', source_principle: 'p', category: 'imports' }),
+        createFinding({ rule_id: 'perf/e', file: 'e.ts', line: 5, severity: 'warning', message: 'e', source_principle: 'p', category: 'perf' }),
+      ];
+      const report = makeReport(findings);
+
+      const unlimited = JSON.parse(await formatClaudeContext(report));
+      const tokensPerIssue = unlimited.issues.map((issue: unknown) => Math.ceil(JSON.stringify(issue).length / 4));
+      const budget = tokensPerIssue[0] + tokensPerIssue[1] + tokensPerIssue[2];
+
+      const output = JSON.parse(await formatClaudeContext(report, { maxTokens: budget }));
+
+      expect(output.issues).toHaveLength(3);
+      expect(output.scan.issues).toBe(3);
+      expect(output.scan.by_category).toEqual({ ux: 2, imports: 1 });
+      expect(output.scan.by_severity).toEqual({ error: 3 });
+      expect(output.scan.truncated).toEqual({
+        total_issues: 5,
+        total_by_category: { ux: 2, imports: 2, perf: 1 },
+        total_by_severity: { error: 3, warning: 2 },
+      });
+    });
+
+    it('composes with maxIssues: count cuts first, tokens further trim', async () => {
+      const findings = Array.from({ length: 10 }, (_, i) =>
+        createFinding({ rule_id: `test/r${i}`, file: `f${i}.ts`, line: i + 1, severity: 'warning', message: `msg${i}`, source_principle: 'p', category: 'test' }),
+      );
+      const report = makeReport(findings);
+
+      const withMaxIssues = JSON.parse(await formatClaudeContext(report, { maxIssues: 5 }));
+      const tokensPerIssue = withMaxIssues.issues.map((issue: unknown) => Math.ceil(JSON.stringify(issue).length / 4));
+      const budget = tokensPerIssue[0] + tokensPerIssue[1];
+
+      const output = JSON.parse(await formatClaudeContext(report, { maxIssues: 5, maxTokens: budget }));
+
+      expect(output.issues).toHaveLength(2);
+      expect(output.scan.truncated?.total_issues).toBe(10);
+    });
+  });
+
   it('sorts issues by severity: error first, then warning, then info', async () => {
     const findings = [
       createFinding({ rule_id: 'test/w', file: 'w.ts', line: 1, severity: 'warning', message: 'warn', source_principle: 'p', category: 'test' }),

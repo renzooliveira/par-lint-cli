@@ -62,6 +62,7 @@ interface ClaudeContextOutput {
 
 export interface ClaudeContextOptions {
   maxIssues?: number;
+  maxTokens?: number;
 }
 
 async function extractSnippet(
@@ -136,15 +137,45 @@ export async function formatClaudeContext(report: Report, options?: ClaudeContex
     return (FIX_COMPLEXITY_RANK[a.fix_complexity] ?? 9) - (FIX_COMPLEXITY_RANK[b.fix_complexity] ?? 9);
   });
   const maxIssues = options?.maxIssues;
-  const truncated = maxIssues != null && maxIssues > 0 && allFindings.length > maxIssues;
-  const sliced = truncated ? allFindings.slice(0, maxIssues) : allFindings;
+  const issuesTruncated = maxIssues != null && maxIssues > 0 && allFindings.length > maxIssues;
+  const sliced = issuesTruncated ? allFindings.slice(0, maxIssues) : allFindings;
+
+  const fileCache = new Map<string, string[]>();
+  const projectRoot = report.project.root;
+  const rawIssuesAll = await Promise.all(
+    sliced.map((f, i) => findingToIssue(f, i, projectRoot, fileCache)),
+  );
+
+  const maxTokens = options?.maxTokens;
+  let keepCount = rawIssuesAll.length;
+  if (maxTokens != null && maxTokens > 0 && rawIssuesAll.length > 0) {
+    let acc = 0;
+    keepCount = 0;
+    for (const rawIssue of rawIssuesAll) {
+      const tokens = Math.ceil(JSON.stringify(rawIssue).length / 4);
+      if (keepCount === 0) {
+        acc = tokens;
+        keepCount = 1;
+      } else if (acc + tokens <= maxTokens) {
+        acc += tokens;
+        keepCount++;
+      } else {
+        break;
+      }
+    }
+  }
+  const tokensTruncated = keepCount < rawIssuesAll.length;
+
+  const rawIssues = tokensTruncated ? rawIssuesAll.slice(0, keepCount) : rawIssuesAll;
+  const survivingFindings = tokensTruncated ? sliced.slice(0, keepCount) : sliced;
+  const truncated = issuesTruncated || tokensTruncated;
 
   const scan: ClaudeContextScan = {
     files: report.performance.files_analyzed,
-    issues: sliced.length,
+    issues: rawIssues.length,
     rules_v: report.par_lint_version,
-    by_category: countBy(sliced, 'category'),
-    by_severity: countBy(sliced, 'severity'),
+    by_category: countBy(survivingFindings, 'category'),
+    by_severity: countBy(survivingFindings, 'severity'),
   };
 
   if (truncated) {
@@ -154,12 +185,6 @@ export async function formatClaudeContext(report: Report, options?: ClaudeContex
       total_by_severity: countBy(allFindings, 'severity'),
     };
   }
-
-  const fileCache = new Map<string, string[]>();
-  const projectRoot = report.project.root;
-  const rawIssues = await Promise.all(
-    sliced.map((f, i) => findingToIssue(f, i, projectRoot, fileCache)),
-  );
 
   const groupMap = new Map<string, ClaudeContextIssue[]>();
   for (const issue of rawIssues) {
