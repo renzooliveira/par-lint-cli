@@ -127,11 +127,14 @@ function countBy(findings: Finding[], key: 'category' | 'severity'): Record<stri
 }
 
 const SEVERITY_RANK: Record<string, number> = { error: 0, warning: 1, info: 2, 'review-suggested': 3 };
+const FIX_COMPLEXITY_RANK: Record<string, number> = { S: 0, M: 1, L: 2, XL: 3 };
 
 export async function formatClaudeContext(report: Report, options?: ClaudeContextOptions): Promise<string> {
-  const allFindings = [...report.findings].sort(
-    (a, b) => (SEVERITY_RANK[a.severity] ?? 9) - (SEVERITY_RANK[b.severity] ?? 9),
-  );
+  const allFindings = [...report.findings].sort((a, b) => {
+    const severityDiff = (SEVERITY_RANK[a.severity] ?? 9) - (SEVERITY_RANK[b.severity] ?? 9);
+    if (severityDiff !== 0) return severityDiff;
+    return (FIX_COMPLEXITY_RANK[a.fix_complexity] ?? 9) - (FIX_COMPLEXITY_RANK[b.fix_complexity] ?? 9);
+  });
   const maxIssues = options?.maxIssues;
   const truncated = maxIssues != null && maxIssues > 0 && allFindings.length > maxIssues;
   const sliced = truncated ? allFindings.slice(0, maxIssues) : allFindings;

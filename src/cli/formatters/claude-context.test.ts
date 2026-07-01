@@ -229,6 +229,51 @@ describe('formatClaudeContext', () => {
     ]);
   });
 
+  it('sorts issues by fix_complexity within the same severity: S, M, L, XL', async () => {
+    const findings = [
+      createFinding({ rule_id: 'test/xl', file: 'xl.ts', line: 1, severity: 'warning', message: 'xl', source_principle: 'p', category: 'test', fix_complexity: 'XL' }),
+      createFinding({ rule_id: 'test/s', file: 's.ts', line: 2, severity: 'warning', message: 's', source_principle: 'p', category: 'test', fix_complexity: 'S' }),
+      createFinding({ rule_id: 'test/l', file: 'l.ts', line: 3, severity: 'warning', message: 'l', source_principle: 'p', category: 'test', fix_complexity: 'L' }),
+      createFinding({ rule_id: 'test/m', file: 'm.ts', line: 4, severity: 'warning', message: 'm', source_principle: 'p', category: 'test', fix_complexity: 'M' }),
+    ];
+
+    const report = makeReport(findings);
+    const output = JSON.parse(await formatClaudeContext(report));
+
+    expect(output.issues.map((i: { fix: { complexity: string } }) => i.fix.complexity)).toEqual([
+      'S', 'M', 'L', 'XL',
+    ]);
+  });
+
+  it('keeps severity as the dominant sort key over fix_complexity', async () => {
+    const findings = [
+      createFinding({ rule_id: 'test/error-xl', file: 'a.ts', line: 1, severity: 'error', message: 'error xl', source_principle: 'p', category: 'test', fix_complexity: 'XL' }),
+      createFinding({ rule_id: 'test/warning-s', file: 'b.ts', line: 2, severity: 'warning', message: 'warning s', source_principle: 'p', category: 'test', fix_complexity: 'S' }),
+    ];
+
+    const report = makeReport(findings);
+    const output = JSON.parse(await formatClaudeContext(report));
+
+    expect(output.issues.map((i: { severity: string }) => i.severity)).toEqual([
+      'error', 'warning',
+    ]);
+  });
+
+  it('survives maxIssues truncation when fix_complexity is cheaper within the same severity', async () => {
+    const findings = [
+      createFinding({ rule_id: 'test/xl', file: 'xl.ts', line: 1, severity: 'warning', message: 'xl', source_principle: 'p', category: 'test', fix_complexity: 'XL' }),
+      createFinding({ rule_id: 'test/l', file: 'l.ts', line: 2, severity: 'warning', message: 'l', source_principle: 'p', category: 'test', fix_complexity: 'L' }),
+      createFinding({ rule_id: 'test/s', file: 's.ts', line: 3, severity: 'warning', message: 's', source_principle: 'p', category: 'test', fix_complexity: 'S' }),
+    ];
+
+    const report = makeReport(findings);
+    const output = JSON.parse(await formatClaudeContext(report, { maxIssues: 1 }));
+
+    expect(output.issues).toHaveLength(1);
+    expect(output.issues[0].rule).toBe('test/s');
+    expect(output.issues[0].fix.complexity).toBe('S');
+  });
+
   describe('snippet extraction', () => {
     let tmpDir: string;
 
